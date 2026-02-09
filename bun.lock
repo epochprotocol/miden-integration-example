@@ -5,7 +5,7 @@
     "": {
       "name": "miden-integration",
       "dependencies": {
-        "@demox-labs/miden-sdk": "0.12.3",
+        "@demox-labs/miden-sdk": "^0.12.5",
         "@epoch-protocol/epoch-intents-sdk": "^1.0.0",
         "@metamask/sdk": "^0.34.0",
         "@rainbow-me/rainbowkit": "^2.2.10",
@@ -81,7 +81,7 @@
 
     "@babel/types": ["@babel/types@7.29.0", "", { "dependencies": { "@babel/helper-string-parser": "^7.27.1", "@babel/helper-validator-identifier": "^7.28.5" } }, "sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A=="],
 
-    "@demox-labs/miden-sdk": ["@demox-labs/miden-sdk@0.12.3", "", { "dependencies": { "@rollup/plugin-typescript": "^12.3.0", "dexie": "^4.0.1", "glob": "^11.0.0" } }, "sha512-iHomtLaZrY1cb8FVevij9x2foXo33qxRnUNNszKDmdlvgEgt1XmZlZUP8+bb4OFPMJF5lRsJaLcfd5pODvF6JQ=="],
+    "@demox-labs/miden-sdk": ["@demox-labs/miden-sdk@0.12.5", "", { "dependencies": { "@rollup/plugin-typescript": "^12.3.0", "dexie": "^4.0.1", "glob": "^11.0.0" } }, "sha512-Oq+MKObtOEY3aro+q1coVSc2RKrIycWbz9hBvnxqIlUkHzn6iL8X4+TG8t14co03cyuVt1dz1F13w0ScQSBMuA=="],
 
     "@ecies/ciphers": ["@ecies/ciphers@0.2.5", "", { "peerDependencies": { "@noble/ciphers": "^1.0.0" } }, "sha512-GalEZH4JgOMHYYcYmVqnFirFsjZHeoGMDt9IxEnM9F7GRUUyUksJ7Ou53L83WHJq3RWKD3AcBpo0iQh0oMpf8A=="],
 

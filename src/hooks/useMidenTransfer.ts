@@ -1,15 +1,31 @@
 import { useState, useCallback } from 'react';
+import type { WebClient, TransactionProver, AccountId } from '../types/miden-sdk';
 
 interface ConsumableNote {
   noteId: string;
 }
 
+interface UseMidenTransferReturn {
+  sendTokens: (senderId: string, receiverId: string, faucetId: string, amount: bigint) => Promise<boolean | undefined>;
+  consumeNotes: (accountId: string) => Promise<boolean | undefined>;
+  refreshConsumableNotes: (accountId: string) => Promise<ConsumableNote[]>;
+  consumableNotes: ConsumableNote[];
+  isLoading: boolean;
+  error: string | null;
+}
+
+/**
+ * React hook for P2ID token transfers and consuming notes.
+ *
+ * IMPORTANT: Calls getAccountId()/getFaucetId() fresh for each SDK method call
+ * to avoid WASM AccountId garbage collection issues.
+ */
 export function useMidenTransfer(
-  client: any,
-  _prover: any,
-  getAccountId: (idStr: string) => any,
-  getFaucetId: (idStr: string) => any,
-) {
+  client: WebClient | null,
+  _prover: TransactionProver | null,
+  getAccountId: (idStr: string) => AccountId | string,
+  getFaucetId: (idStr: string) => AccountId | string,
+): UseMidenTransferReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [consumableNotes, setConsumableNotes] = useState<ConsumableNote[]>([]);
@@ -21,8 +37,10 @@ export function useMidenTransfer(
     amount: bigint,
   ) => {
     if (!client) return;
+
     setIsLoading(true);
     setError(null);
+
     try {
       const { NoteType } = await import('@demox-labs/miden-sdk');
 
@@ -39,12 +57,13 @@ export function useMidenTransfer(
         amount,
       );
       await client.submitNewTransaction(getAccountId(senderId), sendTxRequest);
+
       console.log('[Miden] Send transaction submitted');
       return true;
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to send tokens';
+      const message = err instanceof Error ? err.message : 'Failed to send tokens';
       console.error('[Miden] Send error:', err);
-      setError(msg);
+      setError(message);
       throw err;
     } finally {
       setIsLoading(false);
@@ -52,15 +71,18 @@ export function useMidenTransfer(
   }, [client, getAccountId, getFaucetId]);
 
   const refreshConsumableNotes = useCallback(async (accountId: string) => {
-    if (!client) return;
+    if (!client) return [];
+
     setIsLoading(true);
     setError(null);
+
     try {
       await client.syncState();
       const notes = await client.getConsumableNotes(getAccountId(accountId));
-      const mapped: ConsumableNote[] = notes.map((note: any) => ({
+      const mapped: ConsumableNote[] = notes.map((note) => ({
         noteId: note.inputNoteRecord().id().toString(),
       }));
+
       setConsumableNotes(mapped);
       console.log(`[Miden] Found ${mapped.length} consumable note(s)`);
       return mapped;
@@ -75,19 +97,22 @@ export function useMidenTransfer(
 
   const consumeNotes = useCallback(async (accountId: string) => {
     if (!client) return;
+
     setIsLoading(true);
     setError(null);
+
     try {
       // IMPORTANT: Call getAccountId() fresh for each SDK call — WASM AccountId
       // objects can be freed/GC'd between async operations.
       await client.syncState();
       const notes = await client.getConsumableNotes(getAccountId(accountId));
+
       if (!notes || notes.length === 0) {
         setError('No consumable notes found. Wait ~10s after minting then try again.');
         return false;
       }
 
-      const noteIds = notes.map((note: any) =>
+      const noteIds = notes.map((note) =>
         note.inputNoteRecord().id().toString()
       );
       console.log('[Miden] Consuming notes:', noteIds);
@@ -100,9 +125,9 @@ export function useMidenTransfer(
       setConsumableNotes([]);
       return true;
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to consume notes';
+      const message = err instanceof Error ? err.message : 'Failed to consume notes';
       console.error('[Miden] Consume error:', err);
-      setError(msg);
+      setError(message);
       throw err;
     } finally {
       setIsLoading(false);

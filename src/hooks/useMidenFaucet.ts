@@ -1,20 +1,39 @@
 import { useState, useCallback } from 'react';
 import type { MidenFaucetInfo } from '../types/miden';
+import type { WebClient, TransactionProver, Account, AccountId } from '../types/miden-sdk';
 
+interface UseMidenFaucetReturn {
+  faucets: MidenFaucetInfo[];
+  createFaucet: (symbol: string, decimals: number, maxSupply: bigint) => Promise<string | undefined>;
+  mintTokens: (recipientId: string, faucetId: string, amount: bigint) => Promise<boolean | undefined>;
+  getFaucetId: (idStr: string) => AccountId | string;
+  isLoading: boolean;
+  error: string | null;
+}
+
+/**
+ * React hook for managing Miden faucets and minting tokens.
+ *
+ * IMPORTANT: Uses the same accountObjectsRef as useMidenWallet to store
+ * faucet Account objects. Calls .id() fresh for each SDK method call to avoid
+ * WASM garbage collection issues.
+ */
 export function useMidenFaucet(
-  client: any,
-  _prover: any,
-  getAccountId: (idStr: string) => any,
-  accountObjectsRef: React.MutableRefObject<Map<string, any>>,
-) {
+  client: WebClient | null,
+  _prover: TransactionProver | null,
+  getAccountId: (idStr: string) => AccountId | string,
+  accountObjectsRef: React.MutableRefObject<Map<string, Account>>,
+): UseMidenFaucetReturn {
   const [faucets, setFaucets] = useState<MidenFaucetInfo[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const createFaucet = useCallback(async (symbol: string, decimals: number, maxSupply: bigint) => {
     if (!client) return;
+
     setIsLoading(true);
     setError(null);
+
     try {
       const { AccountStorageMode } = await import('@demox-labs/miden-sdk');
       const account = await client.newFaucet(
@@ -26,9 +45,12 @@ export function useMidenFaucet(
         0
       );
       const id = account.id().toString();
+
       console.log('[Miden] Faucet created:', id);
+
       // Store in shared ref so balance panel can read it
       accountObjectsRef.current.set(id, account);
+
       const faucet: MidenFaucetInfo = {
         id,
         label: `${symbol} Faucet`,
@@ -37,20 +59,25 @@ export function useMidenFaucet(
         decimals,
         maxSupply: maxSupply.toString(),
       };
+
       setFaucets(prev => [...prev, faucet]);
       return id;
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to create faucet';
-      setError(msg);
+      const message = err instanceof Error ? err.message : 'Failed to create faucet';
+      setError(message);
       throw err;
     } finally {
       setIsLoading(false);
     }
   }, [client, accountObjectsRef]);
 
-  const getFaucetId = useCallback((idStr: string) => {
-    const acct = accountObjectsRef.current.get(idStr);
-    return acct ? acct.id() : idStr;
+  /**
+   * Get fresh AccountId WASM object for SDK calls.
+   * CRITICAL: NEVER store and reuse AccountId objects across await boundaries.
+   */
+  const getFaucetId = useCallback((idStr: string): AccountId | string => {
+    const account = accountObjectsRef.current.get(idStr);
+    return account ? account.id() : idStr;
   }, [accountObjectsRef]);
 
   const mintTokens = useCallback(async (
@@ -59,8 +86,10 @@ export function useMidenFaucet(
     amount: bigint,
   ) => {
     if (!client) return;
+
     setIsLoading(true);
     setError(null);
+
     try {
       const { NoteType } = await import('@demox-labs/miden-sdk');
 
@@ -76,12 +105,13 @@ export function useMidenFaucet(
         amount,
       );
       await client.submitNewTransaction(getFaucetId(faucetIdStr), mintTxRequest);
+
       console.log('[Miden] Mint transaction submitted');
       return true;
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to mint tokens';
+      const message = err instanceof Error ? err.message : 'Failed to mint tokens';
       console.error('[Miden] Mint error:', err);
-      setError(msg);
+      setError(message);
       throw err;
     } finally {
       setIsLoading(false);

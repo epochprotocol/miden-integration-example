@@ -19,8 +19,8 @@ import { useEpochIntent } from './hooks/useEpochIntent';
 function App() {
   const [activeTab, setActiveTab] = useState('miden');
 
-  const { client, prover, isInitializing, error: clientError, syncHeight, retry } = useMidenClient();
-  const wallet = useMidenWallet(client, prover);
+  const { client, prover, isInitializing, error: clientError, blockNum, retry } = useMidenClient();
+  const wallet = useMidenWallet(client);
   const faucet = useMidenFaucet(client, prover, wallet.getAccountId, wallet.accountObjectsRef);
   const transfer = useMidenTransfer(client, prover, wallet.getAccountId, faucet.getFaucetId);
   const epoch = useEpochIntent();
@@ -37,7 +37,7 @@ function App() {
       <main className="max-w-5xl mx-auto px-6 py-6 space-y-6">
         <div className="flex items-center justify-between">
           <TabNav activeTab={activeTab} onTabChange={setActiveTab} />
-          <MidenStatus isInitializing={isInitializing} error={clientError} syncHeight={syncHeight} onRetry={retry} />
+          <MidenStatus isInitializing={isInitializing} error={clientError} blockNum={blockNum} onRetry={retry} />
         </div>
 
         {activeTab === 'miden' && (

@@ -1,13 +1,23 @@
 import { MIDEN_CONFIG } from '../config/miden';
+import type { WebClient, TransactionProver } from '../types/miden-sdk';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let clientInstance: any = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-let proverInstance: any = null;
-let initPromise: Promise<{ client: any; prover: any }> | null = null;
+interface MidenClientState {
+  client: WebClient;
+  prover: TransactionProver;
+}
 
-export async function initMiden() {
-  if (initPromise) return initPromise;
+let clientInstance: WebClient | null = null;
+let proverInstance: TransactionProver | null = null;
+let initPromise: Promise<MidenClientState> | null = null;
+
+/**
+ * Initialize the Miden WASM client (singleton pattern).
+ * Safe to call multiple times - subsequent calls return the same promise.
+ */
+export async function initMiden(): Promise<MidenClientState> {
+  if (initPromise) {
+    return initPromise;
+  }
 
   initPromise = (async () => {
     if (typeof window === 'undefined') {
@@ -35,21 +45,33 @@ export async function initMiden() {
   return initPromise;
 }
 
-export function getMidenClient() {
+export function getMidenClient(): WebClient | null {
   return clientInstance;
 }
 
-export function getMidenProver() {
+export function getMidenProver(): TransactionProver | null {
   return proverInstance;
 }
 
-export function terminateMidenClient() {
+/**
+ * Terminate the Miden client and prover.
+ * Use with caution - only call this when you need to fully reset the SDK state.
+ */
+export function terminateMidenClient(): void {
   if (clientInstance) {
-    try { clientInstance.terminate(); } catch { /* */ }
+    try {
+      clientInstance.terminate();
+    } catch {
+      // Ignore termination errors
+    }
     clientInstance = null;
   }
   if (proverInstance) {
-    try { proverInstance.free(); } catch { /* */ }
+    try {
+      proverInstance.free();
+    } catch {
+      // Ignore cleanup errors
+    }
     proverInstance = null;
   }
   initPromise = null;

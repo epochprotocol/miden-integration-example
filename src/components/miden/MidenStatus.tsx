@@ -1,11 +1,11 @@
 interface Props {
   isInitializing: boolean;
   error: string | null;
-  syncHeight: number | null;
+  blockNum: number | null;
   onRetry?: () => void;
 }
 
-export function MidenStatus({ isInitializing, error, syncHeight, onRetry }: Props) {
+export function MidenStatus({ isInitializing, error, blockNum, onRetry }: Props) {
   if (isInitializing) {
     return (
       <div className="flex items-center gap-2 text-yellow-400 bg-yellow-400/10 px-4 py-2 rounded-lg text-sm">
@@ -35,8 +35,8 @@ export function MidenStatus({ isInitializing, error, syncHeight, onRetry }: Prop
     <div className="flex items-center gap-2 text-green-400 bg-green-400/10 px-4 py-2 rounded-lg text-sm">
       <div className="w-2 h-2 bg-green-400 rounded-full" />
       Connected to Miden Testnet
-      {syncHeight !== null && (
-        <span className="text-gray-400 ml-2">Block #{syncHeight}</span>
+      {blockNum !== null && (
+        <span className="text-gray-400 ml-2">Block #{blockNum}</span>
       )}
     </div>
   );

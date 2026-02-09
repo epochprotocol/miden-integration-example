@@ -25,7 +25,7 @@ export function FaucetPanel({ faucets, wallets, onCreateFaucet, onMintTokens, on
   const [flowStep, setFlowStep] = useState<number>(0); // 0 = idle
   const [countdown, setCountdown] = useState(0);
   const [isFlowRunning, setIsFlowRunning] = useState(false);
-  const countdownRef = useRef<ReturnType<typeof setInterval>>();
+  const countdownRef = useRef<ReturnType<typeof setInterval>>(null);
 
   const handleCreate = async () => {
     await onCreateFaucet(symbol, parseInt(decimals), BigInt(maxSupply));
@@ -60,7 +60,7 @@ export function FaucetPanel({ faucets, wallets, onCreateFaucet, onMintTokens, on
         countdownRef.current = setInterval(() => {
           remaining -= 1;
           setCountdown(remaining);
-          if (remaining <= 0) {
+          if (countdownRef.current && remaining <= 0) {
             clearInterval(countdownRef.current);
             resolve();
           }
