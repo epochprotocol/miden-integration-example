@@ -6,6 +6,7 @@ import { WalletPanel } from './components/miden/WalletPanel';
 import { FaucetPanel } from './components/miden/FaucetPanel';
 import { BalancePanel } from './components/miden/BalancePanel';
 import { TransferPanel } from './components/miden/TransferPanel';
+import { PersistenceControls } from './components/miden/PersistenceControls';
 import { EVMWalletConnect } from './components/crosschain/EVMWalletConnect';
 import { IntentForm } from './components/crosschain/IntentForm';
 import { FlowDiagram } from './components/crosschain/FlowDiagram';
@@ -42,6 +43,7 @@ function App() {
 
         {activeTab === 'miden' && (
           <div className="space-y-6">
+            <PersistenceControls />
             <WalletPanel
               accounts={wallet.accounts}
               onCreateWallet={wallet.createWallet}

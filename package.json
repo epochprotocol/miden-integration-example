@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@demox-labs/miden-sdk": "^0.12.5",
+    "@miden-sdk/miden-sdk": "0.13.0",
     "@epoch-protocol/epoch-intents-sdk": "^1.0.0",
     "@metamask/sdk": "^0.34.0",
     "@rainbow-me/rainbowkit": "^2.2.10",

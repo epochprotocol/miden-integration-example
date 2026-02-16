@@ -10,7 +10,7 @@ export default defineConfig({
     format: 'es',
   },
   optimizeDeps: {
-    exclude: ['@demox-labs/miden-sdk'],
+    exclude: ['@miden-sdk/miden-sdk'],
   },
   build: {
     target: 'esnext',
@@ -18,7 +18,7 @@ export default defineConfig({
   server: {
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
-      'Cross-Origin-Embedder-Policy': 'require-corp',
+      'Cross-Origin-Embedder-Policy': 'credentialless',
     },
   },
 })

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { initMiden, terminateMidenClient } from '../services/miden-client';
-import type { WebClient, TransactionProver } from '../types/miden-sdk';
+import type { TransactionProver, WebClient } from '@miden-sdk/miden-sdk';
+// import type { WebClient, TransactionProver } from '../types/miden-sdk';
 
 interface UseMidenClientReturn {
   client: WebClient | null;

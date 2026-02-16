@@ -1,6 +1,8 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { MidenFaucetInfo } from '../types/miden';
-import type { WebClient, TransactionProver, Account, AccountId } from '../types/miden-sdk';
+// import type { WebClient, TransactionProver, Account, AccountId } from '../types/miden-sdk';
+import { loadFaucets, saveFaucets } from '../utils/persistence';
+import type { AccountId } from '@miden-sdk/miden-sdk';
 
 interface UseMidenFaucetReturn {
   faucets: MidenFaucetInfo[];
@@ -24,9 +26,43 @@ export function useMidenFaucet(
   getAccountId: (idStr: string) => AccountId | string,
   accountObjectsRef: React.MutableRefObject<Map<string, Account>>,
 ): UseMidenFaucetReturn {
-  const [faucets, setFaucets] = useState<MidenFaucetInfo[]>([]);
+  const [faucets, setFaucets] = useState<MidenFaucetInfo[]>(() => loadFaucets());
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Restore faucet Account WASM objects from client when available
+  useEffect(() => {
+    if (!client || faucets.length === 0) return;
+
+    const restoreFaucets = async () => {
+      console.log('[Miden] Restoring', faucets.length, 'faucets from storage');
+      const { AccountId } = await import('@miden-sdk/miden-sdk');
+
+      for (const faucet of faucets) {
+        try {
+          // Skip if already loaded
+          if (accountObjectsRef.current.has(faucet.id)) continue;
+
+          const accountId = AccountId.fromHex(faucet.id);
+          const accountObj = await client.getAccount(accountId);
+
+          if (accountObj) {
+            accountObjectsRef.current.set(faucet.id, accountObj);
+            console.log('[Miden] Restored faucet:', faucet.id);
+          }
+        } catch (err) {
+          console.error('[Miden] Failed to restore faucet', faucet.id, ':', err);
+        }
+      }
+    };
+
+    restoreFaucets();
+  }, [client, faucets, accountObjectsRef]);
+
+  // Save faucets to localStorage whenever they change
+  useEffect(() => {
+    saveFaucets(faucets);
+  }, [faucets]);
 
   const createFaucet = useCallback(async (symbol: string, decimals: number, maxSupply: bigint) => {
     if (!client) return;
@@ -35,7 +71,7 @@ export function useMidenFaucet(
     setError(null);
 
     try {
-      const { AccountStorageMode } = await import('@demox-labs/miden-sdk');
+      const { AccountStorageMode } = await import('@miden-sdk/miden-sdk');
       const account = await client.newFaucet(
         AccountStorageMode.public(),
         false,
@@ -91,20 +127,24 @@ export function useMidenFaucet(
     setError(null);
 
     try {
-      const { NoteType } = await import('@demox-labs/miden-sdk');
+      const { NoteType, AccountId } = await import('@miden-sdk/miden-sdk');
 
       await client.syncState();
 
       // IMPORTANT: Call getAccountId()/getFaucetId() fresh for each SDK call —
       // WASM AccountId objects can be freed/GC'd between async operations.
+      // If the account isn't in our ref (returns string), parse via AccountId.fromHex().
+      const resolveId = (raw: AccountId | string): AccountId =>
+        typeof raw === 'string' ? AccountId.fromHex(raw) : raw;
+
       console.log('[Miden] Minting tokens...');
       const mintTxRequest = client.newMintTransactionRequest(
-        getAccountId(recipientIdStr),
-        getFaucetId(faucetIdStr),
+        resolveId(getAccountId(recipientIdStr)),
+        resolveId(getFaucetId(faucetIdStr)),
         NoteType.Public,
         amount,
       );
-      await client.submitNewTransaction(getFaucetId(faucetIdStr), mintTxRequest);
+      await client.submitNewTransaction(resolveId(getFaucetId(faucetIdStr)), mintTxRequest);
 
       console.log('[Miden] Mint transaction submitted');
       return true;

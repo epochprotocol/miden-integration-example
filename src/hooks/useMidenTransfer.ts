@@ -1,5 +1,5 @@
+import type { AccountId, TransactionProver, WebClient } from '@miden-sdk/miden-sdk';
 import { useState, useCallback } from 'react';
-import type { WebClient, TransactionProver, AccountId } from '../types/miden-sdk';
 
 interface ConsumableNote {
   noteId: string;
@@ -42,21 +42,25 @@ export function useMidenTransfer(
     setError(null);
 
     try {
-      const { NoteType } = await import('@demox-labs/miden-sdk');
+      const { NoteType, AccountId } = await import('@miden-sdk/miden-sdk');
 
       await client.syncState();
 
       // IMPORTANT: Call getAccountId()/getFaucetId() fresh for each SDK call —
       // WASM AccountId objects can be freed/GC'd between async operations.
+      // If the account isn't in our ref (returns string), parse via AccountId.fromHex().
+      const resolveId = (raw: AccountId | string): AccountId =>
+        typeof raw === 'string' ? AccountId.fromHex(raw) : raw;
+
       console.log('[Miden] Sending tokens via P2ID...');
       const sendTxRequest = client.newSendTransactionRequest(
-        getAccountId(senderId),
-        getAccountId(receiverId),
-        getFaucetId(faucetId),
+        resolveId(getAccountId(senderId)),
+        resolveId(getAccountId(receiverId)),
+        resolveId(getFaucetId(faucetId)),
         NoteType.Public,
         amount,
       );
-      await client.submitNewTransaction(getAccountId(senderId), sendTxRequest);
+      await client.submitNewTransaction(resolveId(getAccountId(senderId)), sendTxRequest);
 
       console.log('[Miden] Send transaction submitted');
       return true;
@@ -77,8 +81,12 @@ export function useMidenTransfer(
     setError(null);
 
     try {
+      const { AccountId } = await import('@miden-sdk/miden-sdk');
+      const resolveId = (raw: AccountId | string): AccountId =>
+        typeof raw === 'string' ? AccountId.fromHex(raw) : raw;
+
       await client.syncState();
-      const notes = await client.getConsumableNotes(getAccountId(accountId));
+      const notes = await client.getConsumableNotes(resolveId(getAccountId(accountId)));
       const mapped: ConsumableNote[] = notes.map((note) => ({
         noteId: note.inputNoteRecord().id().toString(),
       }));
@@ -102,23 +110,27 @@ export function useMidenTransfer(
     setError(null);
 
     try {
+      const { AccountId } = await import('@miden-sdk/miden-sdk');
       // IMPORTANT: Call getAccountId() fresh for each SDK call — WASM AccountId
       // objects can be freed/GC'd between async operations.
+      const resolveId = (raw: AccountId | string): AccountId =>
+        typeof raw === 'string' ? AccountId.fromHex(raw) : raw;
+
       await client.syncState();
-      const notes = await client.getConsumableNotes(getAccountId(accountId));
+      const notes = await client.getConsumableNotes(resolveId(getAccountId(accountId)));
 
       if (!notes || notes.length === 0) {
         setError('No consumable notes found. Wait ~10s after minting then try again.');
         return false;
       }
 
-      const noteIds = notes.map((note) =>
-        note.inputNoteRecord().id().toString()
+      const noteObjects = notes.map((note) =>
+        note.inputNoteRecord().toNote()
       );
-      console.log('[Miden] Consuming notes:', noteIds);
+      console.log('[Miden] Consuming notes:', noteObjects.map(n => n.id().toString()));
 
-      const consumeTxRequest = client.newConsumeTransactionRequest(noteIds);
-      await client.submitNewTransaction(getAccountId(accountId), consumeTxRequest);
+      const consumeTxRequest = client.newConsumeTransactionRequest(noteObjects);
+      await client.submitNewTransaction(resolveId(getAccountId(accountId)), consumeTxRequest);
 
       await client.syncState();
       console.log('[Miden] Notes consumed');

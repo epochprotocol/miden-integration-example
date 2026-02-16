@@ -1,5 +1,6 @@
+import type { TransactionProver, WebClient } from '@miden-sdk/miden-sdk';
 import { MIDEN_CONFIG } from '../config/miden';
-import type { WebClient, TransactionProver } from '../types/miden-sdk';
+// import type { WebClient, TransactionProver } from '../types/miden-sdk';
 
 interface MidenClientState {
   client: WebClient;
@@ -25,7 +26,7 @@ export async function initMiden(): Promise<MidenClientState> {
     }
 
     console.log('[Miden] Importing SDK...');
-    const { WebClient, TransactionProver } = await import('@demox-labs/miden-sdk');
+    const { WebClient, TransactionProver } = await import('@miden-sdk/miden-sdk');
 
     console.log('[Miden] Creating client...');
     clientInstance = await WebClient.createClient(MIDEN_CONFIG.rpcUrl);

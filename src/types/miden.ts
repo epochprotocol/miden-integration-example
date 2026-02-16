@@ -29,4 +29,15 @@ export interface CrossChainIntentParams {
 export interface IntentResult {
   taskTypeString: string;
   intentData: Record<string, unknown>;
+  solveResult?: {
+    resourceLockRequired?: boolean;
+    transactions?: Array<{
+      to: string;
+      data: string;
+      value?: string;
+    }>;
+    compact?: any;
+    hash?: string;
+  };
+  error?: string;
 }

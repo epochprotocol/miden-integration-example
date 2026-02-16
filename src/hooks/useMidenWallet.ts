@@ -1,6 +1,8 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import type { MidenAccount, VaultAsset } from '../types/miden';
-import type { WebClient, Account, AccountId } from '../types/miden-sdk';
+// import type { WebClient, Account, AccountId } from '../types/miden-sdk';
+import { loadWallets, saveWallets } from '../utils/persistence';
+import type { Account, AccountId, WebClient } from '@miden-sdk/miden-sdk';
 
 interface UseMidenWalletReturn {
   accounts: MidenAccount[];
@@ -21,13 +23,47 @@ interface UseMidenWalletReturn {
  * call .id() fresh inline for each SDK method call.
  */
 export function useMidenWallet(client: WebClient | null): UseMidenWalletReturn {
-  const [accounts, setAccounts] = useState<MidenAccount[]>([]);
+  const [accounts, setAccounts] = useState<MidenAccount[]>(() => loadWallets());
   const [balances, setBalances] = useState<Record<string, VaultAsset[]>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Store actual Account WASM objects so we can call .id() fresh for each SDK call
   const accountObjectsRef = useRef<Map<string, Account>>(new Map());
+
+  // Restore Account WASM objects from client when available
+  useEffect(() => {
+    if (!client || accounts.length === 0) return;
+
+    const restoreAccounts = async () => {
+      console.log('[Miden] Restoring', accounts.length, 'accounts from storage');
+      const { AccountId } = await import('@miden-sdk/miden-sdk');
+
+      for (const account of accounts) {
+        try {
+          // Skip if already loaded
+          if (accountObjectsRef.current.has(account.id)) continue;
+
+          const accountId = AccountId.fromHex(account.id);
+          const accountObj = await client.getAccount(accountId);
+
+          if (accountObj) {
+            accountObjectsRef.current.set(account.id, accountObj);
+            console.log('[Miden] Restored account:', account.id);
+          }
+        } catch (err) {
+          console.error('[Miden] Failed to restore account', account.id, ':', err);
+        }
+      }
+    };
+
+    restoreAccounts();
+  }, [client, accounts]);
+
+  // Save accounts to localStorage whenever they change
+  useEffect(() => {
+    saveWallets(accounts);
+  }, [accounts]);
 
   const createWallet = useCallback(async () => {
     if (!client) return;
@@ -36,7 +72,7 @@ export function useMidenWallet(client: WebClient | null): UseMidenWalletReturn {
     setError(null);
 
     try {
-      const { AccountStorageMode } = await import('@demox-labs/miden-sdk');
+      const { AccountStorageMode } = await import('@miden-sdk/miden-sdk');
       const account = await client.newWallet(AccountStorageMode.public(), true, 0);
       const id = account.id().toString();
 
