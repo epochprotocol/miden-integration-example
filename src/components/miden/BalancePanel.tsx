@@ -45,6 +45,7 @@ export function BalancePanel({ accounts, balances, onSync, isLoading }: Props) {
             </div>
           );
         })}
+        
       </div>
     </div>
   );

@@ -11,11 +11,13 @@ import { EVMWalletConnect } from './components/crosschain/EVMWalletConnect';
 import { IntentForm } from './components/crosschain/IntentForm';
 import { FlowDiagram } from './components/crosschain/FlowDiagram';
 import { IntentStatus } from './components/crosschain/IntentStatus';
+import { AllocatorDebugPanel } from './components/debug/AllocatorDebugPanel';
 import { useMidenClient } from './hooks/useMidenClient';
 import { useMidenWallet } from './hooks/useMidenWallet';
 import { useMidenFaucet } from './hooks/useMidenFaucet';
 import { useMidenTransfer } from './hooks/useMidenTransfer';
 import { useEpochIntent } from './hooks/useEpochIntent';
+import { useIntentStatus } from './hooks/useIntentStatus';
 
 function App() {
   const [activeTab, setActiveTab] = useState('miden');
@@ -25,6 +27,11 @@ function App() {
   const faucet = useMidenFaucet(client, prover, wallet.getAccountId, wallet.accountObjectsRef);
   const transfer = useMidenTransfer(client, prover, wallet.getAccountId, faucet.getFaucetId);
   const epoch = useEpochIntent();
+
+  // Extract tracking info from the latest intent result
+  const intentNonce = epoch.intentResult?.intentNonce;
+  const evmAddress = epoch.intentResult?.intentData?.recipient as string | undefined;
+  const intentStatus = useIntentStatus(evmAddress, intentNonce);
 
   const allAccounts = [
     ...wallet.accounts,
@@ -92,9 +99,15 @@ function App() {
               onCreateIntent={epoch.createIntent}
               onSendP2ID={transfer.sendTokens}
               isLoading={epoch.isLoading || transfer.isLoading}
-              isSDKReady={epoch.isSDKReady}
+              isSDKReady={true}
             />
-            <IntentStatus result={epoch.intentResult} error={epoch.error} />
+            <IntentStatus
+              result={epoch.intentResult}
+              error={epoch.error}
+              flowStatus={intentStatus.status}
+              isPolling={intentStatus.isPolling}
+            />
+            <AllocatorDebugPanel />
           </div>
         )}
       </main>

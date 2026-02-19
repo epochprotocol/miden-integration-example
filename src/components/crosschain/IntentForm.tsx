@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { useAccount } from 'wagmi';
 import type { MidenAccount, MidenFaucetInfo, CrossChainIntentParams } from '../../types/miden';
-import { ALLOCATOR_MIDEN_ACCOUNT_ID } from '../../services/epoch-bridge';
+
+
+ const ALLOCATOR_MIDEN_ACCOUNT_ID = '0x917c80a6789b83101adcc7e9f5671a';
 
 // Supported Sepolia testnet tokens (from epoch-commons-sdk testnetGraph)
 const SEPOLIA_TOKENS = [
@@ -21,13 +22,12 @@ interface Props {
   accounts: MidenAccount[];
   faucets: MidenFaucetInfo[];
   onCreateIntent: (params: CrossChainIntentParams) => Promise<any>;
-  onSendP2ID: (senderId: string, receiverId: string, faucetId: string, amount: bigint) => Promise<boolean | undefined>;
+  onSendP2ID: (senderId: string, receiverId: string, faucetId: string, amount: bigint) => Promise<{ success: boolean; noteId?: string } | undefined>;
   isLoading: boolean;
   isSDKReady: boolean;
 }
 
 export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, isLoading, isSDKReady }: Props) {
-  const { address: evmAddress } = useAccount();
 
   const [midenAccountId, setMidenAccountId] = useState('');
   const [faucetId, setFaucetId] = useState('');
@@ -37,6 +37,7 @@ export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, isLo
   const [minTokenOut, setMinTokenOut] = useState('10');
   const [chainId, setChainId] = useState('11155111'); // Sepolia
   const [status, setStatus] = useState('');
+  const [evmAddress, setEvmAddress] = useState("0x4235215114484bACDfF0071dB54Dc9faaD3489a9");
 
   const handleSubmit = async () => {
     if (!midenAccountId || !faucetId || !amount || !evmAddress) return;
@@ -53,26 +54,24 @@ export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, isLo
       allocatorAccountId: ALLOCATOR_MIDEN_ACCOUNT_ID,
     });
 
+    let midenNoteId: string | undefined;
+
     try {
       // Step 1: Send P2ID note to allocator on Miden side
-      setStatus('Step 1/2: Sending P2ID note to allocator on Miden...');
+        setStatus('Step 1/2: Sending P2ID note to allocator on Miden...');
 
-      // Check if allocator account ID is set
-      if (ALLOCATOR_MIDEN_ACCOUNT_ID === '0x0000000000000000000000000000000000000000') {
-        console.log('[IntentForm] Allocator not configured, skipping P2ID note');
-        setStatus('⚠️  Allocator account not configured. Skipping P2ID note, building intent data only...');
-      } else {
-        console.log('[IntentForm] Sending P2ID note to allocator:', ALLOCATOR_MIDEN_ACCOUNT_ID);
+        console.log('[IntentForm] Sending P2ID note to allocator:');
         try {
-          await onSendP2ID(midenAccountId, ALLOCATOR_MIDEN_ACCOUNT_ID, faucetId, BigInt(amount));
-          console.log('[IntentForm] P2ID note sent successfully');
+          const result = await onSendP2ID(midenAccountId, ALLOCATOR_MIDEN_ACCOUNT_ID, faucetId, BigInt(amount));
+          midenNoteId = result?.noteId;
+          console.log('[IntentForm] P2ID note sent successfully, noteId:', midenNoteId);
           setStatus('✓ P2ID note sent to allocator. Building intent data...');
         } catch (err) {
           // P2ID may fail if allocator account doesn't exist or is invalid
           console.error('[IntentForm] P2ID send failed:', err);
           setStatus('⚠️  P2ID note failed (allocator may not exist). Building intent data...');
         }
-      }
+
 
       // Step 2: Build cross-chain intent via Epoch SDK
       console.log('[IntentForm] Building cross-chain intent via Epoch SDK...');
@@ -96,6 +95,7 @@ export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, isLo
         midenAccountId,
         midenFaucetId: faucetId,
         midenAmount: amount,
+        midenNoteId,
         evmRecipient: evmAddress,
         destinationChainId: parseInt(chainId),
         outputTokenAddress: finalOutputToken,
@@ -170,8 +170,8 @@ export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, isLo
         <div>
           <label className="block text-xs text-gray-400 mb-1">Destination (EVM Wallet)</label>
           <input
-            value={evmAddress ?? ''}
-            readOnly
+            value={"0x4235215114484bACDfF0071dB54Dc9faaD3489a9"}
+            onChange={(e) => setEvmAddress(e.target.value)}
             className="w-full bg-gray-700/50 text-gray-400 rounded-lg px-3 py-2 text-sm font-mono"
             placeholder="Connect EVM wallet above"
           />

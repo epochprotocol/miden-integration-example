@@ -6,7 +6,7 @@ interface ConsumableNote {
 }
 
 interface UseMidenTransferReturn {
-  sendTokens: (senderId: string, receiverId: string, faucetId: string, amount: bigint) => Promise<boolean | undefined>;
+  sendTokens: (senderId: string, receiverId: string, faucetId: string, amount: bigint) => Promise<{ success: boolean; noteId?: string } | undefined>;
   consumeNotes: (accountId: string) => Promise<boolean | undefined>;
   refreshConsumableNotes: (accountId: string) => Promise<ConsumableNote[]>;
   consumableNotes: ConsumableNote[];
@@ -60,10 +60,16 @@ export function useMidenTransfer(
         NoteType.Public,
         amount,
       );
+
+      // Extract note ID from expected output notes before submission
+      const expectedNotes = sendTxRequest.expectedOutputOwnNotes();
+      const noteId = expectedNotes.length > 0 ? expectedNotes[0].id().toString() : undefined;
+      console.log('[Miden] Expected output note ID:', noteId);
+
       await client.submitNewTransaction(resolveId(getAccountId(senderId)), sendTxRequest);
 
       console.log('[Miden] Send transaction submitted');
-      return true;
+      return { success: true, noteId };
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to send tokens';
       console.error('[Miden] Send error:', err);

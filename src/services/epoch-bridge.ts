@@ -13,10 +13,8 @@ import type { CrossChainIntentParams, IntentResult } from '../types/miden';
  * intent is fulfilled — privacy-preserving on the Miden side, trustless on EVM side.
  */
 
-// The allocator's Miden account ID — in production this would be a known trusted service
-// Note: This is a placeholder. For demo purposes, you can use one of your wallet IDs,
-// or in production this would be the allocator service's actual Miden account.
-export const ALLOCATOR_MIDEN_ACCOUNT_ID = '0x875c92a52466351061e4a89278aec9'; // placeholder - replace with real account ID
+// The allocator's Miden account ID — must match the account derived from MIDEN_ALLOCATOR_SEED in SIO's .env
+export const ALLOCATOR_MIDEN_ACCOUNT_ID = '0x917c80a6789b83101adcc7e9f5671a';
 
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 const ZERO_HASH = '0x0000000000000000000000000000000000000000000000000000000000000000';
@@ -49,11 +47,12 @@ export function buildEpochTaskDataParams(params: CrossChainIntentParams) {
       protocolHashIdentifier: ZERO_HASH,
       recipient: params.evmRecipient,
     },
-    extraDataTypestring: 'string midenSourceAccount,string midenFaucetId,string midenNoteType',
+    extraDataTypestring: 'string midenSourceAccount,string midenFaucetId,string midenNoteType,string midenNoteId',
     extraData: {
       midenSourceAccount: params.midenAccountId,
       midenFaucetId: params.midenFaucetId,
       midenNoteType: 'P2ID',
+      midenNoteId: params.midenNoteId || '',
     },
   };
 

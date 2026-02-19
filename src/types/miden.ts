@@ -20,6 +20,7 @@ export interface CrossChainIntentParams {
   midenAccountId: string;
   midenFaucetId: string;
   midenAmount: string;
+  midenNoteId?: string;
   evmRecipient: string;
   destinationChainId: number;
   outputTokenAddress: string;
@@ -38,6 +39,9 @@ export interface IntentResult {
     }>;
     compact?: any;
     hash?: string;
+    nonce?: string;
   };
   error?: string;
+  /** The intent nonce used for status tracking (userAddress:intentNonce in SIO) */
+  intentNonce?: string;
 }

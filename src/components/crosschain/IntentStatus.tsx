@@ -1,11 +1,32 @@
 import type { IntentResult } from '../../types/miden';
+import type { IntentFlowStatus } from '../../hooks/useIntentStatus';
 
 interface Props {
   result: IntentResult | null;
   error: string | null;
+  flowStatus: IntentFlowStatus | null;
+  isPolling: boolean;
 }
 
-export function IntentStatus({ result, error }: Props) {
+function FlowStep({ step, label, done, active }: { step: number; label: string; done: boolean; active: boolean }) {
+  return (
+    <div className="flex items-center gap-2">
+      <div
+        className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+          done ? 'bg-green-500 text-white' : active ? 'bg-yellow-500 text-black' : 'bg-gray-600 text-gray-400'
+        }`}
+      >
+        {done ? '\u2713' : step}
+      </div>
+      <span className={`text-sm ${done ? 'text-green-400' : active ? 'text-yellow-400' : 'text-gray-500'}`}>
+        {label}
+      </span>
+      {active && !done && <span className="text-xs text-yellow-400 animate-pulse ml-1">...</span>}
+    </div>
+  );
+}
+
+export function IntentStatus({ result, error, flowStatus, isPolling }: Props) {
   if (error) {
     return (
       <div className="bg-gray-800 rounded-xl p-6">
@@ -17,11 +38,38 @@ export function IntentStatus({ result, error }: Props) {
 
   if (!result) return null;
 
+  const p2idSent = true; // If we have a result, P2ID was sent
+  const intentSubmitted = !!result.taskTypeString;
+  const evmCompleted = flowStatus?.evmCompleted ?? false;
+  const midenConsumed = flowStatus?.midenConsumed ?? false;
+
   return (
     <div className="bg-gray-800 rounded-xl p-6 space-y-6">
+      {/* Flow Status */}
+      <div className="bg-gray-900 rounded-lg p-4">
+        <div className="text-xs text-gray-400 mb-3 font-semibold uppercase tracking-wide">Intent Flow</div>
+        <div className="space-y-2">
+          <FlowStep step={1} label="P2ID note sent to allocator" done={p2idSent} active={false} />
+          <FlowStep step={2} label="Intent submitted to SIO" done={intentSubmitted} active={p2idSent && !intentSubmitted} />
+          <FlowStep step={3} label="EVM execution" done={evmCompleted} active={intentSubmitted && !evmCompleted} />
+          <FlowStep step={4} label="Miden note consumed" done={midenConsumed} active={evmCompleted && !midenConsumed} />
+        </div>
+
+        {evmCompleted && !midenConsumed && flowStatus?.midenConsumeError && (
+          <p className="text-xs text-yellow-400 mt-3">
+            Backend consumption retrying: {flowStatus.midenConsumeError}
+            {flowStatus.retryCount != null && ` (attempt ${flowStatus.retryCount})`}
+          </p>
+        )}
+
+        {isPolling && !midenConsumed && (
+          <p className="text-xs text-gray-500 mt-2">Polling for status updates...</p>
+        )}
+      </div>
+
       <div>
         <h2 className="text-lg font-semibold text-green-400 mb-4">
-          {result.solveResult ? '✓ Intent Executed' : 'Intent Data Generated'}
+          {result.solveResult ? '\u2713 Intent Executed' : 'Intent Data Generated'}
         </h2>
 
         <div className="space-y-4">
@@ -56,7 +104,7 @@ export function IntentStatus({ result, error }: Props) {
             <div className="bg-gray-900 rounded-lg p-4 mb-4">
               <div className="text-xs text-gray-400 mb-1">Resource Lock Required</div>
               <div className="text-sm text-white">
-                {result.solveResult.resourceLockRequired ? '✓ Yes' : '✗ No'}
+                {result.solveResult.resourceLockRequired ? '\u2713 Yes' : '\u2717 No'}
               </div>
             </div>
           )}
