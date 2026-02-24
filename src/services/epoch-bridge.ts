@@ -47,12 +47,13 @@ export function buildEpochTaskDataParams(params: CrossChainIntentParams) {
       protocolHashIdentifier: ZERO_HASH,
       recipient: params.evmRecipient,
     },
-    extraDataTypestring: 'string midenSourceAccount,string midenFaucetId,string midenNoteType,string midenNoteId',
+    extraDataTypestring: 'string midenSourceAccount,string midenFaucetId,string midenNoteType,string midenNoteId,uint256 midenDecimals',
     extraData: {
       midenSourceAccount: params.midenAccountId,
       midenFaucetId: params.midenFaucetId,
-      midenNoteType: 'P2ID',
-      midenNoteId: params.midenNoteId || '',
+      midenNoteType: 'P2IDE',
+      midenNoteId: '', // Filled by SDK after P2ID note callback
+      midenDecimals: String(params.midenDecimals ?? 8),
     },
   };
 
@@ -62,7 +63,7 @@ export function buildEpochTaskDataParams(params: CrossChainIntentParams) {
 
 export async function buildCrossChainIntent(
   sdk: any,
-  params: CrossChainIntentParams,
+  params: any, // CrossChainIntentParams + SDK-specific fields (collateralType, createMidenP2IDNote, etc)
 ): Promise<IntentResult> {
   console.log('[EpochBridge] Starting cross-chain intent build via Epoch SDK...');
   const taskDataParams = buildEpochTaskDataParams(params);
@@ -86,6 +87,10 @@ export async function buildCrossChainIntent(
       sponsorAddress: params.evmRecipient,
       taskTypeString,
       intentData,
+      collateralType: params.collateralType || 'miden',
+      midenFaucetId: params.midenFaucetId,
+      midenSourceAccount: params.midenSourceAccount || params.midenAccountId,
+      createMidenP2IDNote: params.createMidenP2IDNote,
     });
 
     console.log('[EpochBridge] SDK.solveIntent() response:', solveResult);

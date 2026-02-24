@@ -22,12 +22,14 @@ interface Props {
   accounts: MidenAccount[];
   faucets: MidenFaucetInfo[];
   onCreateIntent: (params: CrossChainIntentParams) => Promise<any>;
-  onSendP2ID: (senderId: string, receiverId: string, faucetId: string, amount: bigint) => Promise<{ success: boolean; noteId?: string } | undefined>;
+  onSendP2ID: (senderId: string, receiverId: string, faucetId: string, amount: bigint, recallHeight?: number) => Promise<{ success: boolean; noteId?: string } | undefined>;
+  onReclaimNotes: (accountId: string) => Promise<boolean | undefined>;
+  currentBlockHeight?: number;
   isLoading: boolean;
   isSDKReady: boolean;
 }
 
-export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, isLoading, isSDKReady }: Props) {
+export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, onReclaimNotes, currentBlockHeight, isLoading, isSDKReady }: Props) {
 
   const [midenAccountId, setMidenAccountId] = useState('');
   const [faucetId, setFaucetId] = useState('');
@@ -38,6 +40,19 @@ export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, isLo
   const [chainId, setChainId] = useState('11155111'); // Sepolia
   const [status, setStatus] = useState('');
   const [evmAddress, setEvmAddress] = useState("0x4235215114484bACDfF0071dB54Dc9faaD3489a9");
+  const [recallBlocks, setRecallBlocks] = useState('100'); // ~15-20 min at ~10s/block
+  const [reclaimStatus, setReclaimStatus] = useState('');
+
+  const handleReclaim = async () => {
+    if (!midenAccountId) return;
+    setReclaimStatus('Syncing and checking for reclaimable notes...');
+    try {
+      const result = await onReclaimNotes(midenAccountId);
+      setReclaimStatus(result ? 'Notes reclaimed successfully!' : 'No reclaimable notes found.');
+    } catch (err) {
+      setReclaimStatus(`Reclaim failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!midenAccountId || !faucetId || !amount || !evmAddress) return;
@@ -54,57 +69,56 @@ export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, isLo
       allocatorAccountId: ALLOCATOR_MIDEN_ACCOUNT_ID,
     });
 
-    let midenNoteId: string | undefined;
-
     try {
-      // Step 1: Send P2ID note to allocator on Miden side
-        setStatus('Step 1/2: Sending P2ID note to allocator on Miden...');
-
-        console.log('[IntentForm] Sending P2ID note to allocator:');
-        try {
-          const result = await onSendP2ID(midenAccountId, ALLOCATOR_MIDEN_ACCOUNT_ID, faucetId, BigInt(amount));
-          midenNoteId = result?.noteId;
-          console.log('[IntentForm] P2ID note sent successfully, noteId:', midenNoteId);
-          setStatus('✓ P2ID note sent to allocator. Building intent data...');
-        } catch (err) {
-          // P2ID may fail if allocator account doesn't exist or is invalid
-          console.error('[IntentForm] P2ID send failed:', err);
-          setStatus('⚠️  P2ID note failed (allocator may not exist). Building intent data...');
-        }
-
-
-      // Step 2: Build cross-chain intent via Epoch SDK
-      console.log('[IntentForm] Building cross-chain intent via Epoch SDK...');
-      setStatus('Step 2/2: Building cross-chain intent via Epoch SDK...');
-      // Use custom token if provided, otherwise use selected token
       const finalOutputToken = customToken || outputToken;
-
-      console.log('[IntentForm] 🔍 TOKEN VALIDATION:');
-      console.log('  outputToken (from dropdown):', outputToken);
-      console.log('  customToken (manual entry):', customToken);
-      console.log('  finalOutputToken (will be sent):', finalOutputToken);
-
       if (!finalOutputToken || finalOutputToken === '0x0000000000000000000000000000000000000000') {
-        const errorMsg = 'Error: Please select or enter a valid output token address';
-        console.error('[IntentForm] ❌', errorMsg);
-        setStatus(errorMsg);
+        setStatus('Error: Please select or enter a valid output token address');
         return;
       }
+
+      setStatus('Checking if deposit needed...');
+
+      const recallOffset = parseInt(recallBlocks) || 100;
+      const recallHeight = currentBlockHeight ? currentBlockHeight + recallOffset : undefined;
+
+      const selectedFaucet = faucets.find(f => f.id === faucetId);
 
       const params: CrossChainIntentParams = {
         midenAccountId,
         midenFaucetId: faucetId,
         midenAmount: amount,
-        midenNoteId,
+        midenDecimals: selectedFaucet?.decimals ?? 8,
         evmRecipient: evmAddress,
         destinationChainId: parseInt(chainId),
         outputTokenAddress: finalOutputToken,
         minTokenOut,
       };
-      console.log('[IntentForm] ✅ Calling onCreateIntent with params:', params);
-      const result = await onCreateIntent(params);
-      console.log('[IntentForm] Intent created successfully:', result);
-      setStatus('Intent built successfully!');
+
+      // Pass P2ID creation as a callback — SDK calls it only after checkIfDepositNeeded confirms resourceLockRequired
+      const sdkParams = {
+        ...params,
+        collateralType: 'miden' as const,
+        midenSourceAccount: midenAccountId,
+        // TODO: I guess this function can we named genric as (callback)
+        createMidenP2IDNote: async (faucetIdParam: string, amountParam: string, allocatorId: string) => {
+          setStatus('Resource lock required — creating P2IDE note on Miden...');
+          try {
+            const result = await onSendP2ID(midenAccountId, allocatorId, faucetIdParam, BigInt(amountParam), recallHeight);
+            if (result?.noteId) {
+              console.log('[IntentForm] P2IDE note created:', result.noteId);
+            }
+            return result || { success: false };
+          } catch (err) {
+            const errorMsg = err instanceof Error ? err.message : String(err);
+            console.error('[IntentForm] P2ID creation failed:', errorMsg);
+            return { success: false, error: errorMsg };
+          }
+        },
+      };
+
+      const result = await onCreateIntent(sdkParams);
+      console.log('[IntentForm] Intent created:', result);
+      setStatus('Intent submitted successfully!');
     } catch (err) {
       console.error('[IntentForm] Intent submission failed:', err);
       setStatus(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -148,7 +162,7 @@ export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, isLo
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <div>
             <label className="block text-xs text-gray-400 mb-1">Amount</label>
             <input
@@ -163,6 +177,15 @@ export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, isLo
               value={chainId}
               onChange={e => setChainId(e.target.value)}
               className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-400 mb-1">Recall after (blocks)</label>
+            <input
+              value={recallBlocks}
+              onChange={e => setRecallBlocks(e.target.value)}
+              className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm"
+              title="Note becomes reclaimable after this many blocks (~10s/block)"
             />
           </div>
         </div>
@@ -226,6 +249,25 @@ export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, isLo
         >
           {isLoading ? 'Processing...' : 'Create Cross-Chain Intent'}
         </button>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleReclaim}
+            disabled={isLoading || !midenAccountId}
+            className="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 disabled:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            Reclaim Expired Notes
+          </button>
+          {currentBlockHeight && (
+            <span className="text-xs text-gray-500">Block: {currentBlockHeight}</span>
+          )}
+        </div>
+
+        {reclaimStatus && (
+          <p className={`text-sm ${reclaimStatus.includes('failed') ? 'text-red-400' : 'text-green-400'}`}>
+            {reclaimStatus}
+          </p>
+        )}
 
         {!isSDKReady && evmAddress && (
           <p className="text-xs text-yellow-400">Epoch SDK not loaded — intent data will be generated locally.</p>

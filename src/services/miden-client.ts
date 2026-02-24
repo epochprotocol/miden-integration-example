@@ -25,20 +25,13 @@ export async function initMiden(): Promise<MidenClientState> {
       throw new Error('Miden SDK can only run in the browser');
     }
 
-    console.log('[Miden] Importing SDK...');
     const { WebClient, TransactionProver } = await import('@miden-sdk/miden-sdk');
 
-    console.log('[Miden] Creating client...');
     clientInstance = await WebClient.createClient(MIDEN_CONFIG.rpcUrl);
-    console.log('[Miden] Client created');
 
-    console.log('[Miden] Creating remote prover...');
     proverInstance = TransactionProver.newRemoteProver(MIDEN_CONFIG.proverUrl);
-    console.log('[Miden] Prover created');
 
-    console.log('[Miden] Syncing state...');
     const state = await clientInstance.syncState();
-    console.log('[Miden] Synced to block:', state.blockNum());
 
     return { client: clientInstance, prover: proverInstance };
   })();

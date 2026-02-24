@@ -22,7 +22,6 @@ export function TransferPanel({
   consumableNotes,
   isLoading,
 }: Props) {
-  console.log("consumable noets --> ", consumableNotes);
   const [senderId, setSenderId] = useState('');
   const [receiverId, setReceiverId] = useState('');
   const [faucetId, setFaucetId] = useState('');

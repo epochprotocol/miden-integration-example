@@ -20,7 +20,7 @@ export interface CrossChainIntentParams {
   midenAccountId: string;
   midenFaucetId: string;
   midenAmount: string;
-  midenNoteId?: string;
+  midenDecimals?: number;
   evmRecipient: string;
   destinationChainId: number;
   outputTokenAddress: string;

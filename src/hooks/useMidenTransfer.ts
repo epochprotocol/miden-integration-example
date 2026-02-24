@@ -6,7 +6,7 @@ interface ConsumableNote {
 }
 
 interface UseMidenTransferReturn {
-  sendTokens: (senderId: string, receiverId: string, faucetId: string, amount: bigint) => Promise<{ success: boolean; noteId?: string } | undefined>;
+  sendTokens: (senderId: string, receiverId: string, faucetId: string, amount: bigint, recallHeight?: number) => Promise<{ success: boolean; noteId?: string } | undefined>;
   consumeNotes: (accountId: string) => Promise<boolean | undefined>;
   refreshConsumableNotes: (accountId: string) => Promise<ConsumableNote[]>;
   consumableNotes: ConsumableNote[];
@@ -35,6 +35,7 @@ export function useMidenTransfer(
     receiverId: string,
     faucetId: string,
     amount: bigint,
+    recallHeight?: number,
   ) => {
     if (!client) return;
 
@@ -52,13 +53,16 @@ export function useMidenTransfer(
       const resolveId = (raw: AccountId | string): AccountId =>
         typeof raw === 'string' ? AccountId.fromHex(raw) : raw;
 
-      console.log('[Miden] Sending tokens via P2ID...');
+      const noteType = recallHeight ? 'P2IDE (recallable)' : 'P2ID';
+      console.log(`[Miden] Sending tokens via ${noteType}...`);
       const sendTxRequest = client.newSendTransactionRequest(
         resolveId(getAccountId(senderId)),
         resolveId(getAccountId(receiverId)),
         resolveId(getFaucetId(faucetId)),
         NoteType.Public,
         amount,
+        recallHeight ?? null,  // recall_height: sender can reclaim after this block
+        null,                  // timelock_height: no timelock
       );
 
       // Extract note ID from expected output notes before submission
@@ -91,14 +95,26 @@ export function useMidenTransfer(
       const resolveId = (raw: AccountId | string): AccountId =>
         typeof raw === 'string' ? AccountId.fromHex(raw) : raw;
 
-      await client.syncState();
+      const syncSummary = await client.syncState();
+      const currentBlock = syncSummary.blockNum();
       const notes = await client.getConsumableNotes(resolveId(getAccountId(accountId)));
-      const mapped: ConsumableNote[] = notes.map((note) => ({
+
+      // Filter out notes that aren't consumable yet (e.g. P2IDE notes before recall height)
+      const consumableNow = notes.filter((note) => {
+        const consumabilities = note.noteConsumability();
+        if (!consumabilities || consumabilities.length === 0) return true;
+        return consumabilities.some((c) => {
+          const afterBlock = c.consumptionStatus().consumableAfterBlock();
+          return afterBlock === undefined || afterBlock <= currentBlock;
+        });
+      });
+
+      const mapped: ConsumableNote[] = consumableNow.map((note) => ({
         noteId: note.inputNoteRecord().id().toString(),
       }));
 
       setConsumableNotes(mapped);
-      console.log(`[Miden] Found ${mapped.length} consumable note(s)`);
+      console.log(`[Miden] Found ${mapped.length} consumable note(s) at block ${currentBlock} (${notes.length} total)`);
       return mapped;
     } catch (err) {
       console.error('[Miden] Refresh notes error:', err);
@@ -122,11 +138,22 @@ export function useMidenTransfer(
       const resolveId = (raw: AccountId | string): AccountId =>
         typeof raw === 'string' ? AccountId.fromHex(raw) : raw;
 
-      await client.syncState();
-      const notes = await client.getConsumableNotes(resolveId(getAccountId(accountId)));
+      const syncSummary = await client.syncState();
+      const currentBlock = syncSummary.blockNum();
+      const allNotes = await client.getConsumableNotes(resolveId(getAccountId(accountId)));
+
+      // Only consume notes that are actually consumable at the current block height
+      const notes = allNotes.filter((note) => {
+        const consumabilities = note.noteConsumability();
+        if (!consumabilities || consumabilities.length === 0) return true;
+        return consumabilities.some((c) => {
+          const afterBlock = c.consumptionStatus().consumableAfterBlock();
+          return afterBlock === undefined || afterBlock <= currentBlock;
+        });
+      });
 
       if (!notes || notes.length === 0) {
-        setError('No consumable notes found. Wait ~10s after minting then try again.');
+        setError('No consumable notes found. P2IDE notes become reclaimable after the recall block height.');
         return false;
       }
 

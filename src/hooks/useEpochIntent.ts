@@ -9,7 +9,7 @@ export function useEpochIntent() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  console.log('wallet client ---> ', midenClient);
+
   const [sdk, setSdk] = useState<any>(null);
 
   useMemo(() => {

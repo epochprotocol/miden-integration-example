@@ -11,7 +11,6 @@ import { EVMWalletConnect } from './components/crosschain/EVMWalletConnect';
 import { IntentForm } from './components/crosschain/IntentForm';
 import { FlowDiagram } from './components/crosschain/FlowDiagram';
 import { IntentStatus } from './components/crosschain/IntentStatus';
-import { AllocatorDebugPanel } from './components/debug/AllocatorDebugPanel';
 import { useMidenClient } from './hooks/useMidenClient';
 import { useMidenWallet } from './hooks/useMidenWallet';
 import { useMidenFaucet } from './hooks/useMidenFaucet';
@@ -98,6 +97,8 @@ function App() {
               faucets={faucet.faucets}
               onCreateIntent={epoch.createIntent}
               onSendP2ID={transfer.sendTokens}
+              onReclaimNotes={transfer.consumeNotes}
+              currentBlockHeight={blockNum}
               isLoading={epoch.isLoading || transfer.isLoading}
               isSDKReady={true}
             />
@@ -107,7 +108,6 @@ function App() {
               flowStatus={intentStatus.status}
               isPolling={intentStatus.isPolling}
             />
-            <AllocatorDebugPanel />
           </div>
         )}
       </main>
