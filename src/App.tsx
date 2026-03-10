@@ -16,7 +16,9 @@ import { useMidenWallet } from './hooks/useMidenWallet';
 import { useMidenFaucet } from './hooks/useMidenFaucet';
 import { useMidenTransfer } from './hooks/useMidenTransfer';
 import { useEpochIntent } from './hooks/useEpochIntent';
+import { useWithdrawIntent } from './hooks/useWithdrawIntent';
 import { useIntentStatus } from './hooks/useIntentStatus';
+import { WithdrawForm } from './components/crosschain/WithdrawForm';
 
 function App() {
   const [activeTab, setActiveTab] = useState('miden');
@@ -26,6 +28,7 @@ function App() {
   const faucet = useMidenFaucet(client, prover, wallet.getAccountId, wallet.accountObjectsRef);
   const transfer = useMidenTransfer(client, prover, wallet.getAccountId, faucet.getFaucetId);
   const epoch = useEpochIntent();
+  const withdraw = useWithdrawIntent();
 
   // Extract tracking info from the latest intent result
   const intentNonce = epoch.intentResult?.intentNonce;
@@ -107,6 +110,23 @@ function App() {
               error={epoch.error}
               flowStatus={intentStatus.status}
               isPolling={intentStatus.isPolling}
+            />
+          </div>
+        )}
+        {activeTab === 'withdraw' && (
+          <div className="space-y-6">
+            <EVMWalletConnect />
+            <WithdrawForm
+              accounts={wallet.accounts}
+              faucets={faucet.faucets}
+              onWithdraw={withdraw.createWithdrawIntent}
+              isLoading={withdraw.isLoading}
+            />
+            <IntentStatus
+              result={withdraw.withdrawResult}
+              error={withdraw.error}
+              flowStatus={null}
+              isPolling={false}
             />
           </div>
         )}

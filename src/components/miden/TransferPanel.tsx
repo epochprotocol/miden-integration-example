@@ -134,7 +134,6 @@ export function TransferPanel({
               {accounts.map(a => (
                 <option key={a.id} value={a.id}>{a.label} — {a.id.slice(0, 16)}...</option>
               ))}
-              <option value={'0x917c80a6789b83101adcc7e9f5671a'} key={12}>0x917c80a6789b83101adcc7e9f5671a</option>
             </select>
           </div>
           <div className="flex gap-2">

@@ -2,8 +2,6 @@ import { useState } from 'react';
 import type { MidenAccount, MidenFaucetInfo, CrossChainIntentParams } from '../../types/miden';
 
 
- const ALLOCATOR_MIDEN_ACCOUNT_ID = '0x917c80a6789b83101adcc7e9f5671a';
-
 // Supported Sepolia testnet tokens (from epoch-commons-sdk testnetGraph)
 const SEPOLIA_TOKENS = [
   { symbol: 'USDC', address: '0x2BB4FfD7E2c6D432b697554Efd77fA13bdbefd69' },
@@ -66,7 +64,7 @@ export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, onRe
       chainId,
       outputToken,
       minTokenOut,
-      allocatorAccountId: ALLOCATOR_MIDEN_ACCOUNT_ID,
+      // allocatorAccountId: ALLOCATOR_MIDEN_ACCOUNT_ID,
     });
 
     try {
@@ -88,6 +86,8 @@ export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, onRe
         midenFaucetId: faucetId,
         midenAmount: amount,
         midenDecimals: selectedFaucet?.decimals ?? 8,
+        // Carry absolute reclaim height through to smallocator (optional)
+        midenReclaimHeight: recallHeight,
         evmRecipient: evmAddress,
         destinationChainId: parseInt(chainId),
         outputTokenAddress: finalOutputToken,

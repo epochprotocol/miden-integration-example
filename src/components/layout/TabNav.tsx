@@ -6,6 +6,7 @@ interface Props {
 const tabs = [
   { id: 'miden', label: 'Miden Wallet' },
   { id: 'crosschain', label: 'Cross-Chain Bridge' },
+  { id: 'withdraw', label: 'Withdraw to Miden' },
 ];
 
 export function TabNav({ activeTab, onTabChange }: Props) {

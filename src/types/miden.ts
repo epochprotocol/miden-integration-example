@@ -21,10 +21,23 @@ export interface CrossChainIntentParams {
   midenFaucetId: string;
   midenAmount: string;
   midenDecimals?: number;
+  /** Optional absolute reclaim height (block number) for P2IDE notes */
+  midenReclaimHeight?: number;
   evmRecipient: string;
   destinationChainId: number;
   outputTokenAddress: string;
   minTokenOut: string;
+}
+
+export interface EVMToMidenIntentParams {
+  evmSourceAddress: string;
+  evmTokenAddress: string;
+  evmAmount: string;
+  evmTokenDecimals?: number;
+  sourceChainId: number;
+  midenRecipientId: string;
+  midenFaucetId: string;
+  midenDecimals?: number;
 }
 
 export interface IntentResult {

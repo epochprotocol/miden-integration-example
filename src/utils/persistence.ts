@@ -58,13 +58,40 @@ export function loadFaucets(): MidenFaucetInfo[] {
 }
 
 /**
- * Clear all persisted data
+ * Delete all IndexedDB databases used by the Miden SDK.
+ * The SDK stores blockchain state (blocks, notes, accounts) in IndexedDB.
+ * Stale or version-mismatched data causes deserialization errors on transaction execution.
  */
-export function clearPersistedData(): void {
+async function clearMidenIndexedDB(): Promise<void> {
+  try {
+    const dbs = await indexedDB.databases();
+    await Promise.all(
+      dbs.map(({ name }) => {
+        if (!name) return Promise.resolve();
+        return new Promise<void>((resolve) => {
+          const req = indexedDB.deleteDatabase(name);
+          req.onsuccess = () => resolve();
+          req.onerror = () => resolve(); // best-effort
+          req.onblocked = () => resolve();
+        });
+      }),
+    );
+    console.log('[Persistence] Cleared Miden IndexedDB stores');
+  } catch (err) {
+    console.error('[Persistence] Failed to clear IndexedDB:', err);
+  }
+}
+
+/**
+ * Clear all persisted data — localStorage accounts/faucets AND the Miden SDK's IndexedDB.
+ * Must be awaited before reloading so the DB deletion completes.
+ */
+export async function clearPersistedData(): Promise<void> {
   try {
     localStorage.removeItem(STORAGE_KEYS.WALLETS);
     localStorage.removeItem(STORAGE_KEYS.FAUCETS);
   } catch (err) {
-    console.error('[Persistence] Failed to clear data:', err);
+    console.error('[Persistence] Failed to clear localStorage:', err);
   }
+  await clearMidenIndexedDB();
 }

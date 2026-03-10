@@ -1,4 +1,5 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
+import { sepolia } from 'viem/chains';
 
 const projectId = 'a3953ff16e6181e34fa7ead113ec1420';
 
@@ -30,18 +31,14 @@ export const miden = defineChain({
 })
 
 
-export const chains = [miden] as const;
+// Only include real EVM chains in wagmi config — Miden (id: 0, no RPC) is not
+// a wagmi-compatible chain and breaks RainbowKit connector initialization.
+export const chains = [sepolia] as const;
 
 export const config = getDefaultConfig({
   appName: 'Miden x Epoch Bridge',
   projectId,
   chains,
-  // transports: {
-  //   ...Object.fromEntries(
-  //     chains.map((chain) => [chain.id, http(chain.rpcUrls.default.http[0])])
-  //   ),
-  // },
-
 });
 
 

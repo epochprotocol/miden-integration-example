@@ -14,7 +14,7 @@ interface Props {
 export function FaucetPanel({ faucets, wallets, onCreateFaucet, onMintTokens, onConsumeNotes, onSyncBalance, isLoading }: Props) {
   const [symbol, setSymbol] = useState('TEST');
   const [decimals, setDecimals] = useState('8');
-  const [maxSupply, setMaxSupply] = useState('1000000');
+  const [maxSupply, setMaxSupply] = useState('100000000000000000');
 
   const [mintFaucetId, setMintFaucetId] = useState('');
   const [mintRecipientId, setMintRecipientId] = useState('');
@@ -37,8 +37,8 @@ export function FaucetPanel({ faucets, wallets, onCreateFaucet, onMintTokens, on
     try {
       await onMintTokens(mintRecipientId, mintFaucetId, BigInt(mintAmount));
       setMintStatus('Mint submitted! Use "Mint & Consume" for a one-click flow, or wait ~10s then consume notes manually.');
-    } catch {
-      setMintStatus('Mint failed');
+    } catch (err) {
+      setMintStatus(`Mint failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
 

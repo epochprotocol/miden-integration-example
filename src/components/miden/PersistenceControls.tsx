@@ -1,9 +1,9 @@
 import { clearPersistedData } from '../../utils/persistence';
 
 export function PersistenceControls() {
-  const handleClear = () => {
+  const handleClear = async () => {
     if (confirm('Clear all saved accounts and faucets? This will require a page refresh.')) {
-      clearPersistedData();
+      await clearPersistedData();
       window.location.reload();
     }
   };

@@ -1,4 +1,7 @@
-import type { CrossChainIntentParams, IntentResult } from '../types/miden';
+import { parseUnits } from 'viem';
+import type { CrossChainIntentParams, EVMToMidenIntentParams, IntentResult } from '../types/miden';
+import type { EpochIntentSDK } from '@epoch-protocol/epoch-intents-sdk';
+import type { CollateralType, TaskType } from '@epoch-protocol/epoch-intents-sdk/dist/types';
 
 /**
  * Cross-chain bridge architecture using P2ID notes:
@@ -13,9 +16,6 @@ import type { CrossChainIntentParams, IntentResult } from '../types/miden';
  * intent is fulfilled — privacy-preserving on the Miden side, trustless on EVM side.
  */
 
-// The allocator's Miden account ID — must match the account derived from MIDEN_ALLOCATOR_SEED in SIO's .env
-export const ALLOCATOR_MIDEN_ACCOUNT_ID = '0x917c80a6789b83101adcc7e9f5671a';
-
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 const ZERO_HASH = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
@@ -26,6 +26,7 @@ export function buildEpochTaskDataParams(params: CrossChainIntentParams) {
     midenAmount: params.midenAmount,
     evmRecipient: params.evmRecipient,
     destinationChainId: params.destinationChainId,
+    midenReclaimHeight: params.midenReclaimHeight,
   });
 
   // Determine the output token address — must be a valid EVM token on the destination chain
@@ -35,30 +36,117 @@ export function buildEpochTaskDataParams(params: CrossChainIntentParams) {
   // and pass the actual addresses directly.
   const hasValidOutputToken = outputToken !== ZERO_ADDRESS;
 
+  // Convert human-readable Miden amount to smallest unit (e.g. "1" with 12 decimals → "1000000000000")
+  const midenDecimals = params.midenDecimals ?? 8;
+  const amountInSmallestUnit = parseUnits(params.midenAmount, midenDecimals).toString();
+
+  console.log('[EpochBridge] Miden amount conversion:', {
+    humanAmount: params.midenAmount,
+    decimals: midenDecimals,
+    amountInSmallestUnit,
+  });
+
   const taskDataParams = {
     taskType: 'gettokenout' as const,
     intentData: {
       isNative: !hasValidOutputToken,
       depositTokenAddress: ZERO_ADDRESS, // tokenIn is always zero (Miden-sourced)
-      tokenInAmount: params.midenAmount,
+      tokenInAmount: amountInSmallestUnit,
       outputTokenAddress: outputToken,
       minTokenOut: params.minTokenOut,
       destinationChainId: String(params.destinationChainId),
       protocolHashIdentifier: ZERO_HASH,
       recipient: params.evmRecipient,
     },
-    extraDataTypestring: 'string midenSourceAccount,string midenFaucetId,string midenNoteType,string midenNoteId,uint256 midenDecimals',
+    extraDataTypestring: 'string midenSourceAccount,string midenFaucetId,string midenNoteType,string midenNoteId,uint256 midenDecimals,uint256 midenReclaimHeight',
     extraData: {
       midenSourceAccount: params.midenAccountId,
       midenFaucetId: params.midenFaucetId,
       midenNoteType: 'P2IDE',
-      midenNoteId: '', // Filled by SDK after P2ID note callback
+      midenNoteId: '',
       midenDecimals: String(params.midenDecimals ?? 8),
+      midenReclaimHeight: params.midenReclaimHeight != null
+        ? String(params.midenReclaimHeight)
+        : '0',
     },
   };
 
   console.log('[EpochBridge] Task data params built:', taskDataParams);
   return taskDataParams;
+}
+
+export function buildEVMToMidenTaskDataParams(params: EVMToMidenIntentParams) {
+  console.log('[EpochBridge] Building EVM→Miden task data params from:', {
+    evmSourceAddress: params.evmSourceAddress,
+    evmTokenAddress: params.evmTokenAddress,
+    evmAmount: params.evmAmount,
+    sourceChainId: params.sourceChainId,
+    midenRecipientId: params.midenRecipientId,
+    midenFaucetId: params.midenFaucetId.slice(0, 16) + '...',
+  });
+
+  // Convert human-readable amount to wei (e.g. "1" USDT → "1000000000000000000" for 18 decimals)
+  const evmDecimals = params.evmTokenDecimals ?? 18;
+  const amountInWei = parseUnits(params.evmAmount, evmDecimals).toString();
+
+  console.log('[EpochBridge] Amount conversion:', {
+    humanAmount: params.evmAmount,
+    decimals: evmDecimals,
+    amountInWei,
+  });
+
+  const taskDataParams = {
+    taskType: 'gettokenout' as TaskType,
+    intentData: {
+      isNative: false,
+      depositTokenAddress: params.evmTokenAddress,
+      tokenInAmount: amountInWei,
+      outputTokenAddress: ZERO_ADDRESS,
+      minTokenOut: '0',
+      destinationChainId: '0',
+      protocolHashIdentifier: ZERO_HASH,
+      recipient: params.evmSourceAddress,
+    },
+    extraDataTypestring: 'string midenRecipientAccount,string midenFaucetId,string midenNoteType,uint256 midenDecimals',
+    extraData: {
+      midenRecipientAccount: params.midenRecipientId,
+      midenFaucetId: params.midenFaucetId,
+      midenNoteType: 'P2ID',
+      midenDecimals: String(params.midenDecimals ?? 8),
+    },
+  };
+
+  console.log('[EpochBridge] EVM→Miden task data params built:', taskDataParams);
+  return taskDataParams;
+}
+
+export async function buildEVMToMidenIntent(
+  sdk: EpochIntentSDK,
+  params: EVMToMidenIntentParams,
+): Promise<IntentResult> {
+  const taskDataParams = buildEVMToMidenTaskDataParams(params);
+  const { taskTypeString, intentData } = await sdk.getTaskData(taskDataParams);
+  console.log('[EpochBridge] SDK.getTaskData() response:', { taskTypeString, intentData });
+
+  try {
+    const solveResult = await sdk.solveIntent({
+      isNative: false,
+      sponsorAddress: params.evmSourceAddress as `0x${string}`,
+      taskTypeString,
+      intentData,
+      collateralType: 'evm' as CollateralType,
+    });
+
+    console.log('[EpochBridge] SDK.solveIntent() response:', solveResult);
+    return { taskTypeString, intentData, solveResult };
+  } catch (err) {
+    console.error('[EpochBridge] EVM→Miden solveIntent failed:', err);
+    return {
+      taskTypeString,
+      intentData,
+      error: err instanceof Error ? err.message : 'Failed to solve EVM→Miden intent',
+    };
+  }
 }
 
 export async function buildCrossChainIntent(
