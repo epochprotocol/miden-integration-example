@@ -1,7 +1,12 @@
 import { parseUnits } from 'viem';
 import type { CrossChainIntentParams, EVMToMidenIntentParams, IntentResult } from '../types/miden';
 import type { EpochIntentSDK } from '@epoch-protocol/epoch-intents-sdk';
-import type { CollateralType, TaskType } from '@epoch-protocol/epoch-intents-sdk/dist/types';
+import type {
+  CollateralType,
+  GetTaskDataParams,
+  SolveIntentParams,
+  TaskType,
+} from '@epoch-protocol/epoch-intents-sdk/dist/types';
 
 /**
  * Cross-chain bridge architecture using P2ID notes:
@@ -19,7 +24,7 @@ import type { CollateralType, TaskType } from '@epoch-protocol/epoch-intents-sdk
 const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 const ZERO_HASH = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
-export function buildEpochTaskDataParams(params: CrossChainIntentParams) {
+export function buildEpochTaskDataParams(params: CrossChainIntentParams): GetTaskDataParams {
   console.log('[EpochBridge] Building task data params from:', {
     midenAccountId: params.midenAccountId,
     midenFaucetId: params.midenFaucetId.slice(0, 16) + '...',
@@ -47,7 +52,7 @@ export function buildEpochTaskDataParams(params: CrossChainIntentParams) {
   });
 
   const taskDataParams = {
-    taskType: 'gettokenout' as const,
+    taskType: 'gettokenout' as TaskType,
     intentData: {
       isNative: !hasValidOutputToken,
       depositTokenAddress: ZERO_ADDRESS, // tokenIn is always zero (Miden-sourced)
@@ -150,8 +155,12 @@ export async function buildEVMToMidenIntent(
 }
 
 export async function buildCrossChainIntent(
-  sdk: any,
-  params: any, // CrossChainIntentParams + SDK-specific fields (collateralType, createMidenP2IDNote, etc)
+  sdk: EpochIntentSDK,
+  params: CrossChainIntentParams & {
+    collateralType?: CollateralType;
+    midenSourceAccount?: string;
+    createMidenP2IDNote?: SolveIntentParams['createMidenP2IDNote'];
+  },
 ): Promise<IntentResult> {
   console.log('[EpochBridge] Starting cross-chain intent build via Epoch SDK...');
   const taskDataParams = buildEpochTaskDataParams(params);
@@ -172,10 +181,10 @@ export async function buildCrossChainIntent(
   try {
     const solveResult = await sdk.solveIntent({
       isNative: taskDataParams.intentData.isNative,
-      sponsorAddress: params.evmRecipient,
+      sponsorAddress: params.evmRecipient as `0x${string}`,
       taskTypeString,
       intentData,
-      collateralType: params.collateralType || 'miden',
+      collateralType: (params.collateralType ?? 'miden') as CollateralType,
       midenFaucetId: params.midenFaucetId,
       midenSourceAccount: params.midenSourceAccount || params.midenAccountId,
       createMidenP2IDNote: params.createMidenP2IDNote,

@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from 'react';
+import { useWalletClient } from 'wagmi';
 import { buildCrossChainIntent, buildEpochTaskDataParams } from '../services/epoch-bridge';
 import type { CrossChainIntentParams, IntentResult } from '../types/miden';
-import { midenClient } from '../config/wagmi';
 
 export function useEpochIntent() {
 
@@ -12,9 +12,11 @@ export function useEpochIntent() {
 
   const [sdk, setSdk] = useState<any>(null);
 
+  const { data: walletClient } = useWalletClient();
+
   useMemo(() => {
-    if (!midenClient) {
-      console.log('[CrossChain] No wallet client, SDK not available');
+    if (!walletClient) {
+      console.log('[CrossChain] No EVM wallet client, SDK not available');
       setSdk(null);
       return;
     }
@@ -22,17 +24,17 @@ export function useEpochIntent() {
     import('@epoch-protocol/epoch-intents-sdk').then(({ EpochIntentSDK }) => {
       const apiBaseUrl = import.meta.env.VITE_ALLOCATOR_URL || 'http://localhost:3000';
       console.log('[CrossChain] Epoch SDK loaded, creating instance with API:', apiBaseUrl);
-      // Cast walletClient to any — the SDK symlink uses its own viem types
+      // Cast walletClient to any — the SDK symlink uses its own viem types.
       setSdk(new EpochIntentSDK({
         apiBaseUrl,
-        walletClient: midenClient as any,
+        walletClient: walletClient as any,
       }));
       console.log('[CrossChain] Epoch SDK ready');
     }).catch((err) => {
       console.error('[CrossChain] Failed to load Epoch SDK:', err);
       setSdk(null);
     });
-  }, [midenClient]);
+  }, [walletClient]);
 
   const createIntent = useCallback(async (params: CrossChainIntentParams) => {
     setIsLoading(true);
