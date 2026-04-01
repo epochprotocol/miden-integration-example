@@ -244,7 +244,7 @@ export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, onRe
 
         <button
           onClick={handleSubmit}
-          disabled={isLoading || !midenAccountId || !faucetId || !evmAddress}
+          disabled={isLoading || !isSDKReady || !midenAccountId || !faucetId || !evmAddress}
           className="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
         >
           {isLoading ? 'Processing...' : 'Create Cross-Chain Intent'}
@@ -269,8 +269,10 @@ export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, onRe
           </p>
         )}
 
-        {!isSDKReady && evmAddress && (
-          <p className="text-xs text-yellow-400">Epoch SDK not loaded — intent data will be generated locally.</p>
+        {!isSDKReady && (
+          <p className="text-xs text-yellow-400">
+            Epoch SDK is not ready. Connect your EVM wallet above and wait for it to load — creating an intent requires the SDK.
+          </p>
         )}
 
         {status && (

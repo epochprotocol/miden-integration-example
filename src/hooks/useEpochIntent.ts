@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useWalletClient } from 'wagmi';
-import { buildCrossChainIntent, buildEpochTaskDataParams } from '../services/epoch-bridge';
+import { buildCrossChainIntent } from '../services/epoch-bridge';
 import type { CrossChainIntentParams, IntentResult } from '../types/miden';
 
 export function useEpochIntent() {
@@ -52,24 +52,16 @@ export function useEpochIntent() {
     });
 
     try {
-      if (sdk) {
-        console.log('[CrossChain] Using Epoch SDK to build intent...');
-        const result = await buildCrossChainIntent(sdk, params);
-        console.log('[CrossChain] Intent created via SDK:', result);
-        setIntentResult(result);
-        return result;
-      } else {
-        console.log('[CrossChain] SDK not available, generating mock intent data...');
-        const taskDataParams = buildEpochTaskDataParams(params);
-        console.log('[CrossChain] Task data params:', taskDataParams);
-        const mockResult: IntentResult = {
-          taskTypeString: 'address tokenIn,uint256 tokenInAmount,address tokenOut,uint256 minTokenOut,uint256 destinationChainId,bytes4 taskType,bytes32 protocolHashIdentifier,address recipient,string midenSourceAccount,string midenFaucetId,string midenNoteType',
-          intentData: taskDataParams.intentData as unknown as Record<string, unknown>,
-        };
-        console.log('[CrossChain] Mock intent result:', mockResult);
-        setIntentResult(mockResult);
-        return mockResult;
+      if (!sdk) {
+        throw new Error(
+          'Epoch SDK is not ready. Connect your EVM wallet above, wait for it to initialize, or check the console if the SDK failed to load.',
+        );
       }
+      console.log('[CrossChain] Using Epoch SDK to build intent...');
+      const result = await buildCrossChainIntent(sdk, params);
+      console.log('[CrossChain] Intent created via SDK:', result);
+      setIntentResult(result);
+      return result;
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Failed to create cross-chain intent';
       console.error('[CrossChain] Intent creation failed:', err);
@@ -85,6 +77,6 @@ export function useEpochIntent() {
     intentResult,
     isLoading,
     error,
-    // isSDKReady: !!sdk,
+    isSDKReady: !!sdk,
   };
 }

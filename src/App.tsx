@@ -103,7 +103,7 @@ function App() {
               onReclaimNotes={transfer.consumeNotes}
               currentBlockHeight={blockNum}
               isLoading={epoch.isLoading || transfer.isLoading}
-              isSDKReady={true}
+              isSDKReady={epoch.isSDKReady}
             />
             <IntentStatus
               result={epoch.intentResult}
