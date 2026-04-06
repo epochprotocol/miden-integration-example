@@ -1,29 +1,65 @@
+import { useState } from 'react';
 import { clearPersistedData } from '../../utils/persistence';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 export function PersistenceControls() {
-  const handleClear = async () => {
-    if (confirm('Clear all saved accounts and faucets? This will require a page refresh.')) {
+  const [open, setOpen] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
+
+  const handleConfirmClear = async () => {
+    setIsClearing(true);
+    try {
       await clearPersistedData();
       window.location.reload();
+    } catch {
+      setIsClearing(false);
+      setOpen(false);
     }
   };
 
   return (
-    <div className="bg-gray-800 rounded-xl p-4 border border-gray-700">
-      <div className="flex items-center justify-between">
+    <>
+      <div className="ui-card-muted flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-gray-200">Persistence</h3>
-          <p className="text-xs text-gray-400 mt-1">
-            Accounts and faucets are now saved to browser storage
-          </p>
+          <h3 className="text-sm font-semibold text-neutral-900">Persistence</h3>
+          <p className="mt-1 text-xs text-neutral-600">Accounts and faucets are saved to browser storage</p>
         </div>
-        <button
-          onClick={handleClear}
-          className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm transition-colors"
-        >
-          Clear Saved Data
-        </button>
+        <Button type="button" variant="destructive" className="shrink-0" onClick={() => setOpen(true)}>
+          Clear saved data
+        </Button>
       </div>
-    </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent
+          showClose={!isClearing}
+          onPointerDownOutside={(e) => isClearing && e.preventDefault()}
+          onEscapeKeyDown={(e) => isClearing && e.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle>Clear all saved data?</DialogTitle>
+            <DialogDescription>
+              This removes stored Miden wallets and faucet metadata from this browser. The page will reload. On-chain
+              accounts are unchanged; you would need seed or recovery to access them again from another device.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button type="button" variant="secondary" disabled={isClearing} onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="button" variant="destructive" disabled={isClearing} onClick={handleConfirmClear}>
+              {isClearing ? 'Clearing…' : 'Clear and reload'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

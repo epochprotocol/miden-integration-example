@@ -10,7 +10,10 @@ interface UseMidenWalletReturn {
   syncState: () => Promise<void>;
   getAccountId: (idStr: string) => AccountId | string;
   accountObjectsRef: React.MutableRefObject<Map<string, Account>>;
+  /** @deprecated use isCreatingWallet or isSyncing */
   isLoading: boolean;
+  isCreatingWallet: boolean;
+  isSyncing: boolean;
   error: string | null;
 }
 
@@ -24,7 +27,8 @@ interface UseMidenWalletReturn {
 export function useMidenWallet(client: WebClient | null): UseMidenWalletReturn {
   const [accounts, setAccounts] = useState<MidenAccount[]>(() => loadWallets());
   const [balances, setBalances] = useState<Record<string, VaultAsset[]>>({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [isCreatingWallet, setIsCreatingWallet] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Store actual Account WASM objects so we can call .id() fresh for each SDK call
@@ -100,7 +104,7 @@ export function useMidenWallet(client: WebClient | null): UseMidenWalletReturn {
   const createWallet = useCallback(async () => {
     if (!client) return;
 
-    setIsLoading(true);
+    setIsCreatingWallet(true);
     setError(null);
 
     try {
@@ -118,7 +122,7 @@ export function useMidenWallet(client: WebClient | null): UseMidenWalletReturn {
       setError(message);
       throw err;
     } finally {
-      setIsLoading(false);
+      setIsCreatingWallet(false);
     }
   }, [client]);
 
@@ -134,7 +138,7 @@ export function useMidenWallet(client: WebClient | null): UseMidenWalletReturn {
   const syncState = useCallback(async () => {
     if (!client) return;
 
-    setIsLoading(true);
+    setIsSyncing(true);
     setError(null);
 
     try {
@@ -172,9 +176,20 @@ export function useMidenWallet(client: WebClient | null): UseMidenWalletReturn {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sync state');
     } finally {
-      setIsLoading(false);
+      setIsSyncing(false);
     }
   }, [client]);
 
-  return { accounts, balances, createWallet, syncState, getAccountId, accountObjectsRef, isLoading, error };
+  return {
+    accounts,
+    balances,
+    createWallet,
+    syncState,
+    getAccountId,
+    accountObjectsRef,
+    isLoading: isCreatingWallet || isSyncing,
+    isCreatingWallet,
+    isSyncing,
+    error,
+  };
 }

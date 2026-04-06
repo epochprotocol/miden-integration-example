@@ -4,22 +4,26 @@ interface Props {
 }
 
 const tabs = [
-  { id: 'miden', label: 'Miden Wallet' },
-  { id: 'crosschain', label: 'Cross-Chain Bridge' },
+  { id: 'miden', label: 'Miden wallet' },
+  { id: 'crosschain', label: 'Cross-chain bridge' },
   { id: 'withdraw', label: 'Withdraw to Miden' },
 ];
 
 export function TabNav({ activeTab, onTabChange }: Props) {
   return (
-    <nav className="flex gap-1 bg-gray-800/50 p-1 rounded-lg">
-      {tabs.map(tab => (
+    <nav
+      className="flex max-w-full gap-0.5 overflow-x-auto rounded-xl border border-neutral-200 bg-neutral-100/90 p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap"
+      aria-label="Primary navigation"
+    >
+      {tabs.map((tab) => (
         <button
           key={tab.id}
+          type="button"
           onClick={() => onTabChange(tab.id)}
-          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+          className={`shrink-0 rounded-lg px-4 py-2.5 text-sm font-medium transition-all duration-200 ease-out ${
             activeTab === tab.id
-              ? 'bg-indigo-600 text-white'
-              : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
+              ? 'bg-white text-neutral-900 shadow-sm ring-1 ring-neutral-200/80'
+              : 'text-neutral-600 hover:bg-white/70 hover:text-neutral-900'
           }`}
         >
           {tab.label}

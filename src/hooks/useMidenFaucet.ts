@@ -1,15 +1,18 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, type MutableRefObject } from 'react';
 import type { MidenFaucetInfo } from '../types/miden';
 // import type { WebClient, TransactionProver, Account, AccountId } from '../types/miden-sdk';
 import { loadFaucets, saveFaucets } from '../utils/persistence';
-import type { AccountId } from '@miden-sdk/miden-sdk';
+import type { Account, AccountId, TransactionProver, WebClient } from '@miden-sdk/miden-sdk';
 
 interface UseMidenFaucetReturn {
   faucets: MidenFaucetInfo[];
   createFaucet: (symbol: string, decimals: number, maxSupply: bigint) => Promise<string | undefined>;
   mintTokens: (recipientId: string, faucetId: string, amount: bigint) => Promise<boolean | undefined>;
   getFaucetId: (idStr: string) => AccountId | string;
+  /** @deprecated use isCreatingFaucet or isMinting */
   isLoading: boolean;
+  isCreatingFaucet: boolean;
+  isMinting: boolean;
   error: string | null;
 }
 
@@ -24,10 +27,11 @@ export function useMidenFaucet(
   client: WebClient | null,
   _prover: TransactionProver | null,
   getAccountId: (idStr: string) => AccountId | string,
-  accountObjectsRef: React.MutableRefObject<Map<string, Account>>,
+  accountObjectsRef: MutableRefObject<Map<string, Account>>,
 ): UseMidenFaucetReturn {
   const [faucets, setFaucets] = useState<MidenFaucetInfo[]>(() => loadFaucets());
-  const [isLoading, setIsLoading] = useState(false);
+  const [isCreatingFaucet, setIsCreatingFaucet] = useState(false);
+  const [isMinting, setIsMinting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Restore faucet Account WASM objects from client when available
@@ -67,7 +71,7 @@ export function useMidenFaucet(
   const createFaucet = useCallback(async (symbol: string, decimals: number, maxSupply: bigint) => {
     if (!client) return;
 
-    setIsLoading(true);
+    setIsCreatingFaucet(true);
     setError(null);
 
     try {
@@ -103,7 +107,7 @@ export function useMidenFaucet(
       setError(message);
       throw err;
     } finally {
-      setIsLoading(false);
+      setIsCreatingFaucet(false);
     }
   }, [client, accountObjectsRef]);
 
@@ -123,7 +127,7 @@ export function useMidenFaucet(
   ) => {
     if (!client) return;
 
-    setIsLoading(true);
+    setIsMinting(true);
     setError(null);
 
     try {
@@ -154,9 +158,18 @@ export function useMidenFaucet(
       setError(message);
       throw err;
     } finally {
-      setIsLoading(false);
+      setIsMinting(false);
     }
   }, [client, getAccountId, getFaucetId]);
 
-  return { faucets, createFaucet, mintTokens, getFaucetId, isLoading, error };
+  return {
+    faucets,
+    createFaucet,
+    mintTokens,
+    getFaucetId,
+    isLoading: isCreatingFaucet || isMinting,
+    isCreatingFaucet,
+    isMinting,
+    error,
+  };
 }

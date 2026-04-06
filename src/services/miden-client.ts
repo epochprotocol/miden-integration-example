@@ -31,7 +31,7 @@ export async function initMiden(): Promise<MidenClientState> {
 
     proverInstance = TransactionProver.newRemoteProver(MIDEN_CONFIG.proverUrl);
 
-    const state = await clientInstance.syncState();
+    await clientInstance.syncState();
 
     return { client: clientInstance, prover: proverInstance };
   })();

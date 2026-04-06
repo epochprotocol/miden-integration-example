@@ -10,7 +10,11 @@ interface UseMidenTransferReturn {
   consumeNotes: (accountId: string) => Promise<boolean | undefined>;
   refreshConsumableNotes: (accountId: string) => Promise<ConsumableNote[]>;
   consumableNotes: ConsumableNote[];
+  /** @deprecated use isSending, isConsuming, or isRefreshingNotes */
   isLoading: boolean;
+  isSending: boolean;
+  isConsuming: boolean;
+  isRefreshingNotes: boolean;
   error: string | null;
 }
 
@@ -26,7 +30,9 @@ export function useMidenTransfer(
   getAccountId: (idStr: string) => AccountId | string,
   getFaucetId: (idStr: string) => AccountId | string,
 ): UseMidenTransferReturn {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [isConsuming, setIsConsuming] = useState(false);
+  const [isRefreshingNotes, setIsRefreshingNotes] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [consumableNotes, setConsumableNotes] = useState<ConsumableNote[]>([]);
 
@@ -39,7 +45,7 @@ export function useMidenTransfer(
   ) => {
     if (!client) return;
 
-    setIsLoading(true);
+    setIsSending(true);
     setError(null);
 
     try {
@@ -80,14 +86,14 @@ export function useMidenTransfer(
       setError(message);
       throw err;
     } finally {
-      setIsLoading(false);
+      setIsSending(false);
     }
   }, [client, getAccountId, getFaucetId]);
 
   const refreshConsumableNotes = useCallback(async (accountId: string) => {
     if (!client) return [];
 
-    setIsLoading(true);
+    setIsRefreshingNotes(true);
     setError(null);
 
     try {
@@ -121,14 +127,14 @@ export function useMidenTransfer(
       setError(err instanceof Error ? err.message : 'Failed to fetch consumable notes');
       return [];
     } finally {
-      setIsLoading(false);
+      setIsRefreshingNotes(false);
     }
   }, [client, getAccountId]);
 
   const consumeNotes = useCallback(async (accountId: string) => {
     if (!client) return;
 
-    setIsLoading(true);
+    setIsConsuming(true);
     setError(null);
 
     try {
@@ -175,9 +181,19 @@ export function useMidenTransfer(
       setError(message);
       throw err;
     } finally {
-      setIsLoading(false);
+      setIsConsuming(false);
     }
   }, [client, getAccountId]);
 
-  return { sendTokens, consumeNotes, refreshConsumableNotes, consumableNotes, isLoading, error };
+  return {
+    sendTokens,
+    consumeNotes,
+    refreshConsumableNotes,
+    consumableNotes,
+    isLoading: isSending || isConsuming || isRefreshingNotes,
+    isSending,
+    isConsuming,
+    isRefreshingNotes,
+    error,
+  };
 }

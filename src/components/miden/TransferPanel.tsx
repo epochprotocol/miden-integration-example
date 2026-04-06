@@ -1,15 +1,27 @@
 import { useState } from 'react';
 import type { MidenAccount, MidenFaucetInfo } from '../../types/miden';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { SelectContent, SelectItem, SelectRoot, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Props {
   accounts: MidenAccount[];
   faucets: MidenFaucetInfo[];
-  onSendTokens: (senderId: string, receiverId: string, faucetId: string, amount: bigint) => Promise<boolean | undefined>;
+  onSendTokens: (
+    senderId: string,
+    receiverId: string,
+    faucetId: string,
+    amount: bigint,
+  ) => Promise<{ success: boolean; noteId?: string } | undefined>;
   onConsumeNotes: (accountId: string) => Promise<boolean | undefined>;
   onRefreshConsumable: (accountId: string) => Promise<any>;
   onSyncBalance: () => Promise<void>;
   consumableNotes: { noteId: string }[];
-  isLoading: boolean;
+  isSending: boolean;
+  isConsuming: boolean;
+  isRefreshingNotes: boolean;
 }
 
 export function TransferPanel({
@@ -20,7 +32,9 @@ export function TransferPanel({
   onRefreshConsumable,
   onSyncBalance,
   consumableNotes,
-  isLoading,
+  isSending,
+  isConsuming,
+  isRefreshingNotes,
 }: Props) {
   const [senderId, setSenderId] = useState('');
   const [receiverId, setReceiverId] = useState('');
@@ -31,133 +45,173 @@ export function TransferPanel({
   const [consumeAccountId, setConsumeAccountId] = useState('');
   const [consumeStatus, setConsumeStatus] = useState('');
 
-  const handleSend = async () => {
+  const handleSend = () => {
     if (!senderId || !receiverId || !faucetId || !amount) return;
-    setSendStatus('Sending P2ID note...');
-    try {
-      await onSendTokens(senderId, receiverId, faucetId, BigInt(amount));
-      setSendStatus('P2ID note sent! Receiver must sync & consume to see tokens.');
-    } catch {
-      setSendStatus('Send failed');
-    }
+    void toast.promise(
+      (async () => {
+        await onSendTokens(senderId, receiverId, faucetId, BigInt(amount));
+      })(),
+      {
+        loading: 'Sending P2ID note…',
+        success: 'P2ID note sent — receiver should sync and consume',
+        error: (err) => {
+          setSendStatus('Send failed');
+          return err instanceof Error ? err.message : 'Send failed';
+        },
+      },
+    );
   };
 
-  const handleConsume = async () => {
+  const handleConsume = () => {
     if (!consumeAccountId) return;
-    setConsumeStatus('Consuming notes...');
-    try {
-      const result = await onConsumeNotes(consumeAccountId);
-      if (result) {
-        setConsumeStatus('Notes consumed! Syncing balances...');
-        await onSyncBalance();
-        setConsumeStatus('Notes consumed and balances updated.');
-      } else {
-        setConsumeStatus('No notes to consume');
-      }
-    } catch {
-      setConsumeStatus('Consume failed');
-    }
+    void toast.promise(
+      (async () => {
+        const result = await onConsumeNotes(consumeAccountId);
+        if (result) await onSyncBalance();
+        if (!result) {
+          setConsumeStatus('No notes to consume');
+          return 'No consumable notes right now';
+        }
+        return 'Notes consumed and balances updated';
+      })(),
+      {
+        loading: 'Consuming notes…',
+        success: (msg) => msg,
+        error: (err) => {
+          setConsumeStatus('Consume failed');
+          return err instanceof Error ? err.message : 'Consume failed';
+        },
+      },
+    );
+  };
+
+  const handleRefreshNotes = () => {
+    if (!consumeAccountId) return;
+    void toast.promise(
+      (async () => {
+        const notes = await onRefreshConsumable(consumeAccountId);
+        return `Found ${notes.length} consumable note${notes.length === 1 ? '' : 's'}`;
+      })(),
+      {
+        loading: 'Checking consumable notes…',
+        success: (msg) => msg,
+        error: (err) => (err instanceof Error ? err.message : 'Could not refresh notes'),
+      },
+    );
   };
 
   if (accounts.length === 0) return null;
 
   return (
-    <div className="bg-gray-800 rounded-xl p-6 space-y-6">
+    <div className="ui-card space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-white mb-4">Send Tokens (P2ID)</h2>
-        <div className="space-y-3">
+        <h2 className="text-lg font-semibold text-neutral-900">Send tokens (P2ID)</h2>
+        <p className="mt-2 text-sm leading-relaxed text-neutral-600">
+          Pay-to-ID: send faucet tokens to another Miden account by ID. The receiver must sync and consume incoming
+          notes before balances update.
+        </p>
+        <div className="mt-4 space-y-3">
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Sender</label>
-            <select
-              value={senderId}
-              onChange={e => setSenderId(e.target.value)}
-              className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm"
-            >
-              <option value="">Select sender</option>
-              {accounts.map(a => (
-                <option key={a.id} value={a.id}>{a.label} — {a.id.slice(0, 16)}...</option>
-              ))}
-            </select>
+            <Label>Sender</Label>
+            <SelectRoot value={senderId || undefined} onValueChange={setSenderId}>
+              <SelectTrigger aria-label="Select sender">
+                <SelectValue placeholder="Select sender" />
+              </SelectTrigger>
+              <SelectContent>
+                {accounts.map((a) => (
+                  <SelectItem key={a.id} value={a.id}>
+                    {a.label} — {a.id.slice(0, 16)}…
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </SelectRoot>
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Receiver Account ID</label>
-            <input
+            <Label htmlFor="p2id-receiver">Receiver account ID</Label>
+            <Input
+              id="p2id-receiver"
               value={receiverId}
-              onChange={e => setReceiverId(e.target.value)}
-              placeholder="Paste receiver account ID"
-              className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm"
+              onChange={(e) => setReceiverId(e.target.value)}
+              placeholder="Wallet or account ID"
+              className="font-mono text-[13px]"
             />
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Faucet</label>
-            <select
-              value={faucetId}
-              onChange={e => setFaucetId(e.target.value)}
-              className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm"
-            >
-              <option value="">Select faucet</option>
-              {faucets.map(f => (
-                <option key={f.id} value={f.id}>{f.symbol} — {f.id.slice(0, 16)}...</option>
-              ))}
-            </select>
+            <Label>Faucet</Label>
+            <SelectRoot value={faucetId || undefined} onValueChange={setFaucetId}>
+              <SelectTrigger aria-label="Select faucet">
+                <SelectValue placeholder="Select faucet" />
+              </SelectTrigger>
+              <SelectContent>
+                {faucets.map((f) => (
+                  <SelectItem key={f.id} value={f.id}>
+                    {f.symbol} — {f.id.slice(0, 16)}…
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </SelectRoot>
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Amount</label>
-            <input
-              value={amount}
-              onChange={e => setAmount(e.target.value)}
-              className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm"
-            />
+            <Label htmlFor="p2id-amount">Amount</Label>
+            <Input id="p2id-amount" value={amount} onChange={(e) => setAmount(e.target.value)} />
           </div>
-          <button
+          <Button
+            type="button"
             onClick={handleSend}
-            disabled={isLoading || !senderId || !receiverId || !faucetId}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-600 text-white text-sm rounded-lg transition-colors"
+            disabled={isSending || !senderId || !receiverId || !faucetId}
           >
-            {isLoading ? 'Sending...' : 'Send via P2ID'}
-          </button>
-          {sendStatus && <p className="text-sm text-yellow-400">{sendStatus}</p>}
+            {isSending ? 'Sending…' : 'Send via P2ID'}
+          </Button>
+          {sendStatus && <p className="text-sm text-amber-800">{sendStatus}</p>}
         </div>
       </div>
 
-      <div className="border-t border-gray-700 pt-6">
-        <h2 className="text-lg font-semibold text-white mb-4">Consume Notes</h2>
-        <div className="space-y-3">
+      <div className="border-t border-neutral-200 pt-6">
+        <h2 className="text-lg font-semibold text-neutral-900">Consume notes</h2>
+        <p className="mt-2 text-sm leading-relaxed text-neutral-600">
+          Apply pending incoming P2ID (or similar) notes to this account’s vault. Use “Check notes” first if you are
+          unsure anything is waiting; “Consume all” finalizes what the node reports as consumable.
+        </p>
+        <div className="mt-4 space-y-3">
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Account</label>
-            <select
-              value={consumeAccountId}
-              onChange={e => setConsumeAccountId(e.target.value)}
-              className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm"
-            >
-              <option value="">Select account</option>
-              {accounts.map(a => (
-                <option key={a.id} value={a.id}>{a.label} — {a.id.slice(0, 16)}...</option>
-              ))}
-            </select>
+            <Label>Account</Label>
+            <SelectRoot value={consumeAccountId || undefined} onValueChange={setConsumeAccountId}>
+              <SelectTrigger aria-label="Select account">
+                <SelectValue placeholder="Select account" />
+              </SelectTrigger>
+              <SelectContent>
+                {accounts.map((a) => (
+                  <SelectItem key={a.id} value={a.id}>
+                    {a.label} — {a.id.slice(0, 16)}…
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </SelectRoot>
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => consumeAccountId && onRefreshConsumable(consumeAccountId)}
-              disabled={isLoading || !consumeAccountId}
-              className="px-4 py-2 bg-gray-600 hover:bg-gray-500 disabled:bg-gray-700 text-white text-sm rounded-lg transition-colors"
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={handleRefreshNotes}
+              disabled={isRefreshingNotes || !consumeAccountId}
             >
-              Check Notes
-            </button>
-            <button
+              {isRefreshingNotes ? 'Checking…' : 'Check notes'}
+            </Button>
+            <Button
+              type="button"
+              variant="default"
               onClick={handleConsume}
-              disabled={isLoading || !consumeAccountId}
-              className="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 text-white text-sm rounded-lg transition-colors"
+              disabled={isConsuming || !consumeAccountId}
             >
-              {isLoading ? 'Consuming...' : 'Consume All'}
-            </button>
+              {isConsuming ? 'Consuming…' : 'Consume all'}
+            </Button>
           </div>
           {consumableNotes.length > 0 && (
-            <div className="text-sm text-gray-400">
-              {consumableNotes.length} consumable note(s) found
+            <div className="text-sm text-neutral-600">
+              {consumableNotes.length} consumable note{consumableNotes.length === 1 ? '' : 's'} found
             </div>
           )}
-          {consumeStatus && <p className="text-sm text-yellow-400">{consumeStatus}</p>}
+          {consumeStatus && <p className="text-sm text-amber-800">{consumeStatus}</p>}
         </div>
       </div>
     </div>
