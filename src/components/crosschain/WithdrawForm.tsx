@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAccount } from 'wagmi';
 import type { MidenAccount, MidenFaucetInfo, EVMToMidenIntentParams } from '../../types/miden';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -20,31 +21,41 @@ const SEPOLIA_TOKENS = [
 ];
 
 const TOKEN_CUSTOM = '__custom__';
+const FAUCET_CUSTOM = '__custom_faucet__';
 
 interface Props {
   accounts: MidenAccount[];
   faucets: MidenFaucetInfo[];
   onWithdraw: (params: EVMToMidenIntentParams) => Promise<any>;
   isLoading: boolean;
+  isSDKReady: boolean;
 }
 
-export function WithdrawForm({ accounts, faucets, onWithdraw, isLoading }: Props) {
+export function WithdrawForm({ accounts, faucets, onWithdraw, isLoading, isSDKReady }: Props) {
   const [evmToken, setEvmToken] = useState(SEPOLIA_TOKENS[0].address);
   const [customToken, setCustomToken] = useState('');
   const [amount, setAmount] = useState('100');
   const [chainId, setChainId] = useState('11155111');
   const [midenRecipientId, setMidenRecipientId] = useState('');
   const [midenFaucetId, setMidenFaucetId] = useState('');
-  const [evmAddress, setEvmAddress] = useState('0x4235215114484bACDfF0071dB54Dc9faaD3489a9');
+  const [customFaucetId, setCustomFaucetId] = useState('');
+  const { address: connectedAddress } = useAccount();
+  const [evmAddress, setEvmAddress] = useState('');
   const [status, setStatus] = useState('');
 
+  useEffect(() => {
+    if (connectedAddress) setEvmAddress(connectedAddress);
+  }, [connectedAddress]);
+
   const tokenSelectValue = evmToken === '' ? TOKEN_CUSTOM : evmToken;
+  const faucetSelectValue = midenFaucetId === '' ? FAUCET_CUSTOM : midenFaucetId;
+  const resolvedFaucetId = customFaucetId || midenFaucetId;
 
   const handleSubmit = () => {
     const finalToken = customToken || evmToken;
-    if (!finalToken || !amount || !midenRecipientId || !midenFaucetId || !evmAddress) return;
+    if (!finalToken || !amount || !midenRecipientId || !resolvedFaucetId || !evmAddress) return;
 
-    const selectedFaucet = faucets.find((f) => f.id === midenFaucetId);
+    const selectedFaucet = faucets.find((f) => f.id === resolvedFaucetId);
     const selectedToken = SEPOLIA_TOKENS.find((t) => t.address === finalToken);
 
     const params: EVMToMidenIntentParams = {
@@ -54,7 +65,7 @@ export function WithdrawForm({ accounts, faucets, onWithdraw, isLoading }: Props
       evmTokenDecimals: selectedToken?.decimals ?? 18,
       sourceChainId: parseInt(chainId, 10),
       midenRecipientId,
-      midenFaucetId,
+      midenFaucetId: resolvedFaucetId,
       midenDecimals: selectedFaucet?.decimals ?? 8,
     };
 
@@ -175,7 +186,18 @@ export function WithdrawForm({ accounts, faucets, onWithdraw, isLoading }: Props
           </div>
           <div>
             <Label>Miden faucet</Label>
-            <SelectRoot value={midenFaucetId || undefined} onValueChange={setMidenFaucetId}>
+            <SelectRoot
+              value={faucetSelectValue}
+              onValueChange={(v) => {
+                if (v === FAUCET_CUSTOM) {
+                  setMidenFaucetId('');
+                  setCustomFaucetId('');
+                } else {
+                  setMidenFaucetId(v);
+                  setCustomFaucetId('');
+                }
+              }}
+            >
               <SelectTrigger aria-label="Select Miden faucet">
                 <SelectValue placeholder="Select faucet" />
               </SelectTrigger>
@@ -185,10 +207,24 @@ export function WithdrawForm({ accounts, faucets, onWithdraw, isLoading }: Props
                     {f.symbol} — {f.id.slice(0, 16)}…
                   </SelectItem>
                 ))}
+                <SelectItem value={FAUCET_CUSTOM}>Custom faucet ID</SelectItem>
               </SelectContent>
             </SelectRoot>
           </div>
         </div>
+
+        {midenFaucetId === '' && (
+          <div>
+            <Label htmlFor="wd-custom-faucet">Custom faucet ID</Label>
+            <Input
+              id="wd-custom-faucet"
+              value={customFaucetId}
+              onChange={(e) => setCustomFaucetId(e.target.value)}
+              placeholder="0x…"
+              className="font-mono text-[13px]"
+            />
+          </div>
+        )}
 
         <Button
           type="button"
@@ -196,11 +232,17 @@ export function WithdrawForm({ accounts, faucets, onWithdraw, isLoading }: Props
           size="lg"
           onClick={handleSubmit}
           disabled={
-            isLoading || !midenRecipientId || !midenFaucetId || !evmAddress || !(customToken || evmToken)
+            isLoading || !isSDKReady || !midenRecipientId || !resolvedFaucetId || !evmAddress || !(customToken || evmToken)
           }
         >
           {isLoading ? 'Processing…' : 'Withdraw to Miden'}
         </Button>
+
+        {!isSDKReady && (
+          <p className="text-xs text-amber-800">
+            Epoch SDK is not ready. Connect your EVM wallet above and wait for it to load.
+          </p>
+        )}
 
         {status && (
           <p className={`text-sm ${status.startsWith('Error') ? 'text-red-600' : 'text-amber-800'}`}>{status}</p>

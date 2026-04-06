@@ -20,6 +20,7 @@ const SEPOLIA_TOKENS = [
 ];
 
 const TOKEN_CUSTOM = '__custom__';
+const FAUCET_CUSTOM = '__custom_faucet__';
 
 interface Props {
   accounts: MidenAccount[];
@@ -52,6 +53,7 @@ export function IntentForm({
 }: Props) {
   const [midenAccountId, setMidenAccountId] = useState('');
   const [faucetId, setFaucetId] = useState('');
+  const [customFaucetId, setCustomFaucetId] = useState('');
   const [amount, setAmount] = useState('100');
   const [outputToken, setOutputToken] = useState(SEPOLIA_TOKENS[0].address);
   const [customToken, setCustomToken] = useState('');
@@ -62,6 +64,8 @@ export function IntentForm({
   const [recallBlocks, setRecallBlocks] = useState('100');
   const [reclaimStatus, setReclaimStatus] = useState('');
 
+  const faucetSelectValue = faucetId === '' ? FAUCET_CUSTOM : faucetId;
+  const resolvedFaucetId = customFaucetId || faucetId;
   const outputSelectValue = outputToken === '' ? TOKEN_CUSTOM : outputToken;
 
   const handleReclaim = () => {
@@ -87,7 +91,7 @@ export function IntentForm({
   };
 
   const handleSubmit = () => {
-    if (!midenAccountId || !faucetId || !amount || !evmAddress) return;
+    if (!midenAccountId || !resolvedFaucetId || !amount || !evmAddress) return;
 
     const finalOutputToken = customToken || outputToken;
     if (!finalOutputToken || finalOutputToken === '0x0000000000000000000000000000000000000000') {
@@ -103,11 +107,11 @@ export function IntentForm({
         const recallOffset = parseInt(recallBlocks, 10) || 100;
         const recallHeight = currentBlockHeight ? currentBlockHeight + recallOffset : undefined;
 
-        const selectedFaucet = faucets.find((f) => f.id === faucetId);
+        const selectedFaucet = faucets.find((f) => f.id === resolvedFaucetId);
 
         const params: CrossChainIntentParams = {
           midenAccountId,
-          midenFaucetId: faucetId,
+          midenFaucetId: resolvedFaucetId,
           midenAmount: amount,
           midenDecimals: selectedFaucet?.decimals ?? 8,
           midenReclaimHeight: recallHeight,
@@ -184,7 +188,18 @@ export function IntentForm({
           </div>
           <div>
             <Label>Token (faucet)</Label>
-            <SelectRoot value={faucetId || undefined} onValueChange={setFaucetId}>
+            <SelectRoot
+              value={faucetSelectValue}
+              onValueChange={(v) => {
+                if (v === FAUCET_CUSTOM) {
+                  setFaucetId('');
+                  setCustomFaucetId('');
+                } else {
+                  setFaucetId(v);
+                  setCustomFaucetId('');
+                }
+              }}
+            >
               <SelectTrigger aria-label="Select faucet">
                 <SelectValue placeholder="Select faucet" />
               </SelectTrigger>
@@ -194,10 +209,24 @@ export function IntentForm({
                     {f.symbol} — {f.id.slice(0, 16)}…
                   </SelectItem>
                 ))}
+                <SelectItem value={FAUCET_CUSTOM}>Custom faucet ID</SelectItem>
               </SelectContent>
             </SelectRoot>
           </div>
         </div>
+
+        {faucetId === '' && (
+          <div>
+            <Label htmlFor="intent-custom-faucet">Custom faucet ID</Label>
+            <Input
+              id="intent-custom-faucet"
+              value={customFaucetId}
+              onChange={(e) => setCustomFaucetId(e.target.value)}
+              placeholder="0x…"
+              className="font-mono text-[13px]"
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-3 gap-3">
           <div>
@@ -288,7 +317,7 @@ export function IntentForm({
           className="w-full"
           size="lg"
           onClick={handleSubmit}
-          disabled={isCreateIntentBusy || !isSDKReady || !midenAccountId || !faucetId || !evmAddress}
+          disabled={isCreateIntentBusy || !isSDKReady || !midenAccountId || !resolvedFaucetId || !evmAddress}
         >
           {isCreateIntentBusy ? 'Processing…' : 'Create cross-chain intent'}
         </Button>

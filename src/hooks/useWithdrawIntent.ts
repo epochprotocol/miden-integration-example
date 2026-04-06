@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useWalletClient } from 'wagmi';
 import { buildEVMToMidenIntent } from '../services/epoch-bridge';
 import type { EVMToMidenIntentParams, IntentResult } from '../types/miden';
@@ -11,14 +11,16 @@ export function useWithdrawIntent() {
   const { data: walletClient } = useWalletClient();
   const [sdk, setSdk] = useState<any>(null);
 
-  useMemo(() => {
+  useEffect(() => {
     if (!walletClient) {
       console.log('[Withdraw] No wallet client, SDK not available');
       setSdk(null);
       return;
     }
+    let cancelled = false;
     console.log('[Withdraw] Initializing Epoch SDK with real walletClient...');
     import('@epoch-protocol/epoch-intents-sdk').then(({ EpochIntentSDK }) => {
+      if (cancelled) return;
       const apiBaseUrl = import.meta.env.VITE_ALLOCATOR_URL || 'http://localhost:3000';
       console.log('[Withdraw] Epoch SDK loaded, creating instance with API:', apiBaseUrl);
       setSdk(new EpochIntentSDK({
@@ -27,9 +29,11 @@ export function useWithdrawIntent() {
       }));
       console.log('[Withdraw] Epoch SDK ready');
     }).catch((err) => {
+      if (cancelled) return;
       console.error('[Withdraw] Failed to load Epoch SDK:', err);
       setSdk(null);
     });
+    return () => { cancelled = true; };
   }, [walletClient]);
 
   const createWithdrawIntent = useCallback(async (params: EVMToMidenIntentParams) => {
@@ -70,5 +74,6 @@ export function useWithdrawIntent() {
     withdrawResult,
     isLoading,
     error,
+    isSDKReady: !!sdk,
   };
 }

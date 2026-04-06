@@ -148,6 +148,7 @@ function App() {
               faucets={faucet.faucets}
               onWithdraw={withdraw.createWithdrawIntent}
               isLoading={withdraw.isLoading}
+              isSDKReady={withdraw.isSDKReady}
             />
             <IntentStatus
               result={withdraw.withdrawResult}
