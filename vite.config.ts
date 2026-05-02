@@ -14,20 +14,19 @@ export default defineConfig({
     },
   },
   plugins: [react(), wasm(), topLevelAwait()],
-  worker: {
-    plugins: () => [wasm(), topLevelAwait()],
-    format: 'es',
-  },
+  // worker: {
+  //   plugins: () => [wasm(), topLevelAwait()],
+  //   format: 'es',
+  // },
   optimizeDeps: {
     exclude: ['@miden-sdk/miden-sdk'],
   },
   build: {
     target: 'esnext',
   },
-  server: {
-    headers: {
-      'Cross-Origin-Opener-Policy': 'same-origin',
-      'Cross-Origin-Embedder-Policy': 'credentialless',
-    },
-  },
+  // Do not set COOP/COEP on the dev document. Cross-origin isolation can make fetches to the
+  // Miden note transport (`https://transport.miden.io`, gRPC-Web) appear without a readable
+  // `Content-Type`, which surfaces as: MissingContentTypeHeader / "failed to sync state".
+  // Opt back in only if you need crossOriginIsolation for something else (e.g. threaded WASM):
+  // server: { headers: { 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Embedder-Policy': 'credentialless' } } },
 })

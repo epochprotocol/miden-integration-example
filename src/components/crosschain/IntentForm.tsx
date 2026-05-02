@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import type { MidenAccount, MidenFaucetInfo, CrossChainIntentParams } from '../../types/miden';
-import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SelectContent, SelectItem, SelectRoot, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useAccounts, useConsume, useNotes, useSend, useSyncState } from '@miden-sdk/react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import type { CrossChainIntentParams, MidenAccount, MidenFaucetInfo } from '../../types/miden';
 
 const SEPOLIA_TOKENS = [
   { symbol: 'USDC', address: '0x2BB4FfD7E2c6D432b697554Efd77fA13bdbefd69' },
@@ -22,21 +23,20 @@ const SEPOLIA_TOKENS = [
 const TOKEN_CUSTOM = '__custom__';
 const FAUCET_CUSTOM = '__custom_faucet__';
 
+function waitTwoAnimationFrames(): Promise<void> {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => resolve());
+    });
+  });
+}
+
 interface Props {
   accounts: MidenAccount[];
   faucets: MidenFaucetInfo[];
-  onCreateIntent: (params: CrossChainIntentParams) => Promise<any>;
-  onSendP2ID: (
-    senderId: string,
-    receiverId: string,
-    faucetId: string,
-    amount: bigint,
-    recallHeight?: number,
-  ) => Promise<{ success: boolean; noteId?: string } | undefined>;
-  onReclaimNotes: (accountId: string) => Promise<boolean | undefined>;
+  onCreateIntent: (params: CrossChainIntentParams) => Promise<unknown>;
   currentBlockHeight?: number;
   isCreateIntentBusy: boolean;
-  isReclaimBusy: boolean;
   isSDKReady: boolean;
 }
 
@@ -44,11 +44,8 @@ export function IntentForm({
   accounts,
   faucets,
   onCreateIntent,
-  onSendP2ID,
-  onReclaimNotes,
   currentBlockHeight,
   isCreateIntentBusy,
-  isReclaimBusy,
   isSDKReady,
 }: Props) {
   const [midenAccountId, setMidenAccountId] = useState('');
@@ -64,6 +61,21 @@ export function IntentForm({
   const [recallBlocks, setRecallBlocks] = useState('100');
   const [reclaimStatus, setReclaimStatus] = useState('');
 
+  const { sync } = useSyncState();
+  const { refetch: refetchAccounts } = useAccounts();
+  const { send, isLoading: isSending } = useSend();
+  const { consume, isLoading: isConsuming } = useConsume();
+  const reclaimNotesFilter = useMemo(
+    () => (midenAccountId ? ({ status: 'committed' as const, accountId: midenAccountId } as const) : undefined),
+    [midenAccountId],
+  );
+  const { consumableNotes, refetch: refetchReclaimNotes, isLoading: reclaimNotesLoading } = useNotes(reclaimNotesFilter);
+  const latestReclaimConsumable = useRef(consumableNotes);
+  useEffect(() => {
+    latestReclaimConsumable.current = consumableNotes;
+  }, [consumableNotes]);
+  const reclaimBusy = isConsuming || reclaimNotesLoading;
+
   const faucetSelectValue = faucetId === '' ? FAUCET_CUSTOM : faucetId;
   const resolvedFaucetId = customFaucetId || faucetId;
   const outputSelectValue = outputToken === '' ? TOKEN_CUSTOM : outputToken;
@@ -73,8 +85,24 @@ export function IntentForm({
     setReclaimStatus('');
     void toast.promise(
       (async () => {
-        const result = await onReclaimNotes(midenAccountId);
-        const msg = result ? 'Notes reclaimed successfully.' : 'No reclaimable notes found.';
+        await sync();
+        await refetchReclaimNotes();
+        await waitTwoAnimationFrames();
+        const notes = latestReclaimConsumable.current;
+        if (!notes.length) {
+          const msg = 'No reclaimable notes found.';
+          setReclaimStatus(msg);
+          return msg;
+        }
+        const reclaimConsumeOut = await consume({
+          accountId: midenAccountId,
+          notes: notes.map((n) => n.inputNoteRecord()),
+        });
+        console.log('[Miden] reclaim consume transactionId:', reclaimConsumeOut.transactionId);
+        await sync();
+        await refetchAccounts();
+        await refetchReclaimNotes();
+        const msg = 'Notes reclaimed successfully.';
         setReclaimStatus(msg);
         return msg;
       })(),
@@ -128,14 +156,28 @@ export function IntentForm({
           createMidenP2IDNote: async (faucetIdParam: string, amountParam: string, allocatorId: string) => {
             setStatus('Resource lock required — creating P2IDE note on Miden…');
             try {
-              const result = await onSendP2ID(
-                midenAccountId,
-                allocatorId,
-                faucetIdParam,
-                BigInt(amountParam),
-                recallHeight,
-              );
-              return result || { success: false };
+              const out = await send({
+                from: midenAccountId,
+                to: allocatorId,
+                assetId: faucetIdParam,
+                amount: BigInt(amountParam),
+                noteType: recallHeight != null ? 'public' : 'private',
+                recallHeight: recallHeight ?? undefined,
+              });
+
+              let noteIdStr: string | null = null;
+              if (out.note) {
+                try {
+                  noteIdStr = out.note.id().toString();
+                } catch {
+                  noteIdStr = null;
+                }
+              }
+              console.log('[Miden] intent P2ID send txId:', out.txId, 'output note id:', noteIdStr);
+              await sync();
+              await refetchAccounts();
+
+              return { success: true, noteId: noteIdStr ?? undefined };
             } catch (err) {
               const errorMsg = err instanceof Error ? err.message : String(err);
               return { success: false, error: errorMsg };
@@ -317,9 +359,11 @@ export function IntentForm({
           className="w-full"
           size="lg"
           onClick={handleSubmit}
-          disabled={isCreateIntentBusy || !isSDKReady || !midenAccountId || !resolvedFaucetId || !evmAddress}
+          disabled={
+            isCreateIntentBusy || isSending || !isSDKReady || !midenAccountId || !resolvedFaucetId || !evmAddress
+          }
         >
-          {isCreateIntentBusy ? 'Processing…' : 'Create cross-chain intent'}
+          {isCreateIntentBusy || isSending ? 'Processing…' : 'Create cross-chain intent'}
         </Button>
 
         {!isSDKReady && (
@@ -345,7 +389,7 @@ export function IntentForm({
               variant="secondary"
               size="sm"
               onClick={handleReclaim}
-              disabled={isReclaimBusy || !midenAccountId}
+              disabled={reclaimBusy || !midenAccountId}
             >
               Reclaim expired notes
             </Button>
