@@ -167,7 +167,10 @@ export function IntentForm({
     void toast.promise(
       (async () => {
         setConfirmStatus('Submitting intent…');
-        await onConfirmIntent(createMidenP2IDNote);
+        const result = await onConfirmIntent(createMidenP2IDNote);
+        if (result && typeof result === 'object' && 'error' in result && (result as { error?: string }).error) {
+          throw new Error((result as { error: string }).error);
+        }
         setConfirmStatus('Intent submitted successfully.');
         return 'Cross-chain intent submitted';
       })(),
@@ -175,9 +178,9 @@ export function IntentForm({
         loading: 'Confirming intent…',
         success: (msg) => msg,
         error: (err) => {
-          const msg = `Error: ${err instanceof Error ? err.message : 'Unknown error'}`;
-          setConfirmStatus(msg);
-          return msg;
+          const msg = err instanceof Error ? err.message : 'Unknown error';
+          setConfirmStatus(`Error: ${msg}. Quote is still saved — try again.`);
+          return `Error: ${msg}`;
         },
       },
     );

@@ -27,7 +27,7 @@ export function useEpochIntent() {
     let cancelled = false;
     import('@epoch-protocol/epoch-intents-sdk').then(({ EpochIntentSDK }) => {
       if (cancelled) return;
-      const apiBaseUrl = "https://testnet-dev.epochprotocol.xyz";
+      const apiBaseUrl = "http://localhost:3000";
       // Miden has no real EVM chain ID — override to dummy 999999999 so the SDK
       // doesn't try to route as an EVM chain.
       const midenWalletClient = {
@@ -79,6 +79,12 @@ export function useEpochIntent() {
         createMidenP2IDNote,
         preFetchedQuote: pendingQuote,
       });
+      if (result?.error) {
+        // Keep the existing quote visible so user can retry confirmation.
+        setIntentResult(result);
+        setError(result.error);
+        throw new Error(result.error);
+      }
       setIntentResult(result);
       setPendingQuote(null);
       return result;
