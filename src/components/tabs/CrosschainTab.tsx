@@ -1,46 +1,12 @@
-import { useMemo } from 'react';
-import { useAccounts } from '@miden-sdk/react';
 import { EVMWalletConnect } from '../crosschain/EVMWalletConnect';
 import { IntentForm } from '../crosschain/IntentForm';
 import { IntentStatus } from '../crosschain/IntentStatus';
 import { useEpochIntent } from '../../hooks/useEpochIntent';
 import { useIntentStatus } from '../../hooks/useIntentStatus';
-import { loadFaucets, loadWallets } from '../../utils/persistence';
-import type { MidenAccount, MidenFaucetInfo } from '../../types/miden';
+import { useMidenWalletAdapter } from '../../hooks/useMidenWalletAdapter';
 
-interface Props {
-  blockNum: number | null;
-}
-
-export function CrosschainTab({ blockNum }: Props) {
-  const { wallets: walletHeaders, faucets: faucetHeaders } = useAccounts();
-
-  const displayWallets: MidenAccount[] = useMemo(() => {
-    const persisted = loadWallets();
-    const localById = new Map(persisted.map((w) => [w.id.toLowerCase(), w]));
-    return walletHeaders.map((h, i) => {
-      const id = h.id().toString();
-      return localById.get(id.toLowerCase()) ?? { id, label: `Wallet ${i + 1}`, type: 'wallet' as const };
-    });
-  }, [walletHeaders]);
-
-  const displayFaucets: MidenFaucetInfo[] = useMemo(() => {
-    const persisted = loadFaucets();
-    const localById = new Map(persisted.map((f) => [f.id.toLowerCase(), f]));
-    return faucetHeaders.map((h, i) => {
-      const id = h.id().toString();
-      return (
-        localById.get(id.toLowerCase()) ?? {
-          id,
-          label: `Faucet ${i + 1}`,
-          type: 'faucet' as const,
-          symbol: '—',
-          decimals: 8,
-          maxSupply: '0',
-        }
-      );
-    });
-  }, [faucetHeaders]);
+export function CrosschainTab() {
+  const midenWallet = useMidenWalletAdapter({ enabled: true });
 
   const epoch = useEpochIntent();
   const intentNonce = epoch.intentResult?.intentNonce;
@@ -52,17 +18,23 @@ export function CrosschainTab({ blockNum }: Props) {
       <header className="space-y-2">
         <h2 className="text-lg font-semibold tracking-tight text-neutral-900 sm:text-xl">Bridge to EVM</h2>
         <p className="max-w-2xl text-sm leading-relaxed text-neutral-600">
-          Connect an Ethereum wallet, pick your Miden wallet and token, then submit your intent. The app may ask you
-          to create a P2ID note when the allocator needs a lock.
+          Connect an Ethereum wallet, pick your Miden wallet and token, then get a quote. Confirm to lock funds and
+          submit the cross-chain intent.
         </p>
       </header>
       <EVMWalletConnect />
       <IntentForm
-        accounts={displayWallets}
-        faucets={displayFaucets}
-        onCreateIntent={epoch.createIntent}
-        currentBlockHeight={blockNum ?? undefined}
-        isCreateIntentBusy={epoch.isLoading}
+        midenConnected={midenWallet.connected}
+        onConnectMiden={() => void midenWallet.connect()}
+        midenAccountId={midenWallet.accountId?.hex ?? null}
+        midenAssets={midenWallet.assets}
+        isLoadingMidenAssets={midenWallet.isLoadingAssets}
+        onFetchQuote={epoch.fetchQuote}
+        onConfirmIntent={epoch.confirmIntent}
+        onClearQuote={epoch.clearQuote}
+        pendingQuote={epoch.pendingQuote}
+        isFetchingQuote={epoch.isFetchingQuote}
+        isConfirmBusy={epoch.isLoading}
         isSDKReady={epoch.isSDKReady}
       />
       <IntentStatus

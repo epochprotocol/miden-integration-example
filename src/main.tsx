@@ -9,8 +9,11 @@ import './index.css';
 import { Toaster } from 'sonner';
 import App from './App';
 import { config } from './config/wagmi';
-import { MidenProvider } from "@miden-sdk/react";
-
+import { MidenFiSignerProvider } from '@miden-sdk/miden-wallet-adapter-react';
+import {
+  AllowedPrivateData,
+  WalletAdapterNetwork,
+} from '@miden-sdk/miden-wallet-adapter-base';
 
 const queryClient = new QueryClient();
 
@@ -26,12 +29,14 @@ createRoot(document.getElementById('root')!).render(
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider theme={rkTheme}>
-          <MidenProvider config={{
-            rpcUrl: "testnet"
-          }}>
+          <MidenFiSignerProvider
+            network={WalletAdapterNetwork.Testnet}
+            appName="Miden Integration Example"
+            allowedPrivateData={AllowedPrivateData.Assets}
+          >
             <App />
             <Toaster position="bottom-right" closeButton duration={5_000} />
-          </MidenProvider>
+          </MidenFiSignerProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

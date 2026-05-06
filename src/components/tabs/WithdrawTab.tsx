@@ -1,41 +1,41 @@
 import { useMemo } from 'react';
-import { useAccounts } from '@miden-sdk/react';
+import { useMidenWalletAdapter } from '../../hooks/useMidenWalletAdapter';
 import { EVMWalletConnect } from '../crosschain/EVMWalletConnect';
 import { WithdrawForm } from '../crosschain/WithdrawForm';
 import { IntentStatus } from '../crosschain/IntentStatus';
 import { useWithdrawIntent } from '../../hooks/useWithdrawIntent';
-import { loadFaucets, loadWallets } from '../../utils/persistence';
 import type { MidenAccount, MidenFaucetInfo } from '../../types/miden';
 
 export function WithdrawTab() {
-  const { wallets: walletHeaders, faucets: faucetHeaders } = useAccounts();
-
+  const midenWallet = useMidenWalletAdapter({ enabled: true });
   const displayWallets: MidenAccount[] = useMemo(() => {
-    const persisted = loadWallets();
-    const localById = new Map(persisted.map((w) => [w.id.toLowerCase(), w]));
-    return walletHeaders.map((h, i) => {
-      const id = h.id().toString();
-      return localById.get(id.toLowerCase()) ?? { id, label: `Wallet ${i + 1}`, type: 'wallet' as const };
-    });
-  }, [walletHeaders]);
+    if (!midenWallet.accountId?.hex) return [];
+    return [
+      {
+        id: midenWallet.accountId.hex,
+        label: 'Connected wallet',
+        type: 'wallet' as const,
+      },
+    ];
+  }, [midenWallet.accountId?.hex]);
 
   const displayFaucets: MidenFaucetInfo[] = useMemo(() => {
-    const persisted = loadFaucets();
-    const localById = new Map(persisted.map((f) => [f.id.toLowerCase(), f]));
-    return faucetHeaders.map((h, i) => {
-      const id = h.id().toString();
-      return (
-        localById.get(id.toLowerCase()) ?? {
-          id,
-          label: `Faucet ${i + 1}`,
+    // With adapter-only mode, we don't have faucet metadata. Populate from assets
+    // so users can copy/paste faucet ids they already hold.
+    const unique = new Map<string, MidenFaucetInfo>();
+    for (const a of midenWallet.assets) {
+      if (!unique.has(a.assetId)) {
+        unique.set(a.assetId, {
+          id: a.assetId,
+          label: `${a.assetId.slice(0, 16)}…`,
           type: 'faucet' as const,
           symbol: '—',
-          decimals: 8,
           maxSupply: '0',
-        }
-      );
-    });
-  }, [faucetHeaders]);
+        });
+      }
+    }
+    return Array.from(unique.values());
+  }, [midenWallet.assets]);
 
   const withdraw = useWithdrawIntent();
 
@@ -51,7 +51,11 @@ export function WithdrawTab() {
       <WithdrawForm
         accounts={displayWallets}
         faucets={displayFaucets}
-        onWithdraw={withdraw.createWithdrawIntent}
+        onFetchQuote={withdraw.fetchQuote}
+        onConfirmWithdraw={withdraw.confirmWithdraw}
+        onClearQuote={withdraw.clearQuote}
+        pendingQuote={withdraw.pendingQuote}
+        isFetchingQuote={withdraw.isFetchingQuote}
         isLoading={withdraw.isLoading}
         isSDKReady={withdraw.isSDKReady}
       />

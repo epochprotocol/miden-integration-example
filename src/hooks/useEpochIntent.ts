@@ -1,37 +1,40 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useWalletClient } from 'wagmi';
-import { buildCrossChainIntent } from '../services/epoch-bridge';
+import { useAccount, useWalletClient } from 'wagmi';
+import {
+  buildCrossChainIntent,
+  getCrossChainQuote,
+  type CrossChainQuote,
+} from '../services/epoch-bridge';
 import type { CrossChainIntentParams, IntentResult } from '../types/miden';
+import { CollateralType, type SolveIntentParams } from '@epoch-protocol/epoch-intents-sdk/dist/types';
 
 export function useEpochIntent() {
-
   const [intentResult, setIntentResult] = useState<IntentResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingQuote, setIsFetchingQuote] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-
+  const [pendingQuote, setPendingQuote] = useState<CrossChainQuote | null>(null);
   const [sdk, setSdk] = useState<any>(null);
 
   const { data: walletClient } = useWalletClient();
+  const { address } = useAccount();
 
   useEffect(() => {
     if (!walletClient) {
-      console.log('[CrossChain] No EVM wallet client, SDK not available');
       setSdk(null);
       return;
     }
     let cancelled = false;
-    console.log('[CrossChain] Initializing Epoch SDK...');
     import('@epoch-protocol/epoch-intents-sdk').then(({ EpochIntentSDK }) => {
       if (cancelled) return;
       const apiBaseUrl = import.meta.env.VITE_ALLOCATOR_URL || 'http://localhost:3000';
-      console.log('[CrossChain] Epoch SDK loaded, creating instance with API:', apiBaseUrl);
-      // Cast walletClient to any — the SDK symlink uses its own viem types.
-      setSdk(new EpochIntentSDK({
-        apiBaseUrl,
-        walletClient: walletClient as any,
-      }));
-      console.log('[CrossChain] Epoch SDK ready');
+      // Miden has no real EVM chain ID — override to dummy 999999999 so the SDK
+      // doesn't try to route as an EVM chain.
+      const midenWalletClient = {
+        ...(walletClient as any),
+        chain: { ...((walletClient as any)?.chain ?? {}), id: 999999999 },
+      };
+      setSdk(new EpochIntentSDK({ apiBaseUrl, walletClient: midenWalletClient }));
     }).catch((err) => {
       if (cancelled) return;
       console.error('[CrossChain] Failed to load Epoch SDK:', err);
@@ -40,35 +43,74 @@ export function useEpochIntent() {
     return () => { cancelled = true; };
   }, [walletClient]);
 
-  const createIntent = useCallback(async (params: CrossChainIntentParams) => {
+  /** Step 1: fetch a reverse quote (tokenInAmount=0 → backend computes required Miden input). */
+  const fetchQuote = useCallback(async (params: CrossChainIntentParams) => {
+    if (!sdk) throw new Error('Epoch SDK not ready — connect EVM wallet first');
+    if (!address) throw new Error('Connect EVM wallet first');
+    setIsFetchingQuote(true);
+    setError(null);
+    setPendingQuote(null);
+    try {
+      const quote = await getCrossChainQuote(sdk, params, address);
+      setPendingQuote(quote);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Quote failed';
+      setError(msg);
+      throw err;
+    } finally {
+      setIsFetchingQuote(false);
+    }
+  }, [sdk, address]);
+
+  /** Step 2: execute the stored quote by creating the P2ID note and submitting the intent. */
+  const confirmIntent = useCallback(async (
+    createMidenP2IDNote: SolveIntentParams['createMidenP2IDNote'],
+  ) => {
+    if (!sdk) throw new Error('Epoch SDK not ready');
+    if (!pendingQuote) throw new Error('Fetch a quote first');
     setIsLoading(true);
     setError(null);
     setIntentResult(null);
-
-    console.log('[CrossChain] Creating intent with params:', {
-      midenAccountId: params.midenAccountId,
-      midenFaucetId: params.midenFaucetId.slice(0, 16) + '...',
-      midenAmount: params.midenAmount,
-      evmRecipient: params.evmRecipient,
-      destinationChainId: params.destinationChainId,
-      outputTokenAddress: params.outputTokenAddress,
-      minTokenOut: params.minTokenOut,
-    });
-
     try {
-      if (!sdk) {
-        throw new Error(
-          'Epoch SDK is not ready. Connect your EVM wallet above, wait for it to initialize, or check the console if the SDK failed to load.',
-        );
-      }
-      console.log('[CrossChain] Using Epoch SDK to build intent...');
-      const result = await buildCrossChainIntent(sdk, params);
-      console.log('[CrossChain] Intent created via SDK:', result);
+      const result = await buildCrossChainIntent(sdk, {
+        ...pendingQuote.params,
+        collateralType: CollateralType.Miden,
+        midenSourceAccount: pendingQuote.params.midenAccountId,
+        createMidenP2IDNote,
+        preFetchedQuote: pendingQuote,
+      });
+      setIntentResult(result);
+      setPendingQuote(null);
+      return result;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Failed to confirm intent';
+      setError(msg);
+      throw err;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [sdk, pendingQuote]);
+
+  /** Direct-bridge path: skip quote, call buildCrossChainIntent with explicit midenAmount. */
+  const submitDirectIntent = useCallback(async (
+    params: CrossChainIntentParams,
+    createMidenP2IDNote: SolveIntentParams['createMidenP2IDNote'],
+  ) => {
+    if (!sdk) throw new Error('Epoch SDK not ready');
+    setIsLoading(true);
+    setError(null);
+    setIntentResult(null);
+    try {
+      const result = await buildCrossChainIntent(sdk, {
+        ...params,
+        collateralType: CollateralType.Miden,
+        midenSourceAccount: params.midenAccountId,
+        createMidenP2IDNote,
+      });
       setIntentResult(result);
       return result;
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to create cross-chain intent';
-      console.error('[CrossChain] Intent creation failed:', err);
+      const msg = err instanceof Error ? err.message : 'Failed to submit direct intent';
       setError(msg);
       throw err;
     } finally {
@@ -76,10 +118,20 @@ export function useEpochIntent() {
     }
   }, [sdk]);
 
+  const clearQuote = useCallback(() => {
+    setPendingQuote(null);
+    setError(null);
+  }, []);
+
   return {
-    createIntent,
+    fetchQuote,
+    confirmIntent,
+    submitDirectIntent,
+    clearQuote,
+    pendingQuote,
     intentResult,
     isLoading,
+    isFetchingQuote,
     error,
     isSDKReady: !!sdk,
   };

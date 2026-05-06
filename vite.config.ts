@@ -14,10 +14,10 @@ export default defineConfig({
     },
   },
   plugins: [react(), wasm(), topLevelAwait()],
-  // worker: {
-  //   plugins: () => [wasm(), topLevelAwait()],
-  //   format: 'es',
-  // },
+  worker: {
+    plugins: () => [wasm(), topLevelAwait()],
+    format: 'es',
+  },
   optimizeDeps: {
     exclude: ['@miden-sdk/miden-sdk'],
   },

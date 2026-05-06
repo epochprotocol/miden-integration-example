@@ -4,7 +4,6 @@ interface Props {
 }
 
 const tabs = [
-  { id: 'miden', label: 'Miden wallet' },
   { id: 'crosschain', label: 'Cross-chain bridge' },
   { id: 'withdraw', label: 'Withdraw to Miden' },
 ];

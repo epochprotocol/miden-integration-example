@@ -14,6 +14,8 @@
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@metamask/sdk": "^0.34.0",
     "@miden-sdk/miden-sdk": "^0.14.5",
+    "@miden-sdk/miden-wallet-adapter-base": "^0.14.5",
+    "@miden-sdk/miden-wallet-adapter-react": "^0.14.5",
     "@miden-sdk/react": "^0.14.5",
     "@phosphor-icons/react": "^2.1.10",
     "@rainbow-me/rainbowkit": "^2.2.10",
