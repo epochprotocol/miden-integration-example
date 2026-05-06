@@ -1,283 +1,376 @@
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { SelectContent, SelectItem, SelectRoot, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useMidenFiWallet } from '@miden-sdk/miden-wallet-adapter-react';
+import { SendTransaction } from '@miden-sdk/miden-wallet-adapter-base';
 import { useState } from 'react';
-import type { MidenAccount, MidenFaucetInfo, CrossChainIntentParams } from '../../types/miden';
+import { toast } from 'sonner';
+import type { CrossChainIntentParams } from '../../types/miden';
+import type { CrossChainQuote } from '../../services/epoch-bridge';
+import { formatQuoteTokenIn } from '../../services/epoch-bridge';
+import type { SolveIntentParams } from '@epoch-protocol/epoch-intents-sdk/dist/types';
+import { DEFAULT_SEPOLIA_CHAIN_ID_STR } from '../../constants/chains';
 
-
-// Supported Sepolia testnet tokens (from epoch-commons-sdk testnetGraph)
 const SEPOLIA_TOKENS = [
-  { symbol: 'USDC', address: '0x2BB4FfD7E2c6D432b697554Efd77fA13bdbefd69' },
-  { symbol: 'DAI', address: '0xc30f1Ce05d1434d484E9A47283aA925fc8A8699a' },
-  { symbol: 'USDT', address: '0xc04d2869665Be874881133943523723Be5782720' },
-  { symbol: 'WETH', address: '0x7946dd86eE310D0aC16804A37787289Fa5b88A8A' },
-  { symbol: 'WBTC', address: '0x9b2a2754a9182fD65360E23afCDf3BeFF51796E9' },
-  { symbol: 'PENGU', address: '0xEA7dC9849206Ce73b11c465d37b85eC06B11Cf2C' },
-  { symbol: 'OSWALD', address: '0xB588418c0f90F07Bc9587d0050845a90C23C7502' },
-  { symbol: 'KICK', address: '0x512Ee6Bd7A4be5Ba4796F15Df080c4D0F89a38eD' },
-  { symbol: 'FERB', address: '0x145e03A80c19ad1b9d0429d06b6d52707de724A0' },
-  { symbol: 'Custom', address: '' }, // For manual entry
+  { symbol: 'USDC', address: '0x2BB4FfD7E2c6D432b697554Efd77fA13bdbefd69', decimals: 18 },
+  { symbol: 'DAI', address: '0xc30f1Ce05d1434d484E9A47283aA925fc8A8699a', decimals: 18 },
+  { symbol: 'USDT', address: '0xc04d2869665Be874881133943523723Be5782720', decimals: 18 },
+  { symbol: 'WETH', address: '0x7946dd86eE310D0aC16804A37787289Fa5b88A8A', decimals: 18 },
+  { symbol: 'WBTC', address: '0x9b2a2754a9182fD65360E23afCDf3BeFF51796E9', decimals: 18 },
+  { symbol: 'PENGU', address: '0xEA7dC9849206Ce73b11c465d37b85eC06B11Cf2C', decimals: 18 },
+  { symbol: 'OSWALD', address: '0xB588418c0f90F07Bc9587d0050845a90C23C7502', decimals: 18 },
+  { symbol: 'KICK', address: '0x512Ee6Bd7A4be5Ba4796F15Df080c4D0F89a38eD', decimals: 18 },
+  { symbol: 'FERB', address: '0x145e03A80c19ad1b9d0429d06b6d52707de724A0', decimals: 18 },
 ];
 
 interface Props {
-  accounts: MidenAccount[];
-  faucets: MidenFaucetInfo[];
-  onCreateIntent: (params: CrossChainIntentParams) => Promise<any>;
-  onSendP2ID: (senderId: string, receiverId: string, faucetId: string, amount: bigint, recallHeight?: number) => Promise<{ success: boolean; noteId?: string } | undefined>;
-  onReclaimNotes: (accountId: string) => Promise<boolean | undefined>;
-  currentBlockHeight?: number;
-  isLoading: boolean;
+  midenConnected: boolean;
+  onConnectMiden: () => void;
+  midenAccountId: string | null;
+  midenAssets: Array<{
+    assetId: string;
+    amount: bigint;
+    symbol?: string;
+    decimals?: number;
+  }>;
+  isLoadingMidenAssets: boolean;
+  onFetchQuote: (params: CrossChainIntentParams) => Promise<void>;
+  onConfirmIntent: (createMidenP2IDNote: SolveIntentParams['createMidenP2IDNote']) => Promise<unknown>;
+  onClearQuote: () => void;
+  pendingQuote: CrossChainQuote | null;
+  isFetchingQuote: boolean;
+  isConfirmBusy: boolean;
   isSDKReady: boolean;
 }
 
-export function IntentForm({ accounts, faucets, onCreateIntent, onSendP2ID, onReclaimNotes, currentBlockHeight, isLoading, isSDKReady }: Props) {
+export function IntentForm({
+  midenConnected,
+  onConnectMiden,
+  midenAccountId,
+  midenAssets,
+  isLoadingMidenAssets,
+  onFetchQuote,
+  onConfirmIntent,
+  onClearQuote,
+  pendingQuote,
+  isFetchingQuote,
+  isConfirmBusy,
+  isSDKReady,
+}: Props) {
+  const { requestSend, waitForTransaction } = useMidenFiWallet();
 
-  const [midenAccountId, setMidenAccountId] = useState('');
-  const [faucetId, setFaucetId] = useState('');
-  const [amount, setAmount] = useState('100');
-  const [outputToken, setOutputToken] = useState(SEPOLIA_TOKENS[0].address); // Default to USDC
-  const [customToken, setCustomToken] = useState('');
+  const [selectedAssetId, setSelectedAssetId] = useState('');
   const [minTokenOut, setMinTokenOut] = useState('10');
-  const [chainId, setChainId] = useState('11155111'); // Sepolia
-  const [status, setStatus] = useState('');
-  const [evmAddress, setEvmAddress] = useState("0x4235215114484bACDfF0071dB54Dc9faaD3489a9");
-  const [recallBlocks, setRecallBlocks] = useState('100'); // ~15-20 min at ~10s/block
-  const [reclaimStatus, setReclaimStatus] = useState('');
+  const [outputToken, setOutputToken] = useState(SEPOLIA_TOKENS[0].address);
+  const [chainId, setChainId] = useState(DEFAULT_SEPOLIA_CHAIN_ID_STR);
+  const [evmAddress, setEvmAddress] = useState('0x4235215114484bACDfF0071dB54Dc9faaD3489a9');
+  const [confirmStatus, setConfirmStatus] = useState('');
+  const destinationChainIdNum = Number.parseInt(chainId, 10);
+  const hasValidDestinationChainId = Number.isInteger(destinationChainIdNum) && destinationChainIdNum > 0;
+  const hasValidEvmRecipient = /^0x[a-fA-F0-9]{40}$/.test(evmAddress.trim());
 
-  const handleReclaim = async () => {
-    if (!midenAccountId) return;
-    setReclaimStatus('Syncing and checking for reclaimable notes...');
-    try {
-      const result = await onReclaimNotes(midenAccountId);
-      setReclaimStatus(result ? 'Notes reclaimed successfully!' : 'No reclaimable notes found.');
-    } catch (err) {
-      setReclaimStatus(`Reclaim failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  const selectedAsset = midenAssets.find(
+    (a) => a.assetId.toLowerCase() === selectedAssetId.toLowerCase(),
+  );
+  const midenFaucetDecimals = selectedAsset?.decimals ?? 8;
+
+  const buildParams = (): CrossChainIntentParams => {
+    if (!hasValidDestinationChainId) {
+      throw new Error('Destination chain ID must be a positive integer.');
     }
+    if (!hasValidEvmRecipient) {
+      throw new Error('Destination EVM address must be a valid 0x-prefixed 20-byte hex address.');
+    }
+    if (!midenAccountId) {
+      throw new Error('Connect Miden wallet first');
+    }
+    return {
+      midenAccountId,
+      midenFaucetId: selectedAssetId,
+      midenDecimals: midenFaucetDecimals,
+      evmRecipient: evmAddress.trim(),
+      destinationChainId: destinationChainIdNum,
+      outputTokenAddress: outputToken,
+      minTokenOut,
+    };
   };
 
-  const handleSubmit = async () => {
-    if (!midenAccountId || !faucetId || !amount || !evmAddress) return;
+  const canFetch =
+    isSDKReady &&
+    !!midenAccountId &&
+    !!selectedAssetId &&
+    hasValidEvmRecipient &&
+    !!outputToken &&
+    hasValidDestinationChainId &&
+    Number.isFinite(midenFaucetDecimals);
 
-    console.log('[IntentForm] Starting cross-chain intent submission...');
-    console.log('[IntentForm] Form data:', {
-      midenAccountId,
-      faucetId: faucetId.slice(0, 16) + '...',
-      amount,
-      evmAddress,
-      chainId,
-      outputToken,
-      minTokenOut,
-      // allocatorAccountId: ALLOCATOR_MIDEN_ACCOUNT_ID,
-    });
-
-    try {
-      const finalOutputToken = customToken || outputToken;
-      if (!finalOutputToken || finalOutputToken === '0x0000000000000000000000000000000000000000') {
-        setStatus('Error: Please select or enter a valid output token address');
-        return;
-      }
-
-      setStatus('Checking if deposit needed...');
-
-      const recallOffset = parseInt(recallBlocks) || 100;
-      const recallHeight = currentBlockHeight ? currentBlockHeight + recallOffset : undefined;
-
-      const selectedFaucet = faucets.find(f => f.id === faucetId);
-
-      const params: CrossChainIntentParams = {
-        midenAccountId,
-        midenFaucetId: faucetId,
-        midenAmount: amount,
-        midenDecimals: selectedFaucet?.decimals ?? 8,
-        // Carry absolute reclaim height through to smallocator (optional)
-        midenReclaimHeight: recallHeight,
-        evmRecipient: evmAddress,
-        destinationChainId: parseInt(chainId),
-        outputTokenAddress: finalOutputToken,
-        minTokenOut,
-      };
-
-      // Pass P2ID creation as a callback — SDK calls it only after checkIfDepositNeeded confirms resourceLockRequired
-      const sdkParams = {
-        ...params,
-        collateralType: 'miden' as const,
-        midenSourceAccount: midenAccountId,
-        // TODO: I guess this function can we named genric as (callback)
-        createMidenP2IDNote: async (faucetIdParam: string, amountParam: string, allocatorId: string) => {
-          setStatus('Resource lock required — creating P2IDE note on Miden...');
-          try {
-            const result = await onSendP2ID(midenAccountId, allocatorId, faucetIdParam, BigInt(amountParam), recallHeight);
-            if (result?.noteId) {
-              console.log('[IntentForm] P2IDE note created:', result.noteId);
-            }
-            return result || { success: false };
-          } catch (err) {
-            const errorMsg = err instanceof Error ? err.message : String(err);
-            console.error('[IntentForm] P2ID creation failed:', errorMsg);
-            return { success: false, error: errorMsg };
-          }
-        },
-      };
-
-      const result = await onCreateIntent(sdkParams);
-      console.log('[IntentForm] Intent created:', result);
-      setStatus('Intent submitted successfully!');
-    } catch (err) {
-      console.error('[IntentForm] Intent submission failed:', err);
-      setStatus(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+  const handleGetQuote = () => {
+    if (!outputToken || outputToken === '0x0000000000000000000000000000000000000000') {
+      toast.error('Select or enter a valid output token address');
+      return;
     }
+    void toast.promise(onFetchQuote(buildParams()), {
+      loading: 'Fetching quote…',
+      success: 'Quote ready — review and confirm',
+      error: (err) => (err instanceof Error ? err.message : 'Quote failed'),
+    });
+  };
+
+  const handleConfirm = () => {
+    if (!pendingQuote) return;
+
+    const createMidenP2IDNote: SolveIntentParams['createMidenP2IDNote'] = async (
+      faucetIdParam,
+      amountParam,
+      allocatorId,
+    ) => {
+      setConfirmStatus('Resource lock required — creating P2IDE note on Miden…');
+      try {
+        if (!midenAccountId) {
+          throw new Error('Missing Miden account id');
+        }
+        if (!requestSend) {
+          throw new Error('Miden wallet adapter not available');
+        }
+
+        const normalizedAmount = BigInt(amountParam);
+        if (normalizedAmount > BigInt(Number.MAX_SAFE_INTEGER)) {
+          throw new Error('Amount too large for wallet adapter send');
+        }
+
+        const payload = new SendTransaction(
+          midenAccountId,
+          allocatorId,
+          faucetIdParam,
+          'public',
+          Number(normalizedAmount),
+        );
+        const txId = await requestSend(payload);
+
+        // Prefer adapter waitForTransaction to get the output note id.
+        if (!waitForTransaction) {
+          throw new Error('waitForTransaction not available in adapter');
+        }
+        const finalized = await waitForTransaction(txId, 120_000);
+        const first = finalized.outputNotes?.[0];
+        const noteId = first ? first.id().toString() : '';
+        if (!noteId) {
+          throw new Error(`Could not read output note id for tx ${txId}`);
+        }
+        return { success: true, noteId };
+      } catch (err) {
+        return { success: false, error: err instanceof Error ? err.message : String(err) };
+      }
+    };
+
+    void toast.promise(
+      (async () => {
+        setConfirmStatus('Submitting intent…');
+        await onConfirmIntent(createMidenP2IDNote);
+        setConfirmStatus('Intent submitted successfully.');
+        return 'Cross-chain intent submitted';
+      })(),
+      {
+        loading: 'Confirming intent…',
+        success: (msg) => msg,
+        error: (err) => {
+          const msg = `Error: ${err instanceof Error ? err.message : 'Unknown error'}`;
+          setConfirmStatus(msg);
+          return msg;
+        },
+      },
+    );
   };
 
   return (
-    <div className="bg-gray-800 rounded-xl p-6">
-      <h2 className="text-lg font-semibold text-white mb-1">Cross-Chain Intent</h2>
-      <p className="text-sm text-gray-400 mb-4">
-        Send a P2ID note to the allocator, then build an Epoch intent for EVM execution.
+    <div className="ui-card">
+      <h2 className="text-base font-semibold text-neutral-900">Intent details</h2>
+      <p className="mt-2 text-sm leading-relaxed text-neutral-600">
+        Pick a Miden token and the EVM output you want to receive. Set a minimum output amount, then click{' '}
+        <strong>Get quote</strong> to see the estimated Miden spend, and <strong>Confirm &amp; sign</strong> to lock
+        funds and submit.
       </p>
 
-      <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">Source (Miden Wallet)</label>
-            <select
-              value={midenAccountId}
-              onChange={e => setMidenAccountId(e.target.value)}
-              className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm"
-            >
-              <option value="">Select wallet</option>
-              {accounts.filter(a => a.type === 'wallet').map(a => (
-                <option key={a.id} value={a.id}>{a.label} — {a.id.slice(0, 16)}...</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">Token (Faucet)</label>
-            <select
-              value={faucetId}
-              onChange={e => setFaucetId(e.target.value)}
-              className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm"
-            >
-              <option value="">Select faucet</option>
-              {faucets.map(f => (
-                <option key={f.id} value={f.id}>{f.symbol} — {f.id.slice(0, 16)}...</option>
-              ))}
-            </select>
+      <div className="mt-4 space-y-4">
+        <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-700">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <div className="font-medium">Miden wallet</div>
+              <div className="font-mono text-xs break-all">
+                {midenConnected ? (midenAccountId ?? 'connected') : 'not connected'}
+              </div>
+            </div>
+            <Button type="button" onClick={onConnectMiden} disabled={midenConnected}>
+              {midenConnected ? 'Connected' : 'Connect Miden wallet'}
+            </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="space-y-2">
+          <Label>Source asset</Label>
+          <SelectRoot
+            value={selectedAssetId || undefined}
+            onValueChange={(v) => {
+              setSelectedAssetId(v);
+              onClearQuote();
+            }}
+          >
+            <SelectTrigger aria-label="Select Miden asset">
+              <SelectValue placeholder={isLoadingMidenAssets ? 'Loading assets…' : 'Select asset'} />
+            </SelectTrigger>
+            <SelectContent>
+              {(midenAssets ?? []).map((a) => (
+                <SelectItem key={a.assetId} value={a.assetId}>
+                  {(a.symbol ?? a.assetId.slice(0, 16) + '…')} — {a.amount.toString()}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </SelectRoot>
+          <p className="text-xs text-neutral-500">
+            Balance: <span className="font-mono">{selectedAsset?.amount?.toString() ?? '—'}</span>
+          </p>
+        </div>
+
+        {/* Output */}
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Amount</label>
-            <input
-              value={amount}
-              onChange={e => setAmount(e.target.value)}
-              className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm"
-            />
+            <Label>Output token ({chainId === DEFAULT_SEPOLIA_CHAIN_ID_STR ? 'Sepolia' : 'destination chain'})</Label>
+            <SelectRoot
+              value={outputToken}
+              onValueChange={(v) => {
+                setOutputToken(v);
+                onClearQuote();
+              }}
+            >
+              <SelectTrigger aria-label="Select output token">
+                <SelectValue placeholder="Token" />
+              </SelectTrigger>
+              <SelectContent>
+                {SEPOLIA_TOKENS.map((token) => (
+                  <SelectItem key={token.symbol} value={token.address}>
+                    {token.symbol}{token.address ? ` · ${token.address.slice(0, 10)}…` : ''}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </SelectRoot>
           </div>
           <div>
-            <label className="block text-xs text-gray-400 mb-1">Destination Chain ID</label>
-            <input
+            <Label htmlFor="intent-min-out">Min output amount</Label>
+            <Input
+              id="intent-min-out"
+              value={minTokenOut}
+              onChange={(e) => { setMinTokenOut(e.target.value); onClearQuote(); }}
+              placeholder="e.g. 10"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label htmlFor="intent-chain">Destination chain ID</Label>
+            <Input
+              id="intent-chain"
               value={chainId}
-              onChange={e => setChainId(e.target.value)}
-              className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">Recall after (blocks)</label>
-            <input
-              value={recallBlocks}
-              onChange={e => setRecallBlocks(e.target.value)}
-              className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm"
-              title="Note becomes reclaimable after this many blocks (~10s/block)"
+              onChange={(e) => {
+                setChainId(e.target.value);
+                onClearQuote();
+              }}
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs text-gray-400 mb-1">Destination (EVM Wallet)</label>
-          <input
-            value={"0x4235215114484bACDfF0071dB54Dc9faaD3489a9"}
-            onChange={(e) => setEvmAddress(e.target.value)}
-            className="w-full bg-gray-700/50 text-gray-400 rounded-lg px-3 py-2 text-sm font-mono"
-            placeholder="Connect EVM wallet above"
+          <Label htmlFor="intent-evm">Destination (EVM wallet)</Label>
+          <Input
+            id="intent-evm"
+            value={evmAddress}
+            onChange={(e) => {
+              setEvmAddress(e.target.value);
+              onClearQuote();
+            }}
+            variant="dim"
+            className="font-mono text-[13px]"
+            placeholder="0x…"
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">Output Token (on {chainId === '11155111' ? 'Sepolia' : 'destination chain'})</label>
-            <select
-              value={outputToken}
-              onChange={e => {
-                setOutputToken(e.target.value);
-                if (e.target.value !== '') {
-                  setCustomToken(''); // Clear custom input when selecting from dropdown
-                }
-              }}
-              className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm"
-            >
-              {SEPOLIA_TOKENS.map(token => (
-                <option key={token.symbol} value={token.address}>
-                  {token.symbol} {token.address && `— ${token.address.slice(0, 10)}...`}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">Min Output Amount</label>
-            <input
-              value={minTokenOut}
-              onChange={e => setMinTokenOut(e.target.value)}
-              className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm"
-            />
-          </div>
-        </div>
-
-        {outputToken === '' && (
-          <div>
-            <label className="block text-xs text-gray-400 mb-1">Custom Token Address</label>
-            <input
-              value={customToken}
-              onChange={e => setCustomToken(e.target.value)}
-              placeholder="0x..."
-              className="w-full bg-gray-700 text-white rounded-lg px-3 py-2 text-sm font-mono"
-            />
+        {/* Quote summary — shown after successful fetchQuote */}
+        {pendingQuote && (
+          <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-neutral-900">Quote</span>
+              <button
+                type="button"
+                className="text-xs text-neutral-500 underline"
+                onClick={onClearQuote}
+              >
+                Re-quote
+              </button>
+            </div>
+            <div className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-orange-700">Required deposit</p>
+              <p className="mt-1 font-mono text-xl font-semibold text-orange-900">
+                {(() => {
+                  const quoteDecimalsRaw = (pendingQuote.quoteResult as any).midenFaucetDecimals;
+                  const quoteDecimals =
+                    typeof quoteDecimalsRaw === 'number'
+                      ? quoteDecimalsRaw
+                      : typeof quoteDecimalsRaw === 'string'
+                        ? Number(quoteDecimalsRaw)
+                        : undefined;
+                  const resolvedDisplayDecimals =
+                    Number.isFinite(quoteDecimals) && (quoteDecimals as number) >= 0
+                      ? (quoteDecimals as number)
+                      : midenFaucetDecimals;
+                  const tokenInRaw = (pendingQuote.quoteResult as any).tokenIn as
+                    | string
+                    | undefined;
+                  if (!tokenInRaw) return 'calculated at execution';
+                  return `${formatQuoteTokenIn(
+                    tokenInRaw,
+                    resolvedDisplayDecimals,
+                    resolvedDisplayDecimals,
+                  )} ${selectedAsset?.symbol ?? 'tokens'}`;
+                })()}
+              </p>
+            </div>
+            <p className="text-xs text-neutral-500 italic">Keep at least this amount in your Miden wallet before confirming.</p>
           </div>
         )}
 
-        <button
-          onClick={handleSubmit}
-          disabled={isLoading || !isSDKReady || !midenAccountId || !faucetId || !evmAddress}
-          className="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
-        >
-          {isLoading ? 'Processing...' : 'Create Cross-Chain Intent'}
-        </button>
-
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleReclaim}
-            disabled={isLoading || !midenAccountId}
-            className="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 disabled:bg-gray-600 text-white text-sm font-medium rounded-lg transition-colors"
+        {/* Action buttons */}
+        {!pendingQuote ? (
+          <Button
+            type="button"
+            className="w-full"
+            size="lg"
+            onClick={handleGetQuote}
+            disabled={isFetchingQuote || !canFetch}
           >
-            Reclaim Expired Notes
-          </button>
-          {currentBlockHeight && (
-            <span className="text-xs text-gray-500">Block: {currentBlockHeight}</span>
-          )}
-        </div>
-
-        {reclaimStatus && (
-          <p className={`text-sm ${reclaimStatus.includes('failed') ? 'text-red-400' : 'text-green-400'}`}>
-            {reclaimStatus}
-          </p>
+            {isFetchingQuote ? 'Fetching quote…' : 'Get quote'}
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            className="w-full"
+            size="lg"
+            onClick={handleConfirm}
+            disabled={isConfirmBusy}
+          >
+            {isConfirmBusy ? 'Processing…' : 'Confirm & Sign'}
+          </Button>
         )}
 
         {!isSDKReady && (
-          <p className="text-xs text-yellow-400">
-            Epoch SDK is not ready. Connect your EVM wallet above and wait for it to load — creating an intent requires the SDK.
+          <p className="text-xs text-amber-800">
+            Epoch SDK not ready — connect your EVM wallet above.
           </p>
         )}
 
-        {status && (
-          <p className={`text-sm ${status.startsWith('Error') ? 'text-red-400' : 'text-yellow-400'}`}>
-            {status}
+        {confirmStatus && (
+          <p className={`text-sm ${confirmStatus.startsWith('Error') ? 'text-red-600' : 'text-amber-800'}`}>
+            {confirmStatus}
           </p>
         )}
       </div>

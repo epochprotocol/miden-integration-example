@@ -1,3 +1,5 @@
+import { Button } from '@/components/ui/button';
+
 interface Props {
   isInitializing: boolean;
   error: string | null;
@@ -8,36 +10,34 @@ interface Props {
 export function MidenStatus({ isInitializing, error, blockNum, onRetry }: Props) {
   if (isInitializing) {
     return (
-      <div className="flex items-center gap-2 text-yellow-400 bg-yellow-400/10 px-4 py-2 rounded-lg text-sm">
-        <div className="w-3 h-3 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin" />
-        Initializing Miden WASM client...
+      <div className="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-900">
+        <div
+          className="h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2 border-amber-600 border-t-transparent"
+          aria-hidden
+        />
+        Initializing Miden WASM client…
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center gap-2 text-red-400 bg-red-400/10 px-4 py-2 rounded-lg text-sm">
-        <span>Error: {error}</span>
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-900">
+        <span className="min-w-0 flex-1">Error: {error}</span>
         {onRetry && (
-          <button
-            onClick={onRetry}
-            className="ml-2 px-2 py-1 bg-red-600 hover:bg-red-500 text-white text-xs rounded"
-          >
+          <Button type="button" size="sm" className="bg-red-600 text-white hover:bg-red-700" onClick={onRetry}>
             Retry
-          </button>
+          </Button>
         )}
       </div>
     );
   }
 
   return (
-    <div className="flex items-center gap-2 text-green-400 bg-green-400/10 px-4 py-2 rounded-lg text-sm">
-      <div className="w-2 h-2 bg-green-400 rounded-full" />
-      Connected to Miden Testnet
-      {blockNum !== null && (
-        <span className="text-gray-400 ml-2">Block #{blockNum}</span>
-      )}
+    <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-900">
+      <div className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" aria-hidden />
+      Connected to Miden testnet
+      {blockNum !== null && <span className="text-emerald-800/80">Block #{blockNum}</span>}
     </div>
   );
 }

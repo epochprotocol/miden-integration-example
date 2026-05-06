@@ -1,0 +1,46 @@
+import { useMemo } from 'react';
+import { useMidenWalletAdapter } from '../../hooks/useMidenWalletAdapter';
+import { EVMWalletConnect } from '../crosschain/EVMWalletConnect';
+import { WithdrawForm } from '../crosschain/WithdrawForm';
+import { IntentStatus } from '../crosschain/IntentStatus';
+import { useWithdrawIntent } from '../../hooks/useWithdrawIntent';
+import type { MidenAccount } from '../../types/miden';
+
+export function WithdrawTab() {
+  const midenWallet = useMidenWalletAdapter({ enabled: true });
+  const displayWallets: MidenAccount[] = useMemo(() => {
+    if (!midenWallet.accountId?.hex) return [];
+    return [
+      {
+        id: midenWallet.accountId.hex,
+        label: 'Connected wallet',
+        type: 'wallet' as const,
+      },
+    ];
+  }, [midenWallet.accountId?.hex]);
+
+  const withdraw = useWithdrawIntent();
+
+  return (
+    <div className="ui-tab-panel space-y-6">
+      <header className="space-y-2">
+        <h2 className="text-lg font-semibold tracking-tight text-neutral-900 sm:text-xl">Withdraw to Miden</h2>
+        <p className="max-w-2xl text-sm leading-relaxed text-neutral-600">
+          Pull funds from your EVM wallet into a Miden account using an Epoch withdraw intent.
+        </p>
+      </header>
+      <EVMWalletConnect />
+      <WithdrawForm
+        accounts={displayWallets}
+        onFetchQuote={withdraw.fetchQuote}
+        onConfirmWithdraw={withdraw.confirmWithdraw}
+        onClearQuote={withdraw.clearQuote}
+        pendingQuote={withdraw.pendingQuote}
+        isFetchingQuote={withdraw.isFetchingQuote}
+        isLoading={withdraw.isLoading}
+        isSDKReady={withdraw.isSDKReady}
+      />
+      <IntentStatus result={withdraw.withdrawResult} error={withdraw.error} flowStatus={null} isPolling={false} />
+    </div>
+  );
+}
