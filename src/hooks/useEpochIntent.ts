@@ -27,7 +27,7 @@ export function useEpochIntent() {
     let cancelled = false;
     import('@epoch-protocol/epoch-intents-sdk').then(({ EpochIntentSDK }) => {
       if (cancelled) return;
-      const apiBaseUrl = import.meta.env.VITE_ALLOCATOR_URL || 'http://localhost:3000';
+      const apiBaseUrl = "https://testnet-dev.epochprotocol.xyz";
       // Miden has no real EVM chain ID — override to dummy 999999999 so the SDK
       // doesn't try to route as an EVM chain.
       const midenWalletClient = {

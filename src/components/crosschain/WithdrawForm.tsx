@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useAccount, useChainId } from 'wagmi';
-import type { MidenAccount, MidenFaucetInfo, EVMToMidenIntentParams } from '../../types/miden';
+import type { MidenAccount, EVMToMidenIntentParams } from '../../types/miden';
 import { MIDEN_DESTINATION_CHAIN_ID } from '../../constants/chains';
-import type { EVMToMidenQuote } from '../../services/epoch-bridge';
+import { formatQuoteTokenIn, type EVMToMidenQuote } from '../../services/epoch-bridge';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,9 +17,17 @@ const SEPOLIA_TOKENS = [
 
 const TOKEN_CUSTOM = '__custom__';
 
+function toNumberOrUndefined(v: unknown): number | undefined {
+  if (typeof v === 'number' && Number.isFinite(v)) return v;
+  if (typeof v === 'string' && v.trim() !== '') {
+    const n = Number(v);
+    if (Number.isFinite(n)) return n;
+  }
+  return undefined;
+}
+
 interface Props {
   accounts: MidenAccount[];
-  faucets: MidenFaucetInfo[];
   onFetchQuote: (params: EVMToMidenIntentParams) => Promise<void>;
   onConfirmWithdraw: () => Promise<unknown>;
   onClearQuote: () => void;
@@ -31,7 +39,6 @@ interface Props {
 
 export function WithdrawForm({
   accounts,
-  faucets,
   onFetchQuote,
   onConfirmWithdraw,
   onClearQuote,
@@ -53,9 +60,12 @@ export function WithdrawForm({
   const tokenSelectValue = evmToken === '' ? TOKEN_CUSTOM : evmToken;
   const resolvedFaucetId = midenFaucetId.trim();
 
-  const selectedFaucet = faucets.find((f) => f.id === resolvedFaucetId);
   const finalToken = customToken || evmToken;
   const selectedToken = SEPOLIA_TOKENS.find((t) => t.address === finalToken);
+  const evmDisplayDecimals =
+    toNumberOrUndefined((pendingQuote?.quoteResult as any)?.tokenInDecimals) ??
+    selectedToken?.decimals ??
+    18;
 
   const buildParams = (): EVMToMidenIntentParams => {
     if (!connectedAddress) {
@@ -250,49 +260,26 @@ export function WithdrawForm({
         </div>
 
         {pendingQuote && (
-          <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-2">
+          <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-neutral-900">Quote</span>
               <button type="button" className="text-xs text-neutral-500 underline" onClick={onClearQuote}>
                 Clear quote
               </button>
             </div>
-            <div className="flex flex-col gap-2 text-sm">
-              <div className="flex justify-between gap-2">
-                <span className="text-neutral-600 shrink-0">Minimum Miden out (your minTokenOut):</span>
-                <span className="font-semibold text-right text-neutral-900">
-                  {pendingQuote.params.minTokenOut} {selectedFaucet?.symbol ?? ''}
-                </span>
-              </div>
-              <div className="flex justify-between gap-2">
-                <span className="text-neutral-600 shrink-0">Estimated EVM spend (tokenIn from quote):</span>
-                <span className="font-mono font-semibold text-right text-neutral-900">
-                  {pendingQuote.quoteResult.tokenIn || 'calculated at execution'}{' '}
-                  {pendingQuote.quoteResult.tokenInSymbol ?? selectedToken?.symbol ?? 'tokens'}
-                </span>
-              </div>
-              {pendingQuote.quoteResult.tokenOut && pendingQuote.quoteResult.tokenOut !== '0' && (
-                <div className="flex justify-between gap-2">
-                  <span className="text-neutral-600 shrink-0">Quoted Miden side (tokenOut):</span>
-                  <span className="font-mono font-semibold text-right text-neutral-900">
-                    {pendingQuote.quoteResult.tokenOut}{' '}
-                    {selectedFaucet?.symbol ?? 'Miden'}
-                  </span>
-                </div>
-              )}
-              <div className="flex justify-between gap-2 text-xs text-neutral-600">
-                <span>Resource lock required</span>
-                <span className="font-medium">{pendingQuote.quoteResult.resourceLockRequired ? 'Yes' : 'No'}</span>
-              </div>
-              {pendingQuote.quoteResult.code != null && pendingQuote.quoteResult.code !== '' && (
-                <p className="text-xs text-neutral-500">
-                  Quote code: <span className="font-mono">{String(pendingQuote.quoteResult.code)}</span>
-                </p>
-              )}
+            <div className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-orange-700">Required deposit</p>
+              <p className="mt-1 font-mono text-xl font-semibold text-orange-900">
+                {formatQuoteTokenIn(
+                  pendingQuote.quoteResult.tokenIn,
+                  evmDisplayDecimals,
+                  toNumberOrUndefined((pendingQuote.quoteResult as any)?.tokenInDecimals),
+                ) || 'calculated at execution'}{' '}
+                {pendingQuote.quoteResult.tokenInSymbol ?? selectedToken?.symbol ?? 'tokens'}
+              </p>
             </div>
             <p className="text-xs text-neutral-500 italic">
-              Amounts are indicative until you sign; slippage is bounded by your Miden{' '}
-              <code className="text-[11px]">minTokenOut</code> in base units.
+              Keep at least this amount in your EVM wallet before confirming.
             </p>
           </div>
         )}

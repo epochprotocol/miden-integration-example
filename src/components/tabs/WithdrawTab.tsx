@@ -4,7 +4,7 @@ import { EVMWalletConnect } from '../crosschain/EVMWalletConnect';
 import { WithdrawForm } from '../crosschain/WithdrawForm';
 import { IntentStatus } from '../crosschain/IntentStatus';
 import { useWithdrawIntent } from '../../hooks/useWithdrawIntent';
-import type { MidenAccount, MidenFaucetInfo } from '../../types/miden';
+import type { MidenAccount } from '../../types/miden';
 
 export function WithdrawTab() {
   const midenWallet = useMidenWalletAdapter({ enabled: true });
@@ -19,24 +19,6 @@ export function WithdrawTab() {
     ];
   }, [midenWallet.accountId?.hex]);
 
-  const displayFaucets: MidenFaucetInfo[] = useMemo(() => {
-    // With adapter-only mode, we don't have faucet metadata. Populate from assets
-    // so users can copy/paste faucet ids they already hold.
-    const unique = new Map<string, MidenFaucetInfo>();
-    for (const a of midenWallet.assets) {
-      if (!unique.has(a.assetId)) {
-        unique.set(a.assetId, {
-          id: a.assetId,
-          label: `${a.assetId.slice(0, 16)}…`,
-          type: 'faucet' as const,
-          symbol: '—',
-          maxSupply: '0',
-        });
-      }
-    }
-    return Array.from(unique.values());
-  }, [midenWallet.assets]);
-
   const withdraw = useWithdrawIntent();
 
   return (
@@ -50,7 +32,6 @@ export function WithdrawTab() {
       <EVMWalletConnect />
       <WithdrawForm
         accounts={displayWallets}
-        faucets={displayFaucets}
         onFetchQuote={withdraw.fetchQuote}
         onConfirmWithdraw={withdraw.confirmWithdraw}
         onClearQuote={withdraw.clearQuote}

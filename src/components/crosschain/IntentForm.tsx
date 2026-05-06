@@ -13,15 +13,15 @@ import type { SolveIntentParams } from '@epoch-protocol/epoch-intents-sdk/dist/t
 import { DEFAULT_SEPOLIA_CHAIN_ID_STR } from '../../constants/chains';
 
 const SEPOLIA_TOKENS = [
-  { symbol: 'USDC', address: '0x2BB4FfD7E2c6D432b697554Efd77fA13bdbefd69'},
-  { symbol: 'DAI', address: '0xc30f1Ce05d1434d484E9A47283aA925fc8A8699a' },
-  { symbol: 'USDT', address: '0xc04d2869665Be874881133943523723Be5782720'},
-  { symbol: 'WETH', address: '0x7946dd86eE310D0aC16804A37787289Fa5b88A8A' },
-  { symbol: 'WBTC', address: '0x9b2a2754a9182fD65360E23afCDf3BeFF51796E9'},
-  { symbol: 'PENGU', address: '0xEA7dC9849206Ce73b11c465d37b85eC06B11Cf2C' },
-  { symbol: 'OSWALD', address: '0xB588418c0f90F07Bc9587d0050845a90C23C7502' },
-  { symbol: 'KICK', address: '0x512Ee6Bd7A4be5Ba4796F15Df080c4D0F89a38eD' },
-  { symbol: 'FERB', address: '0x145e03A80c19ad1b9d0429d06b6d52707de724A0' },
+  { symbol: 'USDC', address: '0x2BB4FfD7E2c6D432b697554Efd77fA13bdbefd69', decimals: 18 },
+  { symbol: 'DAI', address: '0xc30f1Ce05d1434d484E9A47283aA925fc8A8699a', decimals: 18 },
+  { symbol: 'USDT', address: '0xc04d2869665Be874881133943523723Be5782720', decimals: 18 },
+  { symbol: 'WETH', address: '0x7946dd86eE310D0aC16804A37787289Fa5b88A8A', decimals: 18 },
+  { symbol: 'WBTC', address: '0x9b2a2754a9182fD65360E23afCDf3BeFF51796E9', decimals: 18 },
+  { symbol: 'PENGU', address: '0xEA7dC9849206Ce73b11c465d37b85eC06B11Cf2C', decimals: 18 },
+  { symbol: 'OSWALD', address: '0xB588418c0f90F07Bc9587d0050845a90C23C7502', decimals: 18 },
+  { symbol: 'KICK', address: '0x512Ee6Bd7A4be5Ba4796F15Df080c4D0F89a38eD', decimals: 18 },
+  { symbol: 'FERB', address: '0x145e03A80c19ad1b9d0429d06b6d52707de724A0', decimals: 18 },
 ];
 
 interface Props {
@@ -297,7 +297,7 @@ export function IntentForm({
 
         {/* Quote summary — shown after successful fetchQuote */}
         {pendingQuote && (
-          <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-2">
+          <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold text-neutral-900">Quote</span>
               <button
@@ -308,25 +308,34 @@ export function IntentForm({
                 Re-quote
               </button>
             </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-neutral-600">Miden tokens you'll spend (est.):</span>
-              <span className="font-semibold font-mono text-neutral-900">
-                {formatQuoteTokenIn(
-                  (pendingQuote.quoteResult as any).tokenIn,
-                  pendingQuote.params.midenDecimals,
-                  (pendingQuote.quoteResult as any).midenFaucetDecimals,
-                )}{' '}
-                {selectedAsset?.symbol ?? 'tokens'}
-              </span>
+            <div className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-orange-700">Required deposit</p>
+              <p className="mt-1 font-mono text-xl font-semibold text-orange-900">
+                {(() => {
+                  const quoteDecimalsRaw = (pendingQuote.quoteResult as any).midenFaucetDecimals;
+                  const quoteDecimals =
+                    typeof quoteDecimalsRaw === 'number'
+                      ? quoteDecimalsRaw
+                      : typeof quoteDecimalsRaw === 'string'
+                        ? Number(quoteDecimalsRaw)
+                        : undefined;
+                  const resolvedDisplayDecimals =
+                    Number.isFinite(quoteDecimals) && (quoteDecimals as number) >= 0
+                      ? (quoteDecimals as number)
+                      : midenFaucetDecimals;
+                  const tokenInRaw = (pendingQuote.quoteResult as any).tokenIn as
+                    | string
+                    | undefined;
+                  if (!tokenInRaw) return 'calculated at execution';
+                  return `${formatQuoteTokenIn(
+                    tokenInRaw,
+                    resolvedDisplayDecimals,
+                    resolvedDisplayDecimals,
+                  )} ${selectedAsset?.symbol ?? 'tokens'}`;
+                })()}
+              </p>
             </div>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-neutral-600">Min output you receive:</span>
-              <span className="font-semibold text-neutral-900">
-                {minTokenOut}{' '}
-                {SEPOLIA_TOKENS.find((t) => t.address === outputToken)?.symbol ?? outputToken.slice(0, 10)}
-              </span>
-            </div>
-            <p className="text-xs text-neutral-500 italic">Review then click Confirm &amp; Sign to proceed.</p>
+            <p className="text-xs text-neutral-500 italic">Keep at least this amount in your Miden wallet before confirming.</p>
           </div>
         )}
 

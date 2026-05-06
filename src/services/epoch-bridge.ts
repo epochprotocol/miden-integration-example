@@ -44,7 +44,9 @@ export function formatQuoteTokenIn(
         : tokenDecimals;
 
     // If backend ever returns a human-readable decimal string, normalize it.
-    if (/^\d+(\.\d+)?$/.test(raw)) {
+    // IMPORTANT: integer strings (e.g. "1099993") are base units and must use
+    // formatUnits(BigInt(...), dec), not parseUnits(...), otherwise decimals are lost.
+    if (/^\d+\.\d+$/.test(raw)) {
       return formatUnits(parseUnits(raw, dec), dec);
     }
 
