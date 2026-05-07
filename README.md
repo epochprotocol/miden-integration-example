@@ -1,5 +1,12 @@
 # React + TypeScript + Vite
 
+## Run Locally
+
+1. Create a `.env` file by copying `.env.example`.
+2. Install dependencies and start the dev server:
+   - `pnpm i`
+   - `pnpm run dev`
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
