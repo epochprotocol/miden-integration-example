@@ -26,7 +26,8 @@ export function useWithdrawIntent() {
     let cancelled = false;
     import('@epoch-protocol/epoch-intents-sdk').then(({ EpochIntentSDK }) => {
       if (cancelled) return;
-      const apiBaseUrl = "http://localhost:3000";
+      const apiBaseUrl = import.meta.env.VITE_ALLOCATOR_URL || 'http://localhost:3000';
+      console.log('apiBaseUrl: ', apiBaseUrl);
       setSdk(new EpochIntentSDK({ apiBaseUrl, walletClient: walletClient as any }));
     }).catch((err) => {
       if (cancelled) return;

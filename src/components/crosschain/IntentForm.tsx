@@ -11,6 +11,7 @@ import type { CrossChainQuote } from '../../services/epoch-bridge';
 import { formatQuoteTokenIn } from '../../services/epoch-bridge';
 import type { SolveIntentParams } from '@epoch-protocol/epoch-intents-sdk/dist/types';
 import { DEFAULT_SEPOLIA_CHAIN_ID_STR } from '../../constants/chains';
+import { useAccount, useConnections, useWalletClient } from 'wagmi';
 
 const SEPOLIA_TOKENS = [
   { symbol: 'USDC', address: '0x2BB4FfD7E2c6D432b697554Efd77fA13bdbefd69', decimals: 18 },
@@ -61,14 +62,16 @@ export function IntentForm({
   const { requestSend, waitForTransaction } = useMidenFiWallet();
 
   const [selectedAssetId, setSelectedAssetId] = useState('');
-  const [minTokenOut, setMinTokenOut] = useState('10');
+  const [minTokenOut, setMinTokenOut] = useState('1000000000000000000');
   const [outputToken, setOutputToken] = useState(SEPOLIA_TOKENS[0].address);
   const [chainId, setChainId] = useState(DEFAULT_SEPOLIA_CHAIN_ID_STR);
-  const [evmAddress, setEvmAddress] = useState('0x4235215114484bACDfF0071dB54Dc9faaD3489a9');
   const [confirmStatus, setConfirmStatus] = useState('');
   const destinationChainIdNum = Number.parseInt(chainId, 10);
   const hasValidDestinationChainId = Number.isInteger(destinationChainIdNum) && destinationChainIdNum > 0;
-  const hasValidEvmRecipient = /^0x[a-fA-F0-9]{40}$/.test(evmAddress.trim());
+  const { address } = useAccount();
+  const [evmAddress, setEvmAddress] = useState(address ?? '');
+
+  const hasValidEvmRecipient = /^0x[a-fA-F0-9]{40}$/.test(evmAddress?.trim() ?? '');
 
   const selectedAsset = midenAssets.find(
     (a) => a.assetId.toLowerCase() === selectedAssetId.toLowerCase(),
@@ -76,6 +79,9 @@ export function IntentForm({
   const midenFaucetDecimals = selectedAsset?.decimals ?? 8;
 
   const buildParams = (): CrossChainIntentParams => {
+    if (!evmAddress) {
+      throw new Error('Connect EVM wallet first');
+    }
     if (!hasValidDestinationChainId) {
       throw new Error('Destination chain ID must be a positive integer.');
     }
@@ -287,10 +293,10 @@ export function IntentForm({
           <Label htmlFor="intent-evm">Destination (EVM wallet)</Label>
           <Input
             id="intent-evm"
-            value={evmAddress}
+            value={evmAddress ?? '' }
             onChange={(e) => {
-              setEvmAddress(e.target.value);
               onClearQuote();
+              setEvmAddress(e.target.value);
             }}
             variant="dim"
             className="font-mono text-[13px]"

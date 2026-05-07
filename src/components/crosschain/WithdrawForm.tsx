@@ -49,9 +49,9 @@ export function WithdrawForm({
 }: Props) {
   const [evmToken, setEvmToken] = useState(SEPOLIA_TOKENS[0].address);
   const [customToken, setCustomToken] = useState('');
-  const [minTokenOut, setMinTokenOut] = useState('10');
-  const [midenRecipientId, setMidenRecipientId] = useState('');
-  const [midenFaucetId, setMidenFaucetId] = useState('');
+  const [minTokenOut, setMinTokenOut] = useState('1000000');
+  const [midenRecipientId, setMidenRecipientId] = useState(accounts[0].id);
+  const [midenFaucetId, setMidenFaucetId] = useState('0x0a7d175ed63ec5200fb2ced86f6aa5');
   const [status, setStatus] = useState('');
 
   const { address: connectedAddress } = useAccount();
@@ -223,26 +223,7 @@ export function WithdrawForm({
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label>Destination (Miden wallet)</Label>
-            <SelectRoot
-              value={midenRecipientId || undefined}
-              onValueChange={(v) => {
-                setMidenRecipientId(v);
-                onClearQuote();
-              }}
-            >
-              <SelectTrigger aria-label="Select Miden recipient">
-                <SelectValue placeholder="Select wallet" />
-              </SelectTrigger>
-              <SelectContent>
-                {accounts
-                  .filter((a) => a.type === 'wallet')
-                  .map((a) => (
-                    <SelectItem key={a.id} value={a.id}>
-                      {a.label} — {a.id.slice(0, 16)}…
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </SelectRoot>
+            <Input type="text" value={midenRecipientId} onChange={(e) => setMidenRecipientId(e.target.value)} />
           </div>
           <div>
             <Label htmlFor="wd-faucet-id">Miden faucet ID</Label>
