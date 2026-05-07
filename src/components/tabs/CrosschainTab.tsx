@@ -24,8 +24,6 @@ export function CrosschainTab() {
       </header>
       <EVMWalletConnect />
       <IntentForm
-        midenConnected={midenWallet.connected}
-        onConnectMiden={() => void midenWallet.connect()}
         midenAccountId={midenWallet.accountId?.hex ?? null}
         midenAssets={midenWallet.assets}
         isLoadingMidenAssets={midenWallet.isLoadingAssets}
@@ -36,6 +34,8 @@ export function CrosschainTab() {
         isFetchingQuote={epoch.isFetchingQuote}
         isConfirmBusy={epoch.isLoading}
         isSDKReady={epoch.isSDKReady}
+        intentNonce={intentNonce}
+        intentUserAddress={evmAddress}
       />
       <IntentStatus
         result={epoch.intentResult}

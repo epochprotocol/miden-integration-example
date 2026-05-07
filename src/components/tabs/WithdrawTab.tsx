@@ -4,6 +4,7 @@ import { EVMWalletConnect } from '../crosschain/EVMWalletConnect';
 import { WithdrawForm } from '../crosschain/WithdrawForm';
 import { IntentStatus } from '../crosschain/IntentStatus';
 import { useWithdrawIntent } from '../../hooks/useWithdrawIntent';
+import { useIntentStatus } from '../../hooks/useIntentStatus';
 import type { MidenAccount } from '../../types/miden';
 
 export function WithdrawTab() {
@@ -20,6 +21,12 @@ export function WithdrawTab() {
   }, [midenWallet.accountId?.hex]);
 
   const withdraw = useWithdrawIntent();
+
+  // Per INTEGRATION.md §10: userAddress is the EVM source for Flow B (set as `recipient`
+  // on EVM→Miden intents — it's the refund target if the intent fails).
+  const intentNonce = withdraw.withdrawResult?.intentNonce;
+  const evmAddress = withdraw.withdrawResult?.intentData?.recipient as string | undefined;
+  const intentStatus = useIntentStatus(evmAddress, intentNonce);
 
   return (
     <div className="ui-tab-panel space-y-6">
@@ -40,7 +47,12 @@ export function WithdrawTab() {
         isLoading={withdraw.isLoading}
         isSDKReady={withdraw.isSDKReady}
       />
-      <IntentStatus result={withdraw.withdrawResult} error={withdraw.error} flowStatus={null} isPolling={false} />
+      <IntentStatus
+        result={withdraw.withdrawResult}
+        error={withdraw.error}
+        flowStatus={intentStatus.status}
+        isPolling={intentStatus.isPolling}
+      />
     </div>
   );
 }

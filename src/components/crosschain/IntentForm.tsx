@@ -11,7 +11,8 @@ import type { CrossChainQuote } from '../../services/epoch-bridge';
 import { formatQuoteTokenIn } from '../../services/epoch-bridge';
 import type { SolveIntentParams } from '@epoch-protocol/epoch-intents-sdk/dist/types';
 import { DEFAULT_SEPOLIA_CHAIN_ID_STR } from '../../constants/chains';
-import { useAccount, useConnections, useWalletClient } from 'wagmi';
+import { useAccount } from 'wagmi';
+import { useIntentStatus } from '../../hooks/useIntentStatus';
 
 const SEPOLIA_TOKENS = [
   { symbol: 'USDC', address: '0x2BB4FfD7E2c6D432b697554Efd77fA13bdbefd69', decimals: 18 },
@@ -26,8 +27,6 @@ const SEPOLIA_TOKENS = [
 ];
 
 interface Props {
-  midenConnected: boolean;
-  onConnectMiden: () => void;
   midenAccountId: string | null;
   midenAssets: Array<{
     assetId: string;
@@ -43,11 +42,11 @@ interface Props {
   isFetchingQuote: boolean;
   isConfirmBusy: boolean;
   isSDKReady: boolean;
+  intentNonce?: string;
+  intentUserAddress?: string;
 }
 
 export function IntentForm({
-  midenConnected,
-  onConnectMiden,
   midenAccountId,
   midenAssets,
   isLoadingMidenAssets,
@@ -58,6 +57,8 @@ export function IntentForm({
   isFetchingQuote,
   isConfirmBusy,
   isSDKReady,
+  intentNonce,
+  intentUserAddress,
 }: Props) {
   const { requestSend, waitForTransaction } = useMidenFiWallet();
 
@@ -66,10 +67,16 @@ export function IntentForm({
   const [outputToken, setOutputToken] = useState(SEPOLIA_TOKENS[0].address);
   const [chainId, setChainId] = useState(DEFAULT_SEPOLIA_CHAIN_ID_STR);
   const [confirmStatus, setConfirmStatus] = useState('');
+  const [localIntentNonce, setLocalIntentNonce] = useState<string | undefined>(undefined);
+  const [localIntentUserAddress, setLocalIntentUserAddress] = useState<string | undefined>(undefined);
   const destinationChainIdNum = Number.parseInt(chainId, 10);
   const hasValidDestinationChainId = Number.isInteger(destinationChainIdNum) && destinationChainIdNum > 0;
   const { address } = useAccount();
   const [evmAddress, setEvmAddress] = useState(address ?? '');
+
+  const effectiveIntentNonce = localIntentNonce ?? intentNonce;
+  const effectiveIntentUserAddress = localIntentUserAddress ?? intentUserAddress;
+  const intentStatus = useIntentStatus(effectiveIntentUserAddress, effectiveIntentNonce);
 
   const hasValidEvmRecipient = /^0x[a-fA-F0-9]{40}$/.test(evmAddress?.trim() ?? '');
 
@@ -177,6 +184,23 @@ export function IntentForm({
         if (result && typeof result === 'object' && 'error' in result && (result as { error?: string }).error) {
           throw new Error((result as { error: string }).error);
         }
+        if (result && typeof result === 'object') {
+          const nonce =
+            'intentNonce' in result && typeof (result as any).intentNonce === 'string'
+              ? ((result as any).intentNonce as string)
+              : undefined;
+          const recipient =
+            'intentData' in result &&
+            (result as any).intentData &&
+            typeof (result as any).intentData === 'object' &&
+            typeof (result as any).intentData.recipient === 'string'
+              ? ((result as any).intentData.recipient as string)
+              : undefined;
+
+          if (nonce) setLocalIntentNonce(nonce);
+          // Prefer intentData.recipient, but fall back to what the user entered in the form.
+          setLocalIntentUserAddress((recipient ?? evmAddress)?.trim() || undefined);
+        }
         setConfirmStatus('Intent submitted successfully.');
         return 'Cross-chain intent submitted';
       })(),
@@ -202,20 +226,6 @@ export function IntentForm({
       </p>
 
       <div className="mt-4 space-y-4">
-        <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm text-neutral-700">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="space-y-1">
-              <div className="font-medium">Miden wallet</div>
-              <div className="font-mono text-xs break-all">
-                {midenConnected ? (midenAccountId ?? 'connected') : 'not connected'}
-              </div>
-            </div>
-            <Button type="button" onClick={onConnectMiden} disabled={midenConnected}>
-              {midenConnected ? 'Connected' : 'Connect Miden wallet'}
-            </Button>
-          </div>
-        </div>
-
         <div className="space-y-2">
           <Label>Source asset</Label>
           <SelectRoot
@@ -381,6 +391,49 @@ export function IntentForm({
           <p className={`text-sm ${confirmStatus.startsWith('Error') ? 'text-red-600' : 'text-amber-800'}`}>
             {confirmStatus}
           </p>
+        )}
+
+        {effectiveIntentNonce && effectiveIntentUserAddress && (
+          <div className="rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Intent status</div>
+                <div className="font-mono text-[12px] text-neutral-700 break-all">
+                  {effectiveIntentUserAddress} · nonce {effectiveIntentNonce}
+                </div>
+              </div>
+              <div className="text-xs text-neutral-600">
+                {intentStatus.isPolling ? 'Polling every 5s…' : 'Not polling'}
+              </div>
+            </div>
+
+            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2">
+                <div className="text-[11px] uppercase tracking-wide text-neutral-500">EVM execution</div>
+                <div className={`mt-0.5 font-medium ${intentStatus.status?.evmCompleted ? 'text-emerald-700' : 'text-amber-800'}`}>
+                  {intentStatus.status?.evmCompleted ? 'Completed' : 'Pending'}
+                </div>
+                {!!intentStatus.status?.evmTransactionHash && (
+                  <div className="mt-1 font-mono text-[11px] text-neutral-600 break-all">
+                    tx {intentStatus.status.evmTransactionHash}
+                  </div>
+                )}
+              </div>
+
+              <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2">
+                <div className="text-[11px] uppercase tracking-wide text-neutral-500">Miden consumption</div>
+                <div className={`mt-0.5 font-medium ${intentStatus.status?.midenConsumed ? 'text-emerald-700' : 'text-amber-800'}`}>
+                  {intentStatus.status?.midenConsumed ? 'Consumed' : 'Pending'}
+                </div>
+                {!!intentStatus.status?.midenConsumeError && (
+                  <div className="mt-1 text-[11px] text-amber-800 break-all">
+                    retrying: {intentStatus.status.midenConsumeError}
+                    {intentStatus.status.retryCount != null && ` (attempt ${intentStatus.status.retryCount})`}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

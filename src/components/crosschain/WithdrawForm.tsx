@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 import type { MidenAccount, EVMToMidenIntentParams } from '../../types/miden';
 import { MIDEN_DESTINATION_CHAIN_ID } from '../../constants/chains';
@@ -50,12 +50,18 @@ export function WithdrawForm({
   const [evmToken, setEvmToken] = useState(SEPOLIA_TOKENS[0].address);
   const [customToken, setCustomToken] = useState('');
   const [minTokenOut, setMinTokenOut] = useState('1000000');
-  const [midenRecipientId, setMidenRecipientId] = useState(accounts[0].id);
+  const [midenRecipientId, setMidenRecipientId] = useState(() => accounts[0]?.id ?? '');
   const [midenFaucetId, setMidenFaucetId] = useState('0x0a7d175ed63ec5200fb2ced86f6aa5');
   const [status, setStatus] = useState('');
 
   const { address: connectedAddress } = useAccount();
   const walletChainId = useChainId();
+
+  useEffect(() => {
+    if (!midenRecipientId && accounts[0]?.id) {
+      setMidenRecipientId(accounts[0].id);
+    }
+  }, [accounts, midenRecipientId]);
 
   const tokenSelectValue = evmToken === '' ? TOKEN_CUSTOM : evmToken;
   const resolvedFaucetId = midenFaucetId.trim();
