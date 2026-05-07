@@ -4,8 +4,13 @@
 
 1. Create a `.env` file by copying `.env.example`.
 2. Install dependencies and start the dev server:
-   - `pnpm i`
-   - `pnpm run dev`
+  - `pnpm i`
+  - `pnpm run dev`
+3. Get test funds: claim Miden testnet tokens from the official faucet in Miden Wallet; for Sepolia USDC, ping the Epoch team with your Ethereum address and we will send you some Sepolia USDC.
+
+
+
+
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
@@ -78,3 +83,4 @@ export default defineConfig([
   },
 ])
 ```
+
