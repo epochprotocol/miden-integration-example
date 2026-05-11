@@ -1,5 +1,21 @@
 import type { IntentResult } from '../../types/miden';
-import type { IntentFlowStatus } from '../../hooks/useIntentStatus';
+import {
+  explorerTxUrl,
+  midenscanNoteUrl,
+  truncateHash,
+} from '../../lib/explorers';
+
+export interface IntentFlowStatus {
+  evmCompleted: boolean;
+  evmTransactionHash?: string;
+  evmChainId?: number;
+  midenTxId?: string;
+  midenStatus?: string;
+  midenNoteId?: string;
+  latestStatusLabel?: string;
+  latestChainId?: string;
+  statusCount?: number;
+}
 
 interface Props {
   result: IntentResult | null;
@@ -8,36 +24,92 @@ interface Props {
   isPolling: boolean;
 }
 
-function FlowStep({
-  step,
-  label,
-  done,
-  active,
-}: {
-  step: number;
-  label: string;
-  done: boolean;
-  active: boolean;
-}) {
+function Spinner({ className }: { className?: string }) {
   return (
-    <div className="flex items-center gap-2">
+    <svg
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+    </svg>
+  );
+}
+
+function fallbackMidenNoteId(result: IntentResult | null): string | undefined {
+  if (!result) return undefined;
+  const r = result as any;
+  const candidates = [
+    r?.midenNoteId,
+    r?.solveResult?.midenNoteId,
+    r?.solveResult?.compact?.mandate?.midenNoteId,
+    r?.solveResult?.submittedIntentData?.compact?.mandate?.midenNoteId,
+    r?.intentData?.midenNoteId,
+  ];
+  for (const c of candidates) {
+    if (typeof c === 'string' && c.length > 0) return c;
+  }
+  return undefined;
+}
+
+interface RowProps {
+  label: string;
+  value?: string;
+  hint?: string;
+  href?: string | null;
+  buttonLabel?: string;
+  tone?: 'success' | 'pending' | 'neutral';
+}
+
+function StatusRow({ label, value, hint, href, buttonLabel, tone = 'neutral' }: RowProps) {
+  if (!value) return null;
+  const toneClasses =
+    tone === 'success'
+      ? 'border-emerald-200 bg-emerald-50'
+      : tone === 'pending'
+        ? 'border-amber-200 bg-amber-50'
+        : 'border-neutral-200 bg-neutral-50';
+  const labelToneClasses =
+    tone === 'success'
+      ? 'text-emerald-800'
+      : tone === 'pending'
+        ? 'text-amber-800'
+        : 'text-neutral-500';
+  const valueToneClasses =
+    tone === 'success'
+      ? 'text-emerald-900'
+      : tone === 'pending'
+        ? 'text-amber-900'
+        : 'text-neutral-700';
+
+  return (
+    <div className={`rounded-lg border ${toneClasses} px-3 py-2 space-y-1`}>
       <div
-        className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
-          done
-            ? 'bg-emerald-600 text-white'
-            : active
-              ? 'bg-amber-500 text-neutral-900'
-              : 'bg-neutral-200 text-neutral-500'
-        }`}
-      >
-        {done ? '\u2713' : step}
-      </div>
-      <span
-        className={`text-sm ${done ? 'text-emerald-800' : active ? 'text-amber-800' : 'text-neutral-500'}`}
+        className={`text-[11px] font-semibold uppercase tracking-wide ${labelToneClasses}`}
       >
         {label}
-      </span>
-      {active && !done && <span className="ml-1 animate-pulse text-xs text-amber-700">…</span>}
+      </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className={`break-all font-mono text-[12px] ${valueToneClasses}`}>
+          {truncateHash(value)}
+        </span>
+        {href && (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded border border-current/30 px-2 py-0.5 text-[11px] font-medium hover:bg-white/40 transition-colors whitespace-nowrap"
+          >
+            {buttonLabel ?? 'View ↗'}
+          </a>
+        )}
+      </div>
+      {hint && (
+        <div className="text-[11px] text-neutral-500">{hint}</div>
+      )}
     </div>
   );
 }
@@ -54,144 +126,71 @@ export function IntentStatus({ result, error, flowStatus, isPolling }: Props) {
 
   if (!result) return null;
 
-  const p2idSent = true;
-  const intentSubmitted = !!result.taskTypeString;
   const evmCompleted = flowStatus?.evmCompleted ?? false;
-  const midenConsumed = flowStatus?.midenConsumed ?? false;
+  const midenTxId = flowStatus?.midenTxId;
+  const midenNoteId = flowStatus?.midenNoteId ?? fallbackMidenNoteId(result);
+
+  // Client-side Compact deposit tx hash — signed by the user's wallet via the
+  // SDK's `depositERC20AndRegister` / `depositNativeAndRegister` call. This is
+  // the deposit the user actually performs; the SIO-side claim shows up on the
+  // status poll separately under `flowStatus.evmTransactionHash`.
+  const depositTxHash = (result as any)?.solveResult?.depositResult?.transactionHash as
+    | string
+    | undefined;
+  const depositChainId =
+    (result as any)?.depositChainId ?? flowStatus?.evmChainId;
+
+  const depositTxUrl =
+    depositChainId != null && depositTxHash
+      ? explorerTxUrl(Number(depositChainId), depositTxHash)
+      : null;
+  const midenTxUrl = midenTxId ? explorerTxUrl(/* MIDEN_CHAIN_ID */ 999_999_999, midenTxId) : null;
+  const noteUrl = midenNoteId ? midenscanNoteUrl(midenNoteId) : null;
+
+  const stillWaiting = isPolling && !evmCompleted && !midenTxId;
 
   return (
-    <div className="ui-card space-y-6">
-      <div className="ui-card-muted">
-        <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-neutral-600">Intent flow</div>
-        <div className="space-y-2">
-          <FlowStep step={1} label="P2ID note sent to allocator" done={p2idSent} active={false} />
-          <FlowStep
-            step={2}
-            label="Intent submitted to SIO"
-            done={intentSubmitted}
-            active={p2idSent && !intentSubmitted}
-          />
-          <FlowStep
-            step={3}
-            label="EVM execution"
-            done={evmCompleted}
-            active={intentSubmitted && !evmCompleted}
-          />
-          <FlowStep
-            step={4}
-            label="Miden note consumed"
-            done={midenConsumed}
-            active={evmCompleted && !midenConsumed}
-          />
-        </div>
-
-        {evmCompleted && !midenConsumed && flowStatus?.midenConsumeError && (
-          <p className="mt-3 text-xs text-amber-800">
-            Backend consumption retrying: {flowStatus.midenConsumeError}
-            {flowStatus.retryCount != null && ` (attempt ${flowStatus.retryCount})`}
-          </p>
-        )}
-
-        {isPolling && !midenConsumed && (
-          <p className="mt-2 text-xs text-neutral-500">Polling for status updates…</p>
-        )}
-      </div>
-
-      <div>
-        <h2 className="mb-4 text-lg font-semibold text-emerald-800">
-          {result.solveResult ? '\u2713 Intent Executed' : 'Intent Data Generated'}
-        </h2>
-
-        <div className="space-y-4">
-          <div>
-            <div className="ui-label">Task Type String</div>
-            <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 font-mono text-sm break-all text-neutral-800">
-              {result.taskTypeString}
+    <div className="ui-card space-y-3">
+      {stillWaiting && (
+        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
+          <Spinner className="mt-0.5 h-4 w-4 shrink-0 animate-spin text-amber-700" />
+          <div className="flex-1 text-[12px] text-amber-900">
+            <div className="font-semibold text-amber-800">Waiting for SIO execution…</div>
+            <div className="mt-0.5">
+              {flowStatus?.latestStatusLabel
+                ? `Status: ${flowStatus.latestStatusLabel}${
+                    flowStatus.latestChainId ? ` · chain ${flowStatus.latestChainId}` : ''
+                  } · polling every 5s`
+                : 'Solver picking up intent · polling every 5s'}
             </div>
           </div>
-
-          <div>
-            <div className="ui-label">Intent Data</div>
-            <pre className="max-h-80 overflow-auto rounded-lg border border-neutral-200 bg-neutral-50 p-3 font-mono text-sm text-neutral-800">
-              {JSON.stringify(result.intentData, null, 2)}
-            </pre>
-          </div>
-        </div>
-      </div>
-
-      {result.solveResult && (
-        <div className="border-t border-neutral-200 pt-6">
-          <h3 className="text-md mb-3 font-semibold text-primary">Execution Result</h3>
-
-          {result.error && (
-            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 p-4">
-              <div className="mb-1 text-sm font-medium text-red-800">Execution Error</div>
-              <div className="text-sm text-red-700">{result.error}</div>
-            </div>
-          )}
-
-          {result.solveResult.resourceLockRequired !== undefined && (
-            <div className="ui-card-muted mb-4">
-              <div className="ui-label">Resource Lock Required</div>
-              <div className="text-sm text-neutral-900">
-                {result.solveResult.resourceLockRequired ? '\u2713 Yes' : '\u2717 No'}
-              </div>
-            </div>
-          )}
-
-          {result.solveResult.transactions && result.solveResult.transactions.length > 0 && (
-            <div className="ui-card-muted mb-4">
-              <div className="ui-label">Transactions ({result.solveResult.transactions.length})</div>
-              <div className="space-y-3">
-                {result.solveResult.transactions.map((tx, idx) => (
-                  <div key={idx} className="rounded-lg border border-neutral-200 bg-white p-3">
-                    <div className="mb-1 text-xs text-neutral-500">Transaction {idx + 1}</div>
-                    <div className="space-y-2 text-xs">
-                      <div>
-                        <span className="text-neutral-600">To:</span>{' '}
-                        <span className="font-mono text-neutral-900">{tx.to}</span>
-                      </div>
-                      {tx.value && (
-                        <div>
-                          <span className="text-neutral-600">Value:</span>{' '}
-                          <span className="text-neutral-900">{tx.value}</span>
-                        </div>
-                      )}
-                      <div>
-                        <span className="text-neutral-600">Data:</span>{' '}
-                        <span className="break-all font-mono text-neutral-900">{tx.data.slice(0, 66)}…</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {result.solveResult.compact && (
-            <div className="ui-card-muted mb-4">
-              <div className="ui-label">Compact Details</div>
-              <pre className="overflow-x-auto font-mono text-xs text-neutral-800">
-                {JSON.stringify(result.solveResult.compact, null, 2)}
-              </pre>
-            </div>
-          )}
-
-          {result.solveResult.hash && (
-            <div className="ui-card-muted">
-              <div className="ui-label">Transaction Hash</div>
-              <div className="break-all font-mono text-sm text-neutral-900">{result.solveResult.hash}</div>
-            </div>
-          )}
         </div>
       )}
 
-      <div className="rounded-lg border border-neutral-200 bg-neutral-100/80 p-3 text-xs text-neutral-600">
-        <strong className="text-neutral-800">How it works:</strong> The P2ID note locks your Miden tokens. The
-        allocator takes this intent data and submits it to SIO via The Compact. A solver fulfills the output
-        token delivery on the destination EVM chain. Once fulfilled, the allocator consumes the P2ID note to
-        claim the Miden-side funds.
-      </div>
+      <StatusRow
+        label="Compact Deposit Tx"
+        value={depositTxHash}
+        href={depositTxUrl}
+        buttonLabel="View on Explorer ↗"
+        tone={depositTxHash ? 'success' : 'neutral'}
+        hint={depositChainId != null ? `chain ${depositChainId}` : undefined}
+      />
+
+      <StatusRow
+        label="Miden Settlement Tx"
+        value={midenTxId}
+        href={midenTxUrl}
+        buttonLabel="View on Midenscan ↗"
+        tone={midenTxId ? 'success' : 'neutral'}
+      />
+
+      <StatusRow
+        label="Miden Note ID"
+        value={midenNoteId}
+        href={noteUrl}
+        buttonLabel="View Note on Midenscan ↗"
+        tone="neutral"
+      />
     </div>
   );
 }

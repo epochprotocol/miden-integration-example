@@ -76,9 +76,31 @@ export function useWithdrawIntent() {
         evmSourceAddress: address,
         preFetchedQuote: pendingQuote,
       });
-      setWithdrawResult(result);
+      const r = result as any;
+      const isNonceLike = (v: unknown) =>
+        typeof v === 'string' || typeof v === 'number' || typeof v === 'bigint';
+      const rawNonce = isNonceLike(r?.intentNonce)
+        ? r.intentNonce
+        : isNonceLike(r?.solveResult?.nonce)
+          ? r.solveResult.nonce
+          : isNonceLike(r?.solveResult?.submittedIntentData?.nonce)
+            ? r.solveResult.submittedIntentData.nonce
+            : isNonceLike(r?.solveResult?.compact?.nonce)
+              ? r.solveResult.compact.nonce
+              : undefined;
+      const nonce = rawNonce != null ? String(rawNonce) : undefined;
+      console.log('[useWithdrawIntent] extracted nonce', { nonce, raw: rawNonce, solveResult: r?.solveResult });
+      // Chain the deposit tx landed on — taken from the wallet client at submit
+      // time; this is the chain where `depositERC20AndRegister` was called.
+      const depositChainId = walletClient?.chain?.id;
+      const resultWithNonce: IntentResult = {
+        ...(result as IntentResult),
+        ...(nonce ? { intentNonce: nonce } : {}),
+        ...(depositChainId != null ? { depositChainId } : {}),
+      };
+      setWithdrawResult(resultWithNonce);
       setPendingQuote(null);
-      return result;
+      return resultWithNonce;
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Failed to confirm withdraw intent';
       setError(msg);

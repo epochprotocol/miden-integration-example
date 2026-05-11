@@ -1,10 +1,9 @@
 import { useMemo } from 'react';
 import { useMidenWalletAdapter } from '../../hooks/useMidenWalletAdapter';
-import { EVMWalletConnect } from '../crosschain/EVMWalletConnect';
 import { WithdrawForm } from '../crosschain/WithdrawForm';
 import { IntentStatus } from '../crosschain/IntentStatus';
 import { useWithdrawIntent } from '../../hooks/useWithdrawIntent';
-import { useIntentStatus } from '../../hooks/useIntentStatus';
+import { useIntentFlowStatus } from '../../hooks/useIntentFlowStatus';
 import type { MidenAccount } from '../../types/miden';
 
 export function WithdrawTab() {
@@ -26,7 +25,7 @@ export function WithdrawTab() {
   // on EVM→Miden intents — it's the refund target if the intent fails).
   const intentNonce = withdraw.withdrawResult?.intentNonce;
   const evmAddress = withdraw.withdrawResult?.intentData?.recipient as string | undefined;
-  const intentStatus = useIntentStatus(evmAddress, intentNonce);
+  const intentStatus = useIntentFlowStatus(evmAddress, intentNonce);
 
   return (
     <div className="ui-tab-panel space-y-6">
@@ -36,7 +35,6 @@ export function WithdrawTab() {
           Pull funds from your EVM wallet into a Miden account using an Epoch withdraw intent.
         </p>
       </header>
-      <EVMWalletConnect />
       <WithdrawForm
         accounts={displayWallets}
         onFetchQuote={withdraw.fetchQuote}

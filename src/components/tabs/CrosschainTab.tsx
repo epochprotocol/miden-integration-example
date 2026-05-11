@@ -1,8 +1,7 @@
-import { EVMWalletConnect } from '../crosschain/EVMWalletConnect';
 import { IntentForm } from '../crosschain/IntentForm';
 import { IntentStatus } from '../crosschain/IntentStatus';
 import { useEpochIntent } from '../../hooks/useEpochIntent';
-import { useIntentStatus } from '../../hooks/useIntentStatus';
+import { useIntentFlowStatus } from '../../hooks/useIntentFlowStatus';
 import { useMidenWalletAdapter } from '../../hooks/useMidenWalletAdapter';
 
 export function CrosschainTab() {
@@ -11,7 +10,7 @@ export function CrosschainTab() {
   const epoch = useEpochIntent();
   const intentNonce = epoch.intentResult?.intentNonce;
   const evmAddress = epoch.intentResult?.intentData?.recipient as string | undefined;
-  const intentStatus = useIntentStatus(evmAddress, intentNonce);
+  const intentStatus = useIntentFlowStatus(evmAddress, intentNonce);
 
   return (
     <div className="ui-tab-panel space-y-6">
@@ -22,7 +21,6 @@ export function CrosschainTab() {
           submit the cross-chain intent.
         </p>
       </header>
-      <EVMWalletConnect />
       <IntentForm
         midenAccountId={midenWallet.accountId?.hex ?? null}
         midenAssets={midenWallet.assets}

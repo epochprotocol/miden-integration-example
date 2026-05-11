@@ -74,8 +74,19 @@ export interface IntentResult {
     compact?: any;
     hash?: string;
     nonce?: string;
+    /**
+     * Client-side EVM deposit into The Compact contract (depositERC20AndRegister
+     * / depositNativeAndRegister). Populated by the SDK after the user's wallet
+     * signs the deposit tx; only present for EVM-collateral flows.
+     */
+    depositResult?: {
+      success?: boolean;
+      transactionHash?: string;
+    };
   };
   error?: string;
   /** The intent nonce used for status tracking (userAddress:intentNonce in SIO) */
   intentNonce?: string;
+  /** Chain id the compact deposit landed on (= source EVM chain). */
+  depositChainId?: number;
 }
