@@ -1,86 +1,62 @@
-# React + TypeScript + Vite
+# Miden ⇄ EVM Epoch Integration Example
+
+Reference dapp showing how to use [`@epoch-protocol/epoch-intents-sdk`](https://www.npmjs.com/package/@epoch-protocol/epoch-intents-sdk) to move value between an EVM chain (Sepolia) and Miden testnet via Epoch intents.
+
+Two flows:
+
+- **Cross-chain** — EVM → Miden. Pay USDC on Sepolia, receive the target asset (P2IDE note) on Miden.
+- **Withdraw** — Miden → EVM. Burn a Miden note, receive the corresponding asset on Sepolia.
+
+## Stack
+
+- React 19 + Vite + TypeScript + Tailwind v4
+- EVM: wagmi + RainbowKit + viem
+- Miden: `@miden-sdk/miden-sdk`, `@miden-sdk/miden-wallet-adapter-react`
+- Intents: `@epoch-protocol/epoch-intents-sdk` against the Epoch testnet allocator
 
 ## Run Locally
 
-1. Create a `.env` file by copying `.env.example`.
-2. Install dependencies and start the dev server:
-  - `pnpm i`
-  - `pnpm run dev`
-3. Get test funds: claim Miden testnet tokens from the official faucet in Miden Wallet; for Sepolia USDC, ping the Epoch team with your Ethereum address and we will send you some Sepolia USDC.
+1. Copy env file:
+   ```bash
+   cp .env.example .env
+   ```
+   `.env`:
+   ```
+   VITE_ALLOCATOR_URL=https://testnet-dev.epochprotocol.xyz
+   ```
+2. Install + start:
+   ```bash
+   pnpm i
+   pnpm run dev
+   ```
+3. Open `http://localhost:5173`.
 
+## Wallets
 
+- **EVM**: any RainbowKit-supported wallet (MetaMask etc.) on **Sepolia**. Pays gas + provides USDC for cross-chain deposits.
+- **Miden**: Miden wallet adapter. Required for Withdraw and for creating P2IDE notes in Cross-chain.
 
+## Test Funds
 
+- **Miden testnet tokens**: claim from official Miden faucet in Miden Wallet.
+- **Sepolia USDC**: ping Epoch team with your Ethereum address; team will send Sepolia USDC.
+- **Sepolia ETH**: any public Sepolia faucet for gas.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Key Files
 
-Currently, two official plugins are available:
+| Path | Purpose |
+|------|---------|
+| `src/services/epoch-bridge.ts` | Epoch SDK wrapper (intent build / submit / poll) |
+| `src/hooks/useEpochIntent.ts` | EVM→Miden intent submission flow |
+| `src/hooks/useWithdrawIntent.ts` | Miden→EVM withdraw flow |
+| `src/hooks/useMidenWalletAdapter.ts` | Miden wallet connect/state |
+| `src/hooks/useMidenTransfer.ts` | P2IDE note creation on Miden |
+| `src/hooks/useIntentFlowStatus.ts` | Intent lifecycle polling |
+| `src/constants/chains.ts` | Sepolia + Miden virtual chain id (`999999999`) |
+| `src/config/wagmi.ts` | wagmi/RainbowKit config |
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Notes
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
+- `MIDEN_DESTINATION_CHAIN_ID = 999999999` is the virtual chain id used as `tokenOut.chainId` when Miden is the intent output. Do not set this to a real EVM chain id.
+- Allocator URL is configurable via `VITE_ALLOCATOR_URL`. Default points at Epoch testnet-dev.
+- Build: `pnpm build` (`tsc -b && vite build`). Lint: `pnpm lint`.
