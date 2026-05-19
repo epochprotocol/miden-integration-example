@@ -3,28 +3,31 @@ import { useAccount, useChainId } from 'wagmi';
 import type { MidenAccount, EVMToMidenIntentParams } from '../../types/miden';
 import { MIDEN_DESTINATION_CHAIN_ID } from '../../constants/chains';
 import { formatQuoteTokenIn, type EVMToMidenQuote } from '../../services/epoch-bridge';
+import { truncateHash } from '../../lib/explorers';
+import {
+  SEPOLIA_TESTNET_TOKENS,
+  findEvmToken,
+  type EvmToken,
+} from '../../constants/evm-tokens';
 import { toast } from 'sonner';
+
+export const WITHDRAW_DEPOSIT_TOAST_ID = 'withdraw-deposit';
+export const WITHDRAW_SETTLE_TOAST_ID = 'withdraw-settle';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SelectContent, SelectItem, SelectRoot, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const SEPOLIA_TOKENS = [
-  { symbol: 'USDC', address: '0x2BB4FfD7E2c6D432b697554Efd77fA13bdbefd69', decimals: 6 },
-  { symbol: 'USDT', address: '0xc04d2869665Be874881133943523723Be5782720', decimals: 6 },
+// SIO testnet mocks are deployed with 18 decimals across the board — even
+// tokens that have 6 decimals on mainnet (USDC/USDT). See `constants/evm-tokens.ts`.
+const SEPOLIA_TOKENS: EvmToken[] = [
+  ...SEPOLIA_TESTNET_TOKENS,
   { symbol: 'Custom', address: '', decimals: 18 },
 ];
 
 const TOKEN_CUSTOM = '__custom__';
-
-function toNumberOrUndefined(v: unknown): number | undefined {
-  if (typeof v === 'number' && Number.isFinite(v)) return v;
-  if (typeof v === 'string' && v.trim() !== '') {
-    const n = Number(v);
-    if (Number.isFinite(n)) return n;
-  }
-  return undefined;
-}
+// Fallback decimals for custom (unknown) EVM tokens.
+const CUSTOM_TOKEN_DEFAULT_DECIMALS = 18;
 
 interface Props {
   accounts: MidenAccount[];
@@ -67,11 +70,13 @@ export function WithdrawForm({
   const resolvedFaucetId = midenFaucetId.trim();
 
   const finalToken = customToken || evmToken;
-  const selectedToken = SEPOLIA_TOKENS.find((t) => t.address === finalToken);
-  const evmDisplayDecimals =
-    toNumberOrUndefined((pendingQuote?.quoteResult as any)?.tokenInDecimals) ??
-    selectedToken?.decimals ??
-    18;
+  // Resolve decimals via the canonical EVM token map first (case-insensitive
+  // address match). Custom / unknown tokens fall back to 18 — the SIO testnet
+  // default. Do NOT trust a stale entry from `SEPOLIA_TOKENS` matched by exact
+  // string equality; the canonical lookup is normalized.
+  const selectedToken = findEvmToken(finalToken);
+  const evmTokenDecimals = selectedToken?.decimals ?? CUSTOM_TOKEN_DEFAULT_DECIMALS;
+  const evmDisplayDecimals = evmTokenDecimals;
 
   const buildParams = (): EVMToMidenIntentParams => {
     if (!connectedAddress) {
@@ -82,7 +87,7 @@ export function WithdrawForm({
       destinationChainId: MIDEN_DESTINATION_CHAIN_ID,
       evmSourceAddress: connectedAddress,
       evmTokenAddress: finalToken,
-      evmTokenDecimals: selectedToken?.decimals ?? 18,
+      evmTokenDecimals,
       midenRecipientId,
       midenFaucetId: resolvedFaucetId,
       minTokenOut: minTokenOut.trim(),
@@ -124,27 +129,45 @@ export function WithdrawForm({
     );
   };
 
-  const handleConfirm = () => {
-    void toast.promise(
-      (async () => {
-        setStatus('Submitting withdraw intent…');
-        const result = await onConfirmWithdraw();
-        if (result && typeof result === 'object' && 'error' in result && (result as { error?: string }).error) {
-          throw new Error((result as { error: string }).error);
-        }
-        setStatus('Withdraw intent submitted successfully.');
-        return 'Withdraw intent submitted';
-      })(),
-      {
-        loading: 'Confirming withdraw…',
-        success: (msg) => msg,
-        error: (err) => {
-          const msg = `Error: ${err instanceof Error ? err.message : 'Unknown error'}`;
-          setStatus(msg);
-          return msg;
-        },
-      },
-    );
+  const handleConfirm = async () => {
+    // Two-stage toast: (1) Compact deposit signature/confirmation,
+    // (2) SIO Miden settlement — dismissed by parent WithdrawTab once the
+    // synthetic Miden row appears in the status poll.
+    setStatus('Awaiting Compact deposit signature in wallet…');
+    toast.loading('Sign Compact deposit in wallet…', { id: WITHDRAW_DEPOSIT_TOAST_ID });
+    try {
+      const result = await onConfirmWithdraw();
+      if (
+        result &&
+        typeof result === 'object' &&
+        'error' in result &&
+        (result as { error?: string }).error
+      ) {
+        throw new Error((result as { error: string }).error);
+      }
+
+      const depositHash = (result as any)?.solveResult?.depositResult?.transactionHash as
+        | string
+        | undefined;
+
+      if (depositHash) {
+        toast.success(`Compact deposit confirmed · ${truncateHash(depositHash)}`, {
+          id: WITHDRAW_DEPOSIT_TOAST_ID,
+        });
+        setStatus(`Deposit confirmed (${truncateHash(depositHash)}) — polling for Miden settlement…`);
+      } else {
+        toast.success('Intent submitted', { id: WITHDRAW_DEPOSIT_TOAST_ID });
+        setStatus('Intent submitted — polling for Miden settlement…');
+      }
+
+      // Hold a loading toast until the parent component sees a Miden settlement row.
+      toast.loading('Waiting for SIO Miden settlement…', { id: WITHDRAW_SETTLE_TOAST_ID });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      toast.error(`Error: ${msg}`, { id: WITHDRAW_DEPOSIT_TOAST_ID });
+      toast.dismiss(WITHDRAW_SETTLE_TOAST_ID);
+      setStatus(`Error: ${msg}`);
+    }
   };
 
   return (
@@ -260,7 +283,6 @@ export function WithdrawForm({
                 {formatQuoteTokenIn(
                   pendingQuote.quoteResult.tokenIn,
                   evmDisplayDecimals,
-                  toNumberOrUndefined((pendingQuote.quoteResult as any)?.tokenInDecimals),
                 ) || 'calculated at execution'}{' '}
                 {pendingQuote.quoteResult.tokenInSymbol ?? selectedToken?.symbol ?? 'tokens'}
               </p>

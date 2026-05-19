@@ -3,47 +3,55 @@ import { useWalletClient } from 'wagmi';
 import type { IntentTransactionStatus } from '@epoch-protocol/epoch-intents-sdk/dist/types';
 
 const POLL_INTERVAL = 5000;
-const LOG = '[useIntentTransactionStatus]';
 
 const TERMINAL_STATUSES = new Set(['success', 'completed', 'failed', 'reverted']);
 
-function isTerminal(statuses: IntentTransactionStatus[]): boolean {
+function isTerminal(
+  statuses: IntentTransactionStatus[],
+  destinationChainId?: number,
+): boolean {
   if (statuses.length === 0) return false;
+  // When destinationChainId is provided, only stop polling once ALL
+  // destination-chain rows are terminal. SIO can list a prior-step success
+  // alongside a pending user-settlement row on the same chain — stopping at
+  // the first success would hide the in-flight tx. Internal rows on other
+  // chains (e.g. Compact-claim on Base Sepolia 84532) are ignored.
+  if (destinationChainId != null) {
+    const destRows = statuses.filter((s) => Number(s.chainId) === destinationChainId);
+    if (destRows.length === 0) return false;
+    return destRows.every((s) => TERMINAL_STATUSES.has(String(s.status).toLowerCase()));
+  }
   return statuses.every((s) => TERMINAL_STATUSES.has(String(s.status).toLowerCase()));
 }
 
-export function useIntentTransactionStatus(userAddress?: string, intentNonce?: string) {
+export function useIntentTransactionStatus(
+  userAddress?: string,
+  intentNonce?: string,
+  destinationChainId?: number,
+) {
   const [statuses, setStatuses] = useState<IntentTransactionStatus[]>([]);
   const [isPolling, setIsPolling] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sdk, setSdk] = useState<any>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const pollCountRef = useRef(0);
 
   const { data: walletClient } = useWalletClient();
 
   useEffect(() => {
-    console.log(`${LOG} walletClient changed:`, !!walletClient);
     if (!walletClient) {
       setSdk(null);
       return;
     }
     let cancelled = false;
     const apiBaseUrl = import.meta.env.VITE_ALLOCATOR_URL || 'http://localhost:3000';
-    console.log(`${LOG} loading SDK, apiBaseUrl=${apiBaseUrl}`);
     import('@epoch-protocol/epoch-intents-sdk')
       .then(({ EpochIntentSDK }) => {
-        if (cancelled) {
-          console.log(`${LOG} SDK load cancelled`);
-          return;
-        }
-        const instance = new EpochIntentSDK({ apiBaseUrl, walletClient: walletClient as any });
-        console.log(`${LOG} SDK ready`);
-        setSdk(instance);
+        if (cancelled) return;
+        setSdk(new EpochIntentSDK({ apiBaseUrl, walletClient: walletClient as any }));
       })
       .catch((err) => {
         if (cancelled) return;
-        console.error(`${LOG} SDK load failed:`, err);
+        console.error('[useIntentTransactionStatus] SDK load failed:', err);
         setSdk(null);
       });
     return () => {
@@ -53,7 +61,6 @@ export function useIntentTransactionStatus(userAddress?: string, intentNonce?: s
 
   const stopPolling = useCallback(() => {
     if (intervalRef.current) {
-      console.log(`${LOG} stopPolling — clearing interval`);
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
@@ -61,48 +68,27 @@ export function useIntentTransactionStatus(userAddress?: string, intentNonce?: s
   }, []);
 
   const poll = useCallback(async () => {
-    if (!sdk || !userAddress || !intentNonce) {
-      console.log(`${LOG} poll skipped`, {
-        hasSdk: !!sdk,
-        userAddress,
-        intentNonce,
-      });
-      return;
-    }
-    pollCountRef.current += 1;
-    const attempt = pollCountRef.current;
-    console.log(`${LOG} poll #${attempt} → getIntentStatus(${userAddress}, ${intentNonce})`);
+    if (!sdk || !userAddress || !intentNonce) return;
     try {
       const result: IntentTransactionStatus[] = await sdk.getIntentStatus(userAddress, intentNonce);
       const arr = Array.isArray(result) ? result : [];
-      console.log(`${LOG} poll #${attempt} result:`, arr);
       setStatuses(arr);
       setError(null);
-      if (isTerminal(arr)) {
-        console.log(`${LOG} terminal status reached — stop polling`);
-        stopPolling();
-      }
+      if (isTerminal(arr, destinationChainId)) stopPolling();
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Failed to fetch intent status';
-      console.error(`${LOG} poll #${attempt} error:`, err);
+      console.error('[useIntentTransactionStatus] poll error:', err);
       setError(msg);
     }
-  }, [sdk, userAddress, intentNonce, stopPolling]);
+  }, [sdk, userAddress, intentNonce, destinationChainId, stopPolling]);
 
   useEffect(() => {
-    console.log(`${LOG} polling effect`, {
-      hasSdk: !!sdk,
-      userAddress,
-      intentNonce,
-    });
     if (!sdk || !userAddress || !intentNonce) {
       stopPolling();
       setStatuses([]);
       return;
     }
     setIsPolling(true);
-    pollCountRef.current = 0;
-    console.log(`${LOG} starting polling loop @ ${POLL_INTERVAL}ms`);
     void poll();
     intervalRef.current = setInterval(poll, POLL_INTERVAL);
     return () => stopPolling();

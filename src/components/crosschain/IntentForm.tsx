@@ -11,20 +11,12 @@ import type { CrossChainQuote } from '../../services/epoch-bridge';
 import { formatQuoteTokenIn } from '../../services/epoch-bridge';
 import type { SolveIntentParams } from '@epoch-protocol/epoch-intents-sdk/dist/types';
 import { DEFAULT_SEPOLIA_CHAIN_ID_STR } from '../../constants/chains';
+import { getMidenFaucetDecimals } from '../../constants/miden-tokens';
+import { SEPOLIA_TESTNET_TOKENS } from '../../constants/evm-tokens';
 import { useAccount } from 'wagmi';
 import { useIntentTransactionStatus } from '../../hooks/useIntentTransactionStatus';
 
-const SEPOLIA_TOKENS = [
-  { symbol: 'USDC', address: '0x2BB4FfD7E2c6D432b697554Efd77fA13bdbefd69', decimals: 18 },
-  { symbol: 'DAI', address: '0xc30f1Ce05d1434d484E9A47283aA925fc8A8699a', decimals: 18 },
-  { symbol: 'USDT', address: '0xc04d2869665Be874881133943523723Be5782720', decimals: 18 },
-  { symbol: 'WETH', address: '0x7946dd86eE310D0aC16804A37787289Fa5b88A8A', decimals: 18 },
-  { symbol: 'WBTC', address: '0x9b2a2754a9182fD65360E23afCDf3BeFF51796E9', decimals: 18 },
-  { symbol: 'PENGU', address: '0xEA7dC9849206Ce73b11c465d37b85eC06B11Cf2C', decimals: 18 },
-  { symbol: 'OSWALD', address: '0xB588418c0f90F07Bc9587d0050845a90C23C7502', decimals: 18 },
-  { symbol: 'KICK', address: '0x512Ee6Bd7A4be5Ba4796F15Df080c4D0F89a38eD', decimals: 18 },
-  { symbol: 'FERB', address: '0x145e03A80c19ad1b9d0429d06b6d52707de724A0', decimals: 18 },
-];
+const SEPOLIA_TOKENS = SEPOLIA_TESTNET_TOKENS;
 
 interface Props {
   midenAccountId: string | null;
@@ -32,7 +24,6 @@ interface Props {
     assetId: string;
     amount: bigint;
     symbol?: string;
-    decimals?: number;
   }>;
   isLoadingMidenAssets: boolean;
   onFetchQuote: (params: CrossChainIntentParams) => Promise<void>;
@@ -80,28 +71,40 @@ export function IntentForm({
   const { statuses: txStatuses, isPolling: isTxStatusPolling } = useIntentTransactionStatus(
     effectiveIntentUserAddress,
     effectiveIntentNonce,
+    hasValidDestinationChainId ? destinationChainIdNum : undefined,
   );
 
   const latestStatus = txStatuses[txStatuses.length - 1];
   const latestStatusLabel = latestStatus?.status ? String(latestStatus.status) : undefined;
 
-  // Filter out the synthetic Miden settlement row that SIO surfaces under the
-  // pseudo chainId. Miden→EVM only cares about the EVM execution row.
-  const MIDEN_CHAIN_ID = 999_999_999;
-  const evmStatuses = txStatuses.filter((s) => Number(s.chainId) !== MIDEN_CHAIN_ID);
-
-  // Only show the EVM tx hash once the polling API reports a terminal success.
-  // PENDING / FAILED rows do not display a hash to the user.
-  const TERMINAL_OK = new Set(['success', 'completed']);
-  const evmCompletedStatus = evmStatuses.find(
+  // Strict display gate:
+  //   1. Filter rows to destination chain only (ignore internal Compact-claim
+  //      row on dispatcher chain, e.g. Base Sepolia 84532).
+  //   2. If ANY destination-chain row is still pending, render NOTHING and
+  //      keep the polling loader visible — SIO can list a prior-step success
+  //      alongside the not-yet-settled user tx; the user's tx is the one
+  //      currently pending.
+  //   3. Once no pending rows remain on the destination chain, pick the LAST
+  //      success row — that is the final user settlement.
+  const destRows = txStatuses.filter((s) => Number(s.chainId) === destinationChainIdNum);
+  const hasPendingDestRow = destRows.some(
+    (s) => String(s.status).toLowerCase() === 'pending',
+  );
+  const destSuccessRows = destRows.filter(
     (s) =>
-      TERMINAL_OK.has(String(s.status).toLowerCase()) &&
+      String(s.status).toLowerCase() === 'success' &&
       typeof s.transactionHash === 'string' &&
       s.transactionHash.length > 0,
   );
+  const evmCompletedStatus = hasPendingDestRow
+    ? undefined
+    : destSuccessRows[destSuccessRows.length - 1];
   const evmTransactionHash = evmCompletedStatus?.transactionHash;
-
   const evmTxChainId = evmCompletedStatus?.chainId ?? destinationChainIdNum;
+  // Spinner shows while polling OR while any destination row is still pending,
+  // even if polling already exited (defensive — keeps user from seeing a
+  // half-rendered state if poll terminates between updates).
+  const showPollingSpinner = (isTxStatusPolling || hasPendingDestRow) && !evmTransactionHash;
 
   const midenScanBase =
     (import.meta as any).env?.VITE_MIDENSCAN_URL || 'https://testnet.midenscan.com';
@@ -133,7 +136,12 @@ export function IntentForm({
   const selectedAsset = midenAssets.find(
     (a) => a.assetId.toLowerCase() === selectedAssetId.toLowerCase(),
   );
-  const midenFaucetDecimals = selectedAsset?.decimals ?? 8;
+  // Use the hardcoded faucet→decimals map. Do NOT fall back to the wallet
+  // adapter's reported decimals (often defaults to 8 and silently mis-scales).
+  // `undefined` here gates the form via `Number.isFinite` below.
+  const midenFaucetDecimals = selectedAssetId
+    ? getMidenFaucetDecimals(selectedAssetId)
+    : undefined;
 
   const buildParams = (): CrossChainIntentParams => {
     if (!evmAddress) {
@@ -148,10 +156,14 @@ export function IntentForm({
     if (!midenAccountId) {
       throw new Error('Connect Miden wallet first');
     }
+    if (midenFaucetDecimals === undefined) {
+      throw new Error(
+        `Unknown Miden faucet ${selectedAssetId} — add it to miden-tokens.ts before sending.`,
+      );
+    }
     return {
       midenAccountId,
       midenFaucetId: selectedAssetId,
-      midenDecimals: midenFaucetDecimals,
       evmRecipient: evmAddress.trim(),
       destinationChainId: destinationChainIdNum,
       outputTokenAddress: outputToken,
@@ -236,7 +248,6 @@ export function IntentForm({
           throw new Error((result as { error: string }).error);
         }
         if (result && typeof result === 'object') {
-          console.log('result', result);
           const r = result as any;
           const isNonceLike = (v: unknown) =>
             typeof v === 'string' || typeof v === 'number' || typeof v === 'bigint';
@@ -252,13 +263,6 @@ export function IntentForm({
                     ? r.submittedIntentData.nonce
                     : undefined;
           const nonce = rawNonce != null ? String(rawNonce) : undefined;
-          console.log('[IntentForm] extracted nonce', {
-            nonce,
-            raw: r.nonce,
-            alt: r.intentNonce,
-            solveNonce: r.solveResult?.nonce,
-            submittedNonce: r.solveResult?.submittedIntentData?.nonce,
-          });
           const recipient =
             'intentData' in result &&
             (result as any).intentData &&
@@ -401,25 +405,14 @@ export function IntentForm({
               <p className="text-xs font-medium uppercase tracking-wide text-orange-700">Required deposit</p>
               <p className="mt-1 font-mono text-xl font-semibold text-orange-900">
                 {(() => {
-                  const quoteDecimalsRaw = (pendingQuote.quoteResult as any).midenFaucetDecimals;
-                  const quoteDecimals =
-                    typeof quoteDecimalsRaw === 'number'
-                      ? quoteDecimalsRaw
-                      : typeof quoteDecimalsRaw === 'string'
-                        ? Number(quoteDecimalsRaw)
-                        : undefined;
-                  const resolvedDisplayDecimals =
-                    Number.isFinite(quoteDecimals) && (quoteDecimals as number) >= 0
-                      ? (quoteDecimals as number)
-                      : midenFaucetDecimals;
                   const tokenInRaw = (pendingQuote.quoteResult as any).tokenIn as
                     | string
                     | undefined;
                   if (!tokenInRaw) return 'calculated at execution';
+                  if (midenFaucetDecimals === undefined) return tokenInRaw;
                   return `${formatQuoteTokenIn(
                     tokenInRaw,
-                    resolvedDisplayDecimals,
-                    resolvedDisplayDecimals,
+                    midenFaucetDecimals,
                   )} ${selectedAsset?.symbol ?? 'tokens'}`;
                 })()}
               </p>
@@ -493,7 +486,7 @@ export function IntentForm({
           </div>
         )}
 
-        {isTxStatusPolling && !evmTransactionHash && (
+        {showPollingSpinner && (
           <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm">
             <div className="flex items-center gap-3">
               <svg

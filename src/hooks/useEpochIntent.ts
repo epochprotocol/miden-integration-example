@@ -28,7 +28,6 @@ export function useEpochIntent() {
     import('@epoch-protocol/epoch-intents-sdk').then(({ EpochIntentSDK }) => {
       if (cancelled) return;
       const apiBaseUrl = import.meta.env.VITE_ALLOCATOR_URL || 'http://localhost:3000';
-      console.log('apiBaseUrl: ', apiBaseUrl);
       const midenWalletClient = {
         ...(walletClient as any),
         chain: { ...((walletClient as any)?.chain ?? {}), id: 999999999 },

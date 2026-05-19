@@ -7,8 +7,6 @@ export interface MidenAccount {
 export interface MidenFaucetInfo extends MidenAccount {
   type: 'faucet';
   symbol: string;
-  /** Optional persisted label; decimals for math come from `useFaucetDecimals` (MidenClient + faucet component). */
-  decimals?: number;
   maxSupply: string;
 }
 
@@ -20,10 +18,11 @@ export interface VaultAsset {
 export interface CrossChainIntentParams {
   midenAccountId: string;
   midenFaucetId: string;
-  /** Set to use direct-bridge path (same-token). Omit/pass "0" to use minTokenOut reverse-quote route */
+  /**
+   * Miden input amount in base units (matches `minTokenOut` convention).
+   * Omit / pass "0" to use reverse-quote route.
+   */
   midenAmount?: string;
-  /** From `useFaucetDecimals(midenFaucetId).decimals` (same RPC path as dex-solver inventory). Required for scaling. */
-  midenDecimals: number;
   /** Optional absolute reclaim height (block number) for P2IDE notes */
   midenReclaimHeight?: number;
   evmRecipient: string;
@@ -48,11 +47,6 @@ export interface EVMToMidenIntentParams {
   evmTokenDecimals?: number;
   midenRecipientId: string;
   midenFaucetId: string;
-  /**
-   * Withdraw flow no longer depends on frontend faucet-decimals.
-   * Backend should derive decimals from `midenFaucetId` when needed.
-   */
-  midenDecimals?: number;
   /**
    * Minimum Miden-side output you want.
    * Reverse-quote path: paired with `tokenInAmount: "0"` so SIO derives required EVM `tokenIn`.

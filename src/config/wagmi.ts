@@ -47,8 +47,7 @@ import { createWalletClient, custom } from 'viem'
 export const midenClient = createWalletClient({ 
   chain: miden,
   transport: custom({
-    async request({ method, params }) {
-      console.log({method, params});
+    async request(_args) {
       // const response = await customRpc.request(method, params)
       return true
     }

@@ -13,7 +13,6 @@ export interface MidenWalletAsset {
   assetIdDisplay: string;
   amount: bigint;
   symbol?: string;
-  decimals?: number;
 }
 
 export interface UseMidenWalletAdapterOptions {
@@ -134,7 +133,6 @@ export function useMidenWalletAdapter(
           assetIdDisplay: display,
           amount: BigInt(a.amount),
           symbol: meta?.symbol,
-          decimals: meta?.decimals,
         };
       }),
     [rawAssets, assetMetadata],

@@ -44,7 +44,6 @@ export function useMidenTransfer(): UseMidenTransferReturn {
             /* optional */
           }
         }
-        console.log('[Miden] P2ID send txId:', out.txId, 'output note id:', noteId ?? null);
         await sync();
         await refetchAccounts();
         return { success: true, noteId, txId: out.txId };

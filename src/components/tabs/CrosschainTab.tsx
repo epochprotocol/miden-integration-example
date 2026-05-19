@@ -10,7 +10,19 @@ export function CrosschainTab() {
   const epoch = useEpochIntent();
   const intentNonce = epoch.intentResult?.intentNonce;
   const evmAddress = epoch.intentResult?.intentData?.recipient as string | undefined;
-  const intentStatus = useIntentFlowStatus(evmAddress, intentNonce);
+  // Destination chain id is serialized to string in intentData; coerce for the
+  // status hook so it can prefer the destination-chain settlement row over the
+  // Compact-claim row (on the dispatcher chain, e.g. Base Sepolia 84532).
+  const rawDestChain = epoch.intentResult?.intentData?.destinationChainId;
+  const destinationChainId =
+    typeof rawDestChain === 'string' || typeof rawDestChain === 'number'
+      ? Number(rawDestChain)
+      : undefined;
+  const intentStatus = useIntentFlowStatus(
+    evmAddress,
+    intentNonce,
+    Number.isFinite(destinationChainId) ? destinationChainId : undefined,
+  );
 
   return (
     <div className="ui-tab-panel space-y-6">

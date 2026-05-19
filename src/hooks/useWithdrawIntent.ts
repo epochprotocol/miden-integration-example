@@ -27,7 +27,6 @@ export function useWithdrawIntent() {
     import('@epoch-protocol/epoch-intents-sdk').then(({ EpochIntentSDK }) => {
       if (cancelled) return;
       const apiBaseUrl = import.meta.env.VITE_ALLOCATOR_URL || 'http://localhost:3000';
-      console.log('apiBaseUrl: ', apiBaseUrl);
       setSdk(new EpochIntentSDK({ apiBaseUrl, walletClient: walletClient as any }));
     }).catch((err) => {
       if (cancelled) return;
@@ -89,7 +88,6 @@ export function useWithdrawIntent() {
               ? r.solveResult.compact.nonce
               : undefined;
       const nonce = rawNonce != null ? String(rawNonce) : undefined;
-      console.log('[useWithdrawIntent] extracted nonce', { nonce, raw: rawNonce, solveResult: r?.solveResult });
       // Chain the deposit tx landed on — taken from the wallet client at submit
       // time; this is the chain where `depositERC20AndRegister` was called.
       const depositChainId = walletClient?.chain?.id;

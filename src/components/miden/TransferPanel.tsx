@@ -49,11 +49,10 @@ function ConsumeNotesBlock({ accountId }: { accountId: string }) {
           setConsumeStatus('No notes to consume');
           return 'No consumable notes right now';
         }
-        const consumeOut = await consume({
+        await consume({
           accountId,
           notes: notes.map((n) => n.inputNoteRecord()),
         });
-        console.log('[Miden] consume transactionId:', consumeOut.transactionId);
         await sync();
         await refetchAccounts();
         await refetchNotes();
@@ -132,22 +131,13 @@ export function TransferPanel({ accounts, faucets }: Props) {
     if (!senderId || !receiverId || !faucetId || !amount) return;
     void toast.promise(
       (async () => {
-        const out = await send({
+        await send({
           from: senderId,
           to: receiverId,
           assetId: faucetId,
           amount: BigInt(amount),
           noteType: 'private',
         });
-        let noteIdLog: string | null = null;
-        if (out.note) {
-          try {
-            noteIdLog = out.note.id().toString();
-          } catch {
-            noteIdLog = null;
-          }
-        }
-        console.log('[Miden] P2ID send txId:', out.txId, 'output note id:', noteIdLog);
         await sync();
         await refetchAccounts();
         return 'P2ID note sent — receiver should sync and consume';

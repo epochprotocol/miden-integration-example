@@ -22,10 +22,8 @@ export function NotesInboxPanel() {
   const { notes, consumableNotes, noteSummaries, refetch, isLoading, error } = useNotes(
     { status: 'committed', accountId },
   );
-  console.log("notes", notes);
 
   const { consume, isLoading: isConsuming, error: consumeError, reset: resetConsume } = useConsume();
-  console.log('consumableNotes: ', consumableNotes.map((n) => n.inputNoteRecord().id().toString()));
 
   const handleConsumeAll = async () => {
     if (!accountId || consumableNotes.length === 0) return;
