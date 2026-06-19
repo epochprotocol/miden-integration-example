@@ -1,10 +1,15 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
-import { sepolia } from 'viem/chains';
+import { http } from 'wagmi';
+import {
+  baseSepolia,
+  optimismSepolia,
+  polygonAmoy,
+  sepolia,
+} from 'viem/chains';
+import { defineChain, createWalletClient, custom } from 'viem';
 
 const projectId = 'a3953ff16e6181e34fa7ead113ec1420';
 
-import { defineChain } from 'viem'
- 
 export const miden = defineChain({
   id: 0,
   name: 'Miden',
@@ -19,38 +24,30 @@ export const miden = defineChain({
       webSocket: [],
     },
   },
-  // blockExplorers: {
-  //   default: { name: 'Explorer', url: 'https://explorer.zora.energy' },
-  // },
-  // contracts: {
-  //   multicall3: {
-  //     address: '0xcA11bde05977b3631167028862bE2a173976CA11',
-  //     blockCreated: 5882,
-  //   },
-  // },
-})
+});
 
+/** All Epoch testnet EVM chains — see docs/docs-new/supported-chains-and-tokens.md */
+export const chains = [sepolia, baseSepolia, optimismSepolia, polygonAmoy] as const;
 
 // Only include real EVM chains in wagmi config — Miden (id: 0, no RPC) is not
 // a wagmi-compatible chain and breaks RainbowKit connector initialization.
-export const chains = [sepolia] as const;
-
 export const config = getDefaultConfig({
   appName: 'Miden x Epoch Bridge',
   projectId,
   chains,
+  transports: {
+    [sepolia.id]: http(),
+    [baseSepolia.id]: http(),
+    [optimismSepolia.id]: http(),
+    [polygonAmoy.id]: http(),
+  },
 });
 
-
-import { createWalletClient, custom } from 'viem'
- 
-export const midenClient = createWalletClient({ 
+export const midenClient = createWalletClient({
   chain: miden,
   transport: custom({
     async request(_args) {
-      // const response = await customRpc.request(method, params)
-      return true
-    }
-  })
-})
-
+      return true;
+    },
+  }),
+});

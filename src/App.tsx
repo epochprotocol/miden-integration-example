@@ -34,7 +34,7 @@ function App() {
               <div className="space-y-1">
                 <div className="text-xs font-semibold uppercase tracking-wide text-neutral-500">Wallets</div>
                 <div className="text-sm text-neutral-700">
-                  Connect both to run end-to-end flows. EVM pays gas; Miden provides/receives notes.
+                  Connect both to run end-to-end flows. EVM pays gas on any Epoch testnet chain; Miden provides/receives notes.
                 </div>
               </div>
             </div>

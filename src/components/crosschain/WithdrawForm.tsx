@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { useAccount, useChainId } from 'wagmi';
 import type { MidenAccount, EVMToMidenIntentParams } from '../../types/miden';
 import { MIDEN_DESTINATION_CHAIN_ID } from '../../constants/chains';
+import { getTestnetChainName } from '../../constants/chains';
 import { formatQuoteTokenIn, type EVMToMidenQuote } from '../../services/epoch-bridge';
 import { truncateHash } from '../../lib/explorers';
 import {
-  SEPOLIA_TESTNET_TOKENS,
+  EPOCH_TESTNET_TOKENS,
   findEvmToken,
   type EvmToken,
 } from '../../constants/evm-tokens';
@@ -20,8 +21,8 @@ import { SelectContent, SelectItem, SelectRoot, SelectTrigger, SelectValue } fro
 
 // SIO testnet mocks are deployed with 18 decimals across the board — even
 // tokens that have 6 decimals on mainnet (USDC/USDT). See `constants/evm-tokens.ts`.
-const SEPOLIA_TOKENS: EvmToken[] = [
-  ...SEPOLIA_TESTNET_TOKENS,
+const TESTNET_TOKENS: EvmToken[] = [
+  ...EPOCH_TESTNET_TOKENS,
   { symbol: 'Custom', address: '', decimals: 18 },
 ];
 
@@ -50,7 +51,7 @@ export function WithdrawForm({
   isLoading,
   isSDKReady,
 }: Props) {
-  const [evmToken, setEvmToken] = useState(SEPOLIA_TOKENS[0].address);
+  const [evmToken, setEvmToken] = useState(TESTNET_TOKENS[0].address);
   const [customToken, setCustomToken] = useState('');
   const [minTokenOut, setMinTokenOut] = useState('1000000');
   const [midenRecipientId, setMidenRecipientId] = useState(() => accounts[0]?.id ?? '');
@@ -72,7 +73,7 @@ export function WithdrawForm({
   const finalToken = customToken || evmToken;
   // Resolve decimals via the canonical EVM token map first (case-insensitive
   // address match). Custom / unknown tokens fall back to 18 — the SIO testnet
-  // default. Do NOT trust a stale entry from `SEPOLIA_TOKENS` matched by exact
+  // default. Do NOT trust a stale entry from `TESTNET_TOKENS` matched by exact
   // string equality; the canonical lookup is normalized.
   const selectedToken = findEvmToken(finalToken);
   const evmTokenDecimals = selectedToken?.decimals ?? CUSTOM_TOKEN_DEFAULT_DECIMALS;
@@ -180,7 +181,7 @@ export function WithdrawForm({
 
       <div className="mt-4 space-y-4">
         <div>
-          <Label>Source EVM token (Sepolia)</Label>
+          <Label>Source EVM token ({getTestnetChainName(walletChainId)})</Label>
           <SelectRoot
             value={tokenSelectValue}
             onValueChange={(v) => {
@@ -198,7 +199,7 @@ export function WithdrawForm({
               <SelectValue placeholder="Token" />
             </SelectTrigger>
             <SelectContent>
-              {SEPOLIA_TOKENS.map((token) => (
+              {TESTNET_TOKENS.map((token) => (
                 <SelectItem key={token.symbol} value={token.address === '' ? TOKEN_CUSTOM : token.address}>
                   {token.symbol}
                   {token.address ? ` · ${token.address.slice(0, 10)}…` : ''}

@@ -1,9 +1,10 @@
 /**
- * Canonical EVM testnet token list for Sepolia (chainId 11155111).
+ * Canonical EVM testnet token list shared across all Epoch testnet EVM chains
+ * (Sepolia, Base Sepolia, Optimism Sepolia, Polygon Amoy).
  *
  * NOTE: these are SIO testnet mock contracts. Even tokens that have 6 decimals
  * on mainnet (USDC/USDT) are deployed here with **18 decimals**. Source of
- * truth: `epoch-widget/src/epoch-config.ts` EPOCH_TESTNET_TOKENS.
+ * truth: docs/docs-new/supported-chains-and-tokens.md
  *
  * Do NOT use mainnet decimals — `parseUnits` / `formatUnits` against the
  * wrong scale silently mis-formats by 12 orders of magnitude.
@@ -14,7 +15,7 @@ export interface EvmToken {
   decimals: number;
 }
 
-export const SEPOLIA_TESTNET_TOKENS: EvmToken[] = [
+export const EPOCH_TESTNET_TOKENS: EvmToken[] = [
   { symbol: 'USDC',  address: '0x2BB4FfD7E2c6D432b697554Efd77fA13bdbefd69', decimals: 18 },
   { symbol: 'DAI',   address: '0xc30f1Ce05d1434d484E9A47283aA925fc8A8699a', decimals: 18 },
   { symbol: 'USDT',  address: '0xc04d2869665Be874881133943523723Be5782720', decimals: 18 },
@@ -26,8 +27,11 @@ export const SEPOLIA_TESTNET_TOKENS: EvmToken[] = [
   { symbol: 'FERB',  address: '0x145e03A80c19ad1b9d0429d06b6d52707de724A0', decimals: 18 },
 ];
 
+/** @deprecated Prefer `EPOCH_TESTNET_TOKENS`. */
+export const SEPOLIA_TESTNET_TOKENS = EPOCH_TESTNET_TOKENS;
+
 const BY_ADDR: Map<string, EvmToken> = new Map(
-  SEPOLIA_TESTNET_TOKENS.map((t) => [t.address.toLowerCase(), t]),
+  EPOCH_TESTNET_TOKENS.map((t) => [t.address.toLowerCase(), t]),
 );
 
 /** Look up token by address (case-insensitive). Returns undefined if unknown. */

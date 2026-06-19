@@ -6,6 +6,7 @@ import {
   type CrossChainQuote,
 } from '../services/epoch-bridge';
 import type { CrossChainIntentParams, IntentResult } from '../types/miden';
+import { MIDEN_DESTINATION_CHAIN_ID } from '../constants/chains';
 import { CollateralType, type SolveIntentParams } from '@epoch-protocol/epoch-intents-sdk/dist/types';
 
 export function useEpochIntent() {
@@ -30,7 +31,7 @@ export function useEpochIntent() {
       const apiBaseUrl = import.meta.env.VITE_ALLOCATOR_URL || 'http://localhost:3000';
       const midenWalletClient = {
         ...(walletClient as any),
-        chain: { ...((walletClient as any)?.chain ?? {}), id: 999999999 },
+        chain: { ...((walletClient as any)?.chain ?? {}), id: MIDEN_DESTINATION_CHAIN_ID },
       };
       setSdk(new EpochIntentSDK({ apiBaseUrl, walletClient: midenWalletClient }));
     }).catch((err) => {

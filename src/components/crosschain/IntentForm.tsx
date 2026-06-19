@@ -10,13 +10,18 @@ import type { CrossChainIntentParams } from '../../types/miden';
 import type { CrossChainQuote } from '../../services/epoch-bridge';
 import { formatQuoteTokenIn } from '../../services/epoch-bridge';
 import type { SolveIntentParams } from '@epoch-protocol/epoch-intents-sdk/dist/types';
-import { DEFAULT_SEPOLIA_CHAIN_ID_STR } from '../../constants/chains';
+import {
+  DEFAULT_TESTNET_CHAIN_ID_STR,
+  EPOCH_TESTNET_EVM_CHAINS,
+  getTestnetChainName,
+} from '../../constants/chains';
 import { getMidenFaucetDecimals } from '../../constants/miden-tokens';
-import { SEPOLIA_TESTNET_TOKENS } from '../../constants/evm-tokens';
+import { EPOCH_TESTNET_TOKENS } from '../../constants/evm-tokens';
+import { explorerTxUrl } from '../../lib/explorers';
 import { useAccount } from 'wagmi';
 import { useIntentTransactionStatus } from '../../hooks/useIntentTransactionStatus';
 
-const SEPOLIA_TOKENS = SEPOLIA_TESTNET_TOKENS;
+const TESTNET_TOKENS = EPOCH_TESTNET_TOKENS;
 
 interface Props {
   midenAccountId: string | null;
@@ -55,8 +60,8 @@ export function IntentForm({
 
   const [selectedAssetId, setSelectedAssetId] = useState('');
   const [minTokenOut, setMinTokenOut] = useState('1000000000000000000');
-  const [outputToken, setOutputToken] = useState(SEPOLIA_TOKENS[0].address);
-  const [chainId, setChainId] = useState(DEFAULT_SEPOLIA_CHAIN_ID_STR);
+  const [outputToken, setOutputToken] = useState(TESTNET_TOKENS[0].address);
+  const [chainId, setChainId] = useState(DEFAULT_TESTNET_CHAIN_ID_STR);
   const [confirmStatus, setConfirmStatus] = useState('');
   const [localIntentNonce, setLocalIntentNonce] = useState<string | undefined>(undefined);
   const [localIntentUserAddress, setLocalIntentUserAddress] = useState<string | undefined>(undefined);
@@ -112,24 +117,9 @@ export function IntentForm({
     ? `${midenScanBase}/note/${localMidenNoteId}`
     : undefined;
 
-  const explorerTxUrl = (() => {
-    if (!evmTransactionHash) return undefined;
-    const id = Number(evmTxChainId);
-    const base: Record<number, string> = {
-      1: 'https://etherscan.io',
-      11155111: 'https://sepolia.etherscan.io',
-      8453: 'https://basescan.org',
-      84532: 'https://sepolia.basescan.org',
-      10: 'https://optimistic.etherscan.io',
-      11155420: 'https://sepolia-optimism.etherscan.io',
-      42161: 'https://arbiscan.io',
-      421614: 'https://sepolia.arbiscan.io',
-      137: 'https://polygonscan.com',
-      80002: 'https://amoy.polygonscan.com',
-    };
-    const root = base[id];
-    return root ? `${root}/tx/${evmTransactionHash}` : undefined;
-  })();
+  const explorerLink = evmTransactionHash
+    ? explorerTxUrl(Number(evmTxChainId), evmTransactionHash)
+    : undefined;
 
   const hasValidEvmRecipient = /^0x[a-fA-F0-9]{40}$/.test(evmAddress?.trim() ?? '');
 
@@ -328,7 +318,7 @@ export function IntentForm({
         {/* Output */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label>Output token ({chainId === DEFAULT_SEPOLIA_CHAIN_ID_STR ? 'Sepolia' : 'destination chain'})</Label>
+            <Label>Output token ({getTestnetChainName(chainId)})</Label>
             <SelectRoot
               value={outputToken}
               onValueChange={(v) => {
@@ -340,7 +330,7 @@ export function IntentForm({
                 <SelectValue placeholder="Token" />
               </SelectTrigger>
               <SelectContent>
-                {SEPOLIA_TOKENS.map((token) => (
+                {TESTNET_TOKENS.map((token) => (
                   <SelectItem key={token.symbol} value={token.address}>
                     {token.symbol}{token.address ? ` · ${token.address.slice(0, 10)}…` : ''}
                   </SelectItem>
@@ -361,15 +351,25 @@ export function IntentForm({
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label htmlFor="intent-chain">Destination chain ID</Label>
-            <Input
-              id="intent-chain"
+            <Label>Destination chain</Label>
+            <SelectRoot
               value={chainId}
-              onChange={(e) => {
-                setChainId(e.target.value);
+              onValueChange={(v) => {
+                setChainId(v);
                 onClearQuote();
               }}
-            />
+            >
+              <SelectTrigger aria-label="Select destination chain">
+                <SelectValue placeholder="Chain" />
+              </SelectTrigger>
+              <SelectContent>
+                {EPOCH_TESTNET_EVM_CHAINS.map((chain) => (
+                  <SelectItem key={chain.id} value={String(chain.id)}>
+                    {chain.name} ({chain.id})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </SelectRoot>
           </div>
         </div>
 
@@ -530,9 +530,9 @@ export function IntentForm({
               <div className="text-[11px] font-semibold uppercase tracking-wide text-emerald-800">
                 EVM execution tx hash
               </div>
-              {explorerTxUrl && (
+              {explorerLink && (
                 <a
-                  href={explorerTxUrl}
+                  href={explorerLink}
                   target="_blank"
                   rel="noreferrer noopener"
                   className="text-[11px] font-medium text-emerald-700 underline hover:text-emerald-900"
@@ -541,9 +541,9 @@ export function IntentForm({
                 </a>
               )}
             </div>
-            {explorerTxUrl ? (
+            {explorerLink ? (
               <a
-                href={explorerTxUrl}
+                href={explorerLink}
                 target="_blank"
                 rel="noreferrer noopener"
                 className="mt-0.5 block font-mono text-[12px] text-emerald-900 break-all underline decoration-emerald-300 hover:decoration-emerald-700"
