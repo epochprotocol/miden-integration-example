@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@epoch-protocol/epoch-intents-sdk':
-        specifier: ^1.0.25
-        version: 1.0.25(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2))(zod@4.4.2)
+        specifier: ^1.0.26
+        version: 1.0.26(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2))(zod@4.4.2)
       '@fontsource-variable/jetbrains-mono':
         specifier: ^5.2.8
         version: 5.2.8
@@ -309,8 +309,8 @@ packages:
   '@epoch-protocol/epoch-commons-sdk@0.1.12':
     resolution: {integrity: sha512-+dQJouzUHiRVcT2NE3TW6EawRdZ4Q49b1pR9+8G3JJ0vyFkeTCzXYlS8L6yJbZrwADzZi3NjvjhMMql4ZxMk5Q==}
 
-  '@epoch-protocol/epoch-intents-sdk@1.0.25':
-    resolution: {integrity: sha512-9fh6r5zHGlH8wZ1GfPfCoHp+A5SsnXV3ZEu4EnojiaZPdIDNe8/04uHieMp8nL76Io1BMr5jK1ffMadpv2KJLA==}
+  '@epoch-protocol/epoch-intents-sdk@1.0.26':
+    resolution: {integrity: sha512-hy3uyRhwst28Vk9clrA/VLidaI6KZiEJsCrojlYiR095miPqT2t7iZMvfEKmQ5+wNE0vw0SlA78iMmTY72zHow==}
     peerDependencies:
       viem: ^2.x
 
@@ -5613,7 +5613,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@epoch-protocol/epoch-intents-sdk@1.0.25(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2))(zod@4.4.2)':
+  '@epoch-protocol/epoch-intents-sdk@1.0.26(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2))(zod@4.4.2)':
     dependencies:
       '@epoch-protocol/epoch-commons-sdk': 0.1.12(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2)
       viem: 2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2)
@@ -7385,7 +7385,7 @@ snapshots:
 
   '@scure/bip32@1.7.0':
     dependencies:
-      '@noble/curves': 1.9.1
+      '@noble/curves': 1.9.7
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
 
@@ -8740,6 +8740,16 @@ snapshots:
     optionalDependencies:
       typescript: 5.9.3
       zod: 4.4.2
+
+  abitype@1.2.4(typescript@5.9.3)(zod@3.22.4):
+    optionalDependencies:
+      typescript: 5.9.3
+      zod: 3.22.4
+
+  abitype@1.2.4(typescript@5.9.3)(zod@3.25.76):
+    optionalDependencies:
+      typescript: 5.9.3
+      zod: 3.25.76
 
   abitype@1.2.4(typescript@5.9.3)(zod@4.4.2):
     optionalDependencies:
@@ -10195,7 +10205,7 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.2.3(typescript@5.9.3)(zod@3.22.4)
+      abitype: 1.2.4(typescript@5.9.3)(zod@3.22.4)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 5.9.3
@@ -10210,7 +10220,7 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.2.3(typescript@5.9.3)(zod@3.25.76)
+      abitype: 1.2.4(typescript@5.9.3)(zod@3.25.76)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 5.9.3
@@ -10225,7 +10235,7 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/bip32': 1.7.0
       '@scure/bip39': 1.6.0
-      abitype: 1.2.3(typescript@5.9.3)(zod@4.4.2)
+      abitype: 1.2.4(typescript@5.9.3)(zod@4.4.2)
       eventemitter3: 5.0.1
     optionalDependencies:
       typescript: 5.9.3
