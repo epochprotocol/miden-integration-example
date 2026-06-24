@@ -14,7 +14,7 @@ import { normalizeMidenIdToHex } from "../services/epoch-bridge";
  */
 const MIDEN_FAUCET_DECIMALS: Record<string, number> = {
   // USDC on Miden testnet
-  "0a7d175ed63ec5200fb2ced86f6aa5": 6,
+  "2458e5446128e6b150b75b8ebd9ce1": 6,
 };
 
 function toMapKey(faucetId: string): string {
