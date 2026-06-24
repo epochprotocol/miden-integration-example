@@ -166,7 +166,8 @@ export function NotesInboxPanel() {
           <ul className="space-y-2 text-sm">
             {consumableNotes.map((cn) => {
               const rec = cn.inputNoteRecord();
-              const id = rec.id().toString();
+              const id = rec?.id()?.toString() ?? "";
+              if (!id) return null;
               return (
                 <li
                   key={id}
