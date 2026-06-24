@@ -18,17 +18,17 @@ importers:
         specifier: ^0.34.0
         version: 0.34.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@miden-sdk/miden-sdk':
-        specifier: ^0.14.5
-        version: 0.14.5(rollup@4.60.2)(tslib@2.8.1)(typescript@5.9.3)
+        specifier: ^0.15.2
+        version: 0.15.2
       '@miden-sdk/miden-wallet-adapter-base':
         specifier: ^0.14.3
         version: 0.14.3
       '@miden-sdk/miden-wallet-adapter-react':
         specifier: ^0.14.3
-        version: 0.14.3(@miden-sdk/react@0.14.5(@miden-sdk/miden-sdk@0.14.5(rollup@4.60.2)(tslib@2.8.1)(typescript@5.9.3))(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5)))(react@19.2.5)(typescript@5.9.3)
+        version: 0.14.3(@miden-sdk/react@0.14.5(@miden-sdk/miden-sdk@0.15.2)(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5)))(react@19.2.5)(typescript@5.9.3)
       '@miden-sdk/react':
         specifier: ^0.14.5
-        version: 0.14.5(@miden-sdk/miden-sdk@0.14.5(rollup@4.60.2)(tslib@2.8.1)(typescript@5.9.3))(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5))
+        version: 0.14.5(@miden-sdk/miden-sdk@0.15.2)(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5))
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -722,8 +722,8 @@ packages:
     resolution: {integrity: sha512-w8CVbdkDrVXFJbfBSlDfafDR6BAkpDmv1bC1UJVCoVny5tW2RKAdn9i68Xf7asYT4TnUhl/hN4zfUiKQq9II4g==}
     engines: {node: '>=16.0.0'}
 
-  '@miden-sdk/miden-sdk@0.14.5':
-    resolution: {integrity: sha512-lXaO8mWE6GuaTmTCGtKE6XzDxQl83MMFlYvuuQnWHEcdmnENu1LYG9/WVyCveiJQr2VSMMkhc+lQEaqKhrOvOg==}
+  '@miden-sdk/miden-sdk@0.15.2':
+    resolution: {integrity: sha512-0ww0aKrTZlLOpn9TbPnYg5erqE+j5QOqqGBn1ki/ku6iJRvkHyZquQPIz2CWi76AOAnUt+OZLKoMNEZ0X2RFww==}
 
   '@miden-sdk/miden-wallet-adapter-base@0.14.3':
     resolution: {integrity: sha512-SfoIMnzP4OD4u6I8GyYvlbghXuXInw6vkQMmE+s8xTcshEiZk38MbVmmlPTtSFAhz7Z+K3nAOsW84EMn83d52A==}
@@ -741,6 +741,21 @@ packages:
     peerDependenciesMeta:
       '@miden-sdk/react':
         optional: true
+
+  '@miden-sdk/node-darwin-arm64@0.15.2':
+    resolution: {integrity: sha512-Y4cZjjSImHC1AwAlk+xWp661+3LIIzlHB/1saDCSr4pAvufoMCou2vRRP+l4vwAT+9iDvLwi1iSw2qfybCORiA==}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@miden-sdk/node-darwin-x64@0.15.2':
+    resolution: {integrity: sha512-pxUZpHWCNjClEcEVPDLF4HsFqAQMzoA2PjSjVHSUK8xdcD3F/fiRNIuW+3pYD9gDkvNPGRsJtPLO21R2Rmvskg==}
+    cpu: [x64]
+    os: [darwin]
+
+  '@miden-sdk/node-linux-x64-gnu@0.15.2':
+    resolution: {integrity: sha512-7ndNrEg+xSmcGb8lDcD/MAYKwXAzjlB6tfL/8fsUvZVgJ5h6ijDIhNCt4JMA40SS736mU7JHlzbTy8uPBwxqFA==}
+    cpu: [x64]
+    os: [linux]
 
   '@miden-sdk/react@0.14.5':
     resolution: {integrity: sha512-j8uHdmUVitQZ9yP2sRsbNulDy6Mf8pjfRyWMt7eQ9r3fvaQuc7R2iKJuOMcgvMVrhn0nWrCXxgeRwzts9L+ogQ==}
@@ -1579,30 +1594,8 @@ packages:
   '@rolldown/pluginutils@1.0.0-rc.3':
     resolution: {integrity: sha512-eybk3TjzzzV97Dlj5c+XrBFW57eTNhzod66y9HrBlzJ6NsCrWCp/2kaPS3K9wJmurBC0Tdw4yPjXKZqlznim3Q==}
 
-  '@rollup/plugin-typescript@12.3.0':
-    resolution: {integrity: sha512-7DP0/p7y3t67+NabT9f8oTBFE6gGkto4SA6Np2oudYmZE/m1dt8RB0SjL1msMxFpLo631qjRCcBlAbq1ml/Big==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^2.14.0||^3.0.0||^4.0.0
-      tslib: '*'
-      typescript: '>=3.7.0'
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-      tslib:
-        optional: true
-
   '@rollup/plugin-virtual@3.0.2':
     resolution: {integrity: sha512-10monEYsBp3scM4/ND4LNH5Rxvh3e/cVeL3jWTgZ2SrQ+BmUoQcopVQvnaMcOnykb1VkxUFuDAN+0FnpTFRy2A==}
-    engines: {node: '>=14.0.0'}
-    peerDependencies:
-      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
-    peerDependenciesMeta:
-      rollup:
-        optional: true
-
-  '@rollup/pluginutils@5.3.0':
-    resolution: {integrity: sha512-5EdhGZtnu3V88ces7s53hhfK5KSASnJZv8Lulpc04cWO3REESroJXg73DFsOmgbU2BhwV0E20bu2IDZb3VKW4Q==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
@@ -3162,9 +3155,6 @@ packages:
   estraverse@5.3.0:
     resolution: {integrity: sha512-MMdARuVEQziNTeJD8DgMqmhwR11BRQ/cBP+pLtYdSTnf3MIO8fFeiINEbX36ZdNlfU/7A9f3gUw49B3oQsvwBA==}
     engines: {node: '>=4.0'}
-
-  estree-walker@2.0.2:
-    resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
 
   esutils@2.0.3:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
@@ -6081,15 +6071,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@miden-sdk/miden-sdk@0.14.5(rollup@4.60.2)(tslib@2.8.1)(typescript@5.9.3)':
+  '@miden-sdk/miden-sdk@0.15.2':
     dependencies:
-      '@rollup/plugin-typescript': 12.3.0(rollup@4.60.2)(tslib@2.8.1)(typescript@5.9.3)
       dexie: 4.4.2
       glob: 11.1.0
-    transitivePeerDependencies:
-      - rollup
-      - tslib
-      - typescript
+    optionalDependencies:
+      '@miden-sdk/node-darwin-arm64': 0.15.2
+      '@miden-sdk/node-darwin-x64': 0.15.2
+      '@miden-sdk/node-linux-x64-gnu': 0.15.2
 
   '@miden-sdk/miden-wallet-adapter-base@0.14.3':
     dependencies:
@@ -6101,19 +6090,28 @@ snapshots:
       nanoid: 5.1.11
       typescript: 5.9.3
 
-  '@miden-sdk/miden-wallet-adapter-react@0.14.3(@miden-sdk/react@0.14.5(@miden-sdk/miden-sdk@0.14.5(rollup@4.60.2)(tslib@2.8.1)(typescript@5.9.3))(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5)))(react@19.2.5)(typescript@5.9.3)':
+  '@miden-sdk/miden-wallet-adapter-react@0.14.3(@miden-sdk/react@0.14.5(@miden-sdk/miden-sdk@0.15.2)(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5)))(react@19.2.5)(typescript@5.9.3)':
     dependencies:
       '@miden-sdk/miden-wallet-adapter-base': 0.14.3
       '@miden-sdk/miden-wallet-adapter-miden': 0.14.3(typescript@5.9.3)
       react: 19.2.5
     optionalDependencies:
-      '@miden-sdk/react': 0.14.5(@miden-sdk/miden-sdk@0.14.5(rollup@4.60.2)(tslib@2.8.1)(typescript@5.9.3))(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5))
+      '@miden-sdk/react': 0.14.5(@miden-sdk/miden-sdk@0.15.2)(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5))
     transitivePeerDependencies:
       - typescript
 
-  '@miden-sdk/react@0.14.5(@miden-sdk/miden-sdk@0.14.5(rollup@4.60.2)(tslib@2.8.1)(typescript@5.9.3))(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5))':
+  '@miden-sdk/node-darwin-arm64@0.15.2':
+    optional: true
+
+  '@miden-sdk/node-darwin-x64@0.15.2':
+    optional: true
+
+  '@miden-sdk/node-linux-x64-gnu@0.15.2':
+    optional: true
+
+  '@miden-sdk/react@0.14.5(@miden-sdk/miden-sdk@0.15.2)(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5))':
     dependencies:
-      '@miden-sdk/miden-sdk': 0.14.5(rollup@4.60.2)(tslib@2.8.1)(typescript@5.9.3)
+      '@miden-sdk/miden-sdk': 0.15.2
       react: 19.2.5
       zustand: 5.0.12(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5))
     transitivePeerDependencies:
@@ -7249,24 +7247,7 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.0-rc.3': {}
 
-  '@rollup/plugin-typescript@12.3.0(rollup@4.60.2)(tslib@2.8.1)(typescript@5.9.3)':
-    dependencies:
-      '@rollup/pluginutils': 5.3.0(rollup@4.60.2)
-      resolve: 1.22.12
-      typescript: 5.9.3
-    optionalDependencies:
-      rollup: 4.60.2
-      tslib: 2.8.1
-
   '@rollup/plugin-virtual@3.0.2(rollup@4.60.2)':
-    optionalDependencies:
-      rollup: 4.60.2
-
-  '@rollup/pluginutils@5.3.0(rollup@4.60.2)':
-    dependencies:
-      '@types/estree': 1.0.8
-      estree-walker: 2.0.2
-      picomatch: 4.0.4
     optionalDependencies:
       rollup: 4.60.2
 
@@ -9355,8 +9336,6 @@ snapshots:
       estraverse: 5.3.0
 
   estraverse@5.3.0: {}
-
-  estree-walker@2.0.2: {}
 
   esutils@2.0.3: {}
 
