@@ -3,7 +3,6 @@ import { http } from 'wagmi';
 import {
   baseSepolia,
   optimismSepolia,
-  polygonAmoy,
   sepolia,
 } from 'viem/chains';
 import { defineChain, createWalletClient, custom } from 'viem';
@@ -27,7 +26,7 @@ export const miden = defineChain({
 });
 
 /** All Epoch testnet EVM chains — see docs/docs-new/supported-chains-and-tokens.md */
-export const chains = [sepolia, baseSepolia, optimismSepolia, polygonAmoy] as const;
+export const chains = [sepolia, baseSepolia, optimismSepolia] as const;
 
 // Only include real EVM chains in wagmi config — Miden (id: 0, no RPC) is not
 // a wagmi-compatible chain and breaks RainbowKit connector initialization.
@@ -39,7 +38,6 @@ export const config = getDefaultConfig({
     [sepolia.id]: http(),
     [baseSepolia.id]: http(),
     [optimismSepolia.id]: http(),
-    [polygonAmoy.id]: http(),
   },
 });
 

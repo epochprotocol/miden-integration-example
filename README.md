@@ -14,7 +14,6 @@ Two flows:
 | Ethereum Sepolia | 11155111 |
 | Base Sepolia | 84532 |
 | Optimism Sepolia | 11155420 |
-| Polygon Amoy | 80002 |
 | Miden (virtual) | 999999999 |
 
 Testnet tokens (USDC, DAI, USDT, etc.) share the same contract addresses across all EVM testnet chains. See [Supported Chains & Tokens](../docs/docs-new/supported-chains-and-tokens.md).
@@ -52,7 +51,6 @@ Testnet tokens (USDC, DAI, USDT, etc.) share the same contract addresses across 
 
 - **Miden testnet tokens**: claim from official Miden faucet in Miden Wallet.
 - **EVM testnet tokens**: ping Epoch team with your Ethereum address; team will send testnet USDC.
-- **EVM native gas**: use public faucets for Sepolia, Base Sepolia, Optimism Sepolia, or Polygon Amoy.
 
 ## Key Files
 

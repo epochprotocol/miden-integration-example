@@ -1,6 +1,5 @@
 /**
  * Canonical EVM testnet token list shared across all Epoch testnet EVM chains
- * (Sepolia, Base Sepolia, Optimism Sepolia, Polygon Amoy).
  *
  * NOTE: these are SIO testnet mock contracts. Even tokens that have 6 decimals
  * on mainnet (USDC/USDT) are deployed here with **18 decimals**. Source of

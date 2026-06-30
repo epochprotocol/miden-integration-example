@@ -15,7 +15,6 @@ const EVM_EXPLORERS: Record<number, string> = {
   11155111: 'https://sepolia.etherscan.io',
   11155420: 'https://sepolia-optimism.etherscan.io',
   84532: 'https://sepolia.basescan.org',
-  80002: 'https://amoy.polygonscan.com',
 };
 
 export const explorerTxUrl = (

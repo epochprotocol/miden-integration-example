@@ -5,7 +5,6 @@ export const EPOCH_TESTNET_EVM_CHAINS = [
   { id: 11155111, name: 'Ethereum Sepolia' },
   { id: 84532, name: 'Base Sepolia' },
   { id: 11155420, name: 'Optimism Sepolia' },
-  { id: 80002, name: 'Polygon Amoy' },
 ] as const;
 
 export type EpochTestnetEvmChainId = (typeof EPOCH_TESTNET_EVM_CHAINS)[number]['id'];
