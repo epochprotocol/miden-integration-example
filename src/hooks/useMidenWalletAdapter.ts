@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMidenFiWallet } from "@miden-sdk/miden-wallet-adapter-react";
-import { useAssetMetadata, toBech32AccountId } from "@miden-sdk/react";
+import { useAssetMetadata } from "@miden-sdk/react";
 import { AccountId, Address } from "@miden-sdk/miden-sdk";
 import type { Asset } from "@miden-sdk/miden-wallet-adapter-base";
 
@@ -30,7 +30,9 @@ export interface UseMidenWalletAdapterResult {
   refreshAssets: () => Promise<void>;
 }
 
-const normalizeAccountId = (rawAddress: string | null): NormalizedMidenAccountId | null => {
+const normalizeAccountId = (
+  rawAddress: string | null,
+): NormalizedMidenAccountId | null => {
   if (!rawAddress) return null;
   const input = rawAddress.replace(/\s+/g, "").trim();
   if (!input) return null;
@@ -109,13 +111,18 @@ export function useMidenWalletAdapter(
       setRawAssets(raw ?? []);
     } catch (err) {
       setRawAssets([]);
-      setAssetsError(err instanceof Error ? err.message : "Failed to load assets");
+      setAssetsError(
+        err instanceof Error ? err.message : "Failed to load assets",
+      );
     } finally {
       setIsLoadingAssets(false);
     }
   }, [enabled, connected, requestAssets]);
 
-  const faucetIds = useMemo(() => rawAssets.map((a) => a.faucetId), [rawAssets]);
+  const faucetIds = useMemo(
+    () => rawAssets.map((a) => a.faucetId),
+    [rawAssets],
+  );
   const { assetMetadata } = useAssetMetadata(faucetIds);
 
   const assets = useMemo<MidenWalletAsset[]>(
@@ -124,7 +131,7 @@ export function useMidenWalletAdapter(
         const meta = assetMetadata.get(a.faucetId);
         let display = a.faucetId;
         try {
-          display = toBech32AccountId(a.faucetId);
+          display = normalizeAccountId(a.faucetId)?.hex ?? a.faucetId;
         } catch {
           // keep raw faucetId
         }
@@ -137,6 +144,9 @@ export function useMidenWalletAdapter(
       }),
     [rawAssets, assetMetadata],
   );
+  console.log("rawAssets", rawAssets);
+
+  console.log("assets", assets);
 
   const connect = useCallback(async () => {
     if (!connected) await adapterConnect();
@@ -164,4 +174,3 @@ export function useMidenWalletAdapter(
     refreshAssets,
   };
 }
-

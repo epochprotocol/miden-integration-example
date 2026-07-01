@@ -13,11 +13,11 @@ import { normalizeMidenIdToHex } from "../services/epoch-bridge";
  * (e.g. `mtst1qxxxxxxxxxxxxx_xxxxxx`) resolve correctly.
  */
 const MIDEN_FAUCET_DECIMALS: Record<string, number> = {
-  "8ddb61e056105cf119634d919be743": 6,
-  d162796b525d6c517a0d2a332413d4: 6,
-  d2f049a23e9068715a2def9842673f: 6,
-  d4510f4a85b542b144b84b04670ae6: 6,
-  b7856af9c04fd3b124308caf69c9f4: 6,
+  fc90f0f4da30e51168453b60eafed7: 6, // USDC
+  "176275876f2fd41103257e341832b9": 6, // DAI
+  "7725b0e9bb9406912d2ebeaeb05f4d": 6, // USDT
+  a54717f6bd3210d128aeeaa8a2b7f3: 6, // WETH
+  "151823cde4b7bd91352617729d7614": 6, // WBTC
 };
 
 function toMapKey(faucetId: string): string {
