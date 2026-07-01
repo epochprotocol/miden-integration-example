@@ -67,7 +67,7 @@ export function WithdrawForm({
     () => accounts[0]?.id ?? "",
   );
   const [midenFaucetId, setMidenFaucetId] = useState(
-    "0x2458e5446128e6b150b75b8ebd9ce1",
+    "0xfc90f0f4da30e51168453b60eafed7",
   );
   const [status, setStatus] = useState("");
 
