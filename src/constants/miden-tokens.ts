@@ -18,6 +18,7 @@ const MIDEN_FAUCET_DECIMALS: Record<string, number> = {
   "7725b0e9bb9406912d2ebeaeb05f4d": 6, // USDT
   a54717f6bd3210d128aeeaa8a2b7f3: 6, // WETH
   "151823cde4b7bd91352617729d7614": 6, // WBTC
+  "2458e5446128e6b150b75b8ebd9ce1": 6, // MIDEN
 };
 
 function toMapKey(faucetId: string): string {
