@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@epoch-protocol/epoch-intents-sdk':
-        specifier: ^1.0.26
-        version: 1.0.26(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2))(zod@4.4.2)
+        specifier: ^1.0.29
+        version: 1.0.29(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2))(zod@4.4.2)
       '@fontsource-variable/jetbrains-mono':
         specifier: ^5.2.8
         version: 5.2.8
@@ -306,11 +306,11 @@ packages:
   '@emotion/hash@0.9.2':
     resolution: {integrity: sha512-MyqliTZGuOm3+5ZRSaaBGP3USLw6+EGykkwZns2EPC5g8jJ4z9OrdZY9apkl3+UP9+sdz76YYkwCKP5gh8iY3g==}
 
-  '@epoch-protocol/epoch-commons-sdk@0.1.12':
-    resolution: {integrity: sha512-+dQJouzUHiRVcT2NE3TW6EawRdZ4Q49b1pR9+8G3JJ0vyFkeTCzXYlS8L6yJbZrwADzZi3NjvjhMMql4ZxMk5Q==}
+  '@epoch-protocol/epoch-commons-sdk@0.1.16':
+    resolution: {integrity: sha512-SsbfsLqmJitR88P+QVA/67FScWBSlLdQajY+9fhJ88qU08ut2sy/aOV1YbzKDS0rMtsZMbPhDcxTmaJ6sVdo9A==}
 
-  '@epoch-protocol/epoch-intents-sdk@1.0.26':
-    resolution: {integrity: sha512-hy3uyRhwst28Vk9clrA/VLidaI6KZiEJsCrojlYiR095miPqT2t7iZMvfEKmQ5+wNE0vw0SlA78iMmTY72zHow==}
+  '@epoch-protocol/epoch-intents-sdk@1.0.29':
+    resolution: {integrity: sha512-aSfCWflf2Paqrlm618q8UWg1FJXIYxOF7Z36MBdyWvJkq1vBeMLV0ZarvGaZ0yKgZbUlEg/yPmBndEhf4QSiuQ==}
     peerDependencies:
       viem: ^2.x
 
@@ -633,6 +633,33 @@ packages:
 
   '@lit/reactive-element@2.1.2':
     resolution: {integrity: sha512-pbCDiVMnne1lYUIaYNN5wrwQXDtHaYtg7YEFPeW+hws6U47WeFvISGUWekPGKWOP1ygrs0ef0o1VJMk1exos5A==}
+
+  '@metamask/7715-permission-types@0.3.0':
+    resolution: {integrity: sha512-+bqFNe6/YCe2LZapiVJO3/hn7BSJLExYT+cDJS1spJocPeVsTyURv3IjblZxRqTOv+igTwrYbh45LvdkgzxkZQ==}
+    engines: {node: ^18.18 || >=20}
+
+  '@metamask/abi-utils@3.0.0':
+    resolution: {integrity: sha512-a/l0DiSIr7+CBYVpHygUa3ztSlYLFCQMsklLna+t6qmNY9+eIO5TedNxhyIyvaJ+4cN7TLy0NQFbp9FV3X2ktg==}
+    engines: {node: ^18.18 || ^20.14 || >=22}
+
+  '@metamask/delegation-abis@0.11.0':
+    resolution: {integrity: sha512-tnNGFDLQ5jfgPhHJaT5JwvF759nja1iGAG00REbk1Ufir+TxjxTmF8L9MbJifZmUh4fnyqV4Ik6NAOYVNBPVBg==}
+    engines: {node: ^18.18 || >=20}
+
+  '@metamask/delegation-core@0.2.0':
+    resolution: {integrity: sha512-leP40qoxhTmexfeY/neZ9XkhmUiq8fHh3ax4wmmTB5CG6VuXStn2LzLz875RiBtjwU3c4IqaZljxvwC1dUuWVw==}
+    engines: {node: ^18.18 || >=20}
+
+  '@metamask/delegation-deployments@0.12.0':
+    resolution: {integrity: sha512-9SB5DhLAnbpIWbFxP3UKPXLhCt8iiRjBBjZ7hqF5dMXy9buBEDpCRg+FJYRxYRecwporrTVrv+NfKUyCbL2ncw==}
+    engines: {node: ^18.18 || >=20}
+
+  '@metamask/delegation-toolkit@0.13.0':
+    resolution: {integrity: sha512-SVc2gcnKQ8KQodugfuXMs49pHO1x9AYw3Wmdg4yBEsgm5TF5zPpWFmAj+bOL8q+Fn+mHJAibFIrJBtS970G9Dw==}
+    engines: {node: ^18.18 || >=20}
+    deprecated: Renamed to @metamask/smart-accounts-kit
+    peerDependencies:
+      viem: ^2.31.4
 
   '@metamask/eth-json-rpc-provider@1.0.1':
     resolution: {integrity: sha512-whiUMPlAOrVGmX8aKYVPvlKyG4CpQXiNNyt74vE1xb5sPvmx5oA7B/kOi/JdBvhGQq97U1/AVdXEdk2zkP8qyA==}
@@ -5061,6 +5088,9 @@ packages:
     resolution: {integrity: sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw==}
     engines: {node: '>= 8'}
 
+  webauthn-p256@0.0.10:
+    resolution: {integrity: sha512-EeYD+gmIT80YkSIDb2iWq0lq2zbHo1CxHlQTeJ+KkCILWpVy3zASH3ByD4bopzfk0uCwXxLqKGLqp2W4O28VFA==}
+
   webextension-polyfill@0.10.0:
     resolution: {integrity: sha512-c5s35LgVa5tFaHhrZDnr3FpQpjj1BB+RXhLTYUxGqBVN460HkbM8TBtEqdXWbpTKfzwCcjAZVF7zXCYSKtcp9g==}
 
@@ -5593,7 +5623,7 @@ snapshots:
 
   '@emotion/hash@0.9.2': {}
 
-  '@epoch-protocol/epoch-commons-sdk@0.1.12(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2)':
+  '@epoch-protocol/epoch-commons-sdk@0.1.16(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2)':
     dependencies:
       ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       viem: 2.42.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2)
@@ -5603,12 +5633,14 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@epoch-protocol/epoch-intents-sdk@1.0.26(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2))(zod@4.4.2)':
+  '@epoch-protocol/epoch-intents-sdk@1.0.29(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2))(zod@4.4.2)':
     dependencies:
-      '@epoch-protocol/epoch-commons-sdk': 0.1.12(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2)
+      '@epoch-protocol/epoch-commons-sdk': 0.1.16(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2)
+      '@metamask/delegation-toolkit': 0.13.0(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2))
       viem: 2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2)
     transitivePeerDependencies:
       - bufferutil
+      - supports-color
       - typescript
       - utf-8-validate
       - zod
@@ -5857,6 +5889,39 @@ snapshots:
   '@lit/reactive-element@2.1.2':
     dependencies:
       '@lit-labs/ssr-dom-shim': 1.5.1
+
+  '@metamask/7715-permission-types@0.3.0': {}
+
+  '@metamask/abi-utils@3.0.0':
+    dependencies:
+      '@metamask/superstruct': 3.2.1
+      '@metamask/utils': 11.11.0
+    transitivePeerDependencies:
+      - supports-color
+
+  '@metamask/delegation-abis@0.11.0': {}
+
+  '@metamask/delegation-core@0.2.0':
+    dependencies:
+      '@metamask/abi-utils': 3.0.0
+      '@metamask/utils': 11.11.0
+      '@noble/hashes': 1.8.0
+    transitivePeerDependencies:
+      - supports-color
+
+  '@metamask/delegation-deployments@0.12.0': {}
+
+  '@metamask/delegation-toolkit@0.13.0(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2))':
+    dependencies:
+      '@metamask/7715-permission-types': 0.3.0
+      '@metamask/delegation-abis': 0.11.0
+      '@metamask/delegation-core': 0.2.0
+      '@metamask/delegation-deployments': 0.12.0
+      buffer: 6.0.3
+      viem: 2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2)
+      webauthn-p256: 0.0.10
+    transitivePeerDependencies:
+      - supports-color
 
   '@metamask/eth-json-rpc-provider@1.0.1':
     dependencies:
@@ -11380,6 +11445,11 @@ snapshots:
       - zod
 
   web-streams-polyfill@3.3.3: {}
+
+  webauthn-p256@0.0.10:
+    dependencies:
+      '@noble/curves': 1.9.7
+      '@noble/hashes': 1.8.0
 
   webextension-polyfill@0.10.0: {}
 
