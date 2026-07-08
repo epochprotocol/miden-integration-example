@@ -132,18 +132,12 @@ export function buildEpochTaskDataParams(
       protocolHashIdentifier: ZERO_HASH,
       recipient: params.evmRecipient,
     },
-    // Mirror EpochSwapWidget Miden extraData pattern exactly
     extraDataTypestring:
-      "string midenSourceAccount,string midenFaucetId,string midenNoteType,string midenNoteId,uint256 midenReclaimHeight",
+      "string midenSourceAccount,string midenFaucetId,string midenNoteId",
     extraData: {
       midenSourceAccount: midenSourceAccountHex,
       midenFaucetId: midenFaucetIdHex,
-      midenNoteType: "P2IDE",
       midenNoteId: "",
-      midenReclaimHeight:
-        params.midenReclaimHeight != null
-          ? String(params.midenReclaimHeight)
-          : "1000",
     },
   };
 
@@ -193,12 +187,10 @@ export function buildEVMToMidenTaskDataParams(params: EVMToMidenIntentParams) {
       protocolHashIdentifier: ZERO_HASH,
       recipient: params.evmSourceAddress,
     },
-    extraDataTypestring:
-      "string midenRecipientAccount,string midenFaucetId,string midenNoteType",
+    extraDataTypestring: "string midenRecipientAccount,string midenFaucetId",
     extraData: {
       midenRecipientAccount: midenRecipientHex,
       midenFaucetId: midenFaucetHex,
-      midenNoteType: "P2ID",
     },
   };
 

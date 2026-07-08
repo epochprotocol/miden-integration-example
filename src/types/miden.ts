@@ -23,8 +23,6 @@ export interface CrossChainIntentParams {
    * Omit / pass "0" to use reverse-quote route.
    */
   midenAmount?: string;
-  /** Optional absolute reclaim height (block number) for P2IDE notes */
-  midenReclaimHeight?: number;
   evmRecipient: string;
   destinationChainId: number;
   outputTokenAddress: string;

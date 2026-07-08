@@ -2,12 +2,13 @@
  * Epoch testnet EVM chains — source of truth: docs/docs-new/supported-chains-and-tokens.md
  */
 export const EPOCH_TESTNET_EVM_CHAINS = [
-  { id: 11155111, name: 'Ethereum Sepolia' },
-  { id: 84532, name: 'Base Sepolia' },
-  { id: 11155420, name: 'Optimism Sepolia' },
+  { id: 11155111, name: "Ethereum Sepolia" },
+  { id: 84532, name: "Base Sepolia" },
+  { id: 11155420, name: "Optimism Sepolia" },
 ] as const;
 
-export type EpochTestnetEvmChainId = (typeof EPOCH_TESTNET_EVM_CHAINS)[number]['id'];
+export type EpochTestnetEvmChainId =
+  (typeof EPOCH_TESTNET_EVM_CHAINS)[number]["id"];
 
 /** Default destination chain for Cross-chain deposit and withdraw source chain. */
 export const DEFAULT_TESTNET_CHAIN_ID = 11155111;

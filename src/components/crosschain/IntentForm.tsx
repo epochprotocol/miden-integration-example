@@ -189,6 +189,7 @@ export function IntentForm({
       faucetIdParam,
       amountParam,
       allocatorId,
+      recallBlocks,
     ) => {
       setConfirmStatus('Resource lock required — creating P2IDE note on Miden…');
       try {
@@ -210,6 +211,7 @@ export function IntentForm({
           faucetIdParam,
           'public',
           Number(normalizedAmount),
+          recallBlocks,
         );
         const txId = await requestSend(payload);
 
