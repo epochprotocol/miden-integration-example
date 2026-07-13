@@ -9,6 +9,10 @@ import type {
   EpochIntentSDK,
   IntentQuoteResult,
 } from "@epoch-protocol/epoch-intents-sdk";
+import {
+  MIDEN_TO_EVM_EXTRA_TYPESTRING,
+  EVM_TO_MIDEN_EXTRA_TYPESTRING,
+} from "@epoch-protocol/epoch-intents-sdk";
 import type {
   CollateralType,
   GetTaskDataParams,
@@ -132,11 +136,11 @@ export function buildEpochTaskDataParams(
       protocolHashIdentifier: ZERO_HASH,
       recipient: params.evmRecipient,
     },
-    extraDataTypestring:
-      "string midenSourceAccount,string midenFaucetId,string midenNoteId",
+    extraDataTypestring: MIDEN_TO_EVM_EXTRA_TYPESTRING,
     extraData: {
       midenSourceAccount: midenSourceAccountHex,
       midenFaucetId: midenFaucetIdHex,
+      midenNoteType: "",
       midenNoteId: "",
     },
   };
@@ -187,7 +191,7 @@ export function buildEVMToMidenTaskDataParams(params: EVMToMidenIntentParams) {
       protocolHashIdentifier: ZERO_HASH,
       recipient: params.evmSourceAddress,
     },
-    extraDataTypestring: "string midenRecipientAccount,string midenFaucetId",
+    extraDataTypestring: EVM_TO_MIDEN_EXTRA_TYPESTRING,
     extraData: {
       midenRecipientAccount: midenRecipientHex,
       midenFaucetId: midenFaucetHex,
