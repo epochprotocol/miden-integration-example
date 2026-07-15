@@ -1,9 +1,11 @@
-import type { IntentResult } from '../../types/miden';
+import { MIDEN_VIRTUAL_CHAIN_ID } from "@epoch-protocol/epoch-intents-sdk";
+import type { IntentResult } from "../../types/miden";
 import {
   explorerTxUrl,
   midenscanNoteUrl,
   truncateHash,
-} from '../../lib/explorers';
+} from "../../lib/explorers";
+import { readMidenNoteId } from "../../lib/intent-result";
 
 export interface IntentFlowStatus {
   evmCompleted: boolean;
@@ -33,26 +35,21 @@ function Spinner({ className }: { className?: string }) {
       viewBox="0 0 24 24"
       aria-hidden="true"
     >
-      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+      />
     </svg>
   );
-}
-
-function fallbackMidenNoteId(result: IntentResult | null): string | undefined {
-  if (!result) return undefined;
-  const r = result as any;
-  const candidates = [
-    r?.midenNoteId,
-    r?.solveResult?.midenNoteId,
-    r?.solveResult?.compact?.mandate?.midenNoteId,
-    r?.solveResult?.submittedIntentData?.compact?.mandate?.midenNoteId,
-    r?.intentData?.midenNoteId,
-  ];
-  for (const c of candidates) {
-    if (typeof c === 'string' && c.length > 0) return c;
-  }
-  return undefined;
 }
 
 interface RowProps {
@@ -61,29 +58,36 @@ interface RowProps {
   hint?: string;
   href?: string | null;
   buttonLabel?: string;
-  tone?: 'success' | 'pending' | 'neutral';
+  tone?: "success" | "pending" | "neutral";
 }
 
-function StatusRow({ label, value, hint, href, buttonLabel, tone = 'neutral' }: RowProps) {
+function StatusRow({
+  label,
+  value,
+  hint,
+  href,
+  buttonLabel,
+  tone = "neutral",
+}: RowProps) {
   if (!value) return null;
   const toneClasses =
-    tone === 'success'
-      ? 'border-emerald-200 bg-emerald-50'
-      : tone === 'pending'
-        ? 'border-amber-200 bg-amber-50'
-        : 'border-neutral-200 bg-neutral-50';
+    tone === "success"
+      ? "border-emerald-200 bg-emerald-50"
+      : tone === "pending"
+        ? "border-amber-200 bg-amber-50"
+        : "border-neutral-200 bg-neutral-50";
   const labelToneClasses =
-    tone === 'success'
-      ? 'text-emerald-800'
-      : tone === 'pending'
-        ? 'text-amber-800'
-        : 'text-neutral-500';
+    tone === "success"
+      ? "text-emerald-800"
+      : tone === "pending"
+        ? "text-amber-800"
+        : "text-neutral-500";
   const valueToneClasses =
-    tone === 'success'
-      ? 'text-emerald-900'
-      : tone === 'pending'
-        ? 'text-amber-900'
-        : 'text-neutral-700';
+    tone === "success"
+      ? "text-emerald-900"
+      : tone === "pending"
+        ? "text-amber-900"
+        : "text-neutral-700";
 
   return (
     <div className={`rounded-lg border ${toneClasses} px-3 py-2 space-y-1`}>
@@ -103,13 +107,11 @@ function StatusRow({ label, value, hint, href, buttonLabel, tone = 'neutral' }: 
             rel="noopener noreferrer"
             className="rounded border border-current/30 px-2 py-0.5 text-[11px] font-medium hover:bg-white/40 transition-colors whitespace-nowrap"
           >
-            {buttonLabel ?? 'View ↗'}
+            {buttonLabel ?? "View ↗"}
           </a>
         )}
       </div>
-      {hint && (
-        <div className="text-[11px] text-neutral-500">{hint}</div>
-      )}
+      {hint && <div className="text-[11px] text-neutral-500">{hint}</div>}
     </div>
   );
 }
@@ -118,7 +120,9 @@ export function IntentStatus({ result, error, flowStatus, isPolling }: Props) {
   if (error) {
     return (
       <div className="ui-card border-red-200 bg-red-50/80">
-        <h2 className="mb-2 text-lg font-semibold text-red-800">Intent Error</h2>
+        <h2 className="mb-2 text-lg font-semibold text-red-800">
+          Intent Error
+        </h2>
         <p className="text-sm text-red-700">{error}</p>
       </div>
     );
@@ -128,23 +132,22 @@ export function IntentStatus({ result, error, flowStatus, isPolling }: Props) {
 
   const evmCompleted = flowStatus?.evmCompleted ?? false;
   const midenTxId = flowStatus?.midenTxId;
-  const midenNoteId = flowStatus?.midenNoteId ?? fallbackMidenNoteId(result);
+  const midenNoteId = flowStatus?.midenNoteId ?? readMidenNoteId(result);
 
   // Client-side Compact deposit tx hash — signed by the user's wallet via the
   // SDK's `depositERC20AndRegister` / `depositNativeAndRegister` call. This is
   // the deposit the user actually performs; the SIO-side claim shows up on the
   // status poll separately under `flowStatus.evmTransactionHash`.
-  const depositTxHash = (result as any)?.solveResult?.depositResult?.transactionHash as
-    | string
-    | undefined;
-  const depositChainId =
-    (result as any)?.depositChainId ?? flowStatus?.evmChainId;
+  const depositTxHash = result.solveResult?.depositResult?.transactionHash;
+  const depositChainId = result.depositChainId ?? flowStatus?.evmChainId;
 
   const depositTxUrl =
     depositChainId != null && depositTxHash
       ? explorerTxUrl(Number(depositChainId), depositTxHash)
       : null;
-  const midenTxUrl = midenTxId ? explorerTxUrl(/* MIDEN_CHAIN_ID */ 999_999_999, midenTxId) : null;
+  const midenTxUrl = midenTxId
+    ? explorerTxUrl(MIDEN_VIRTUAL_CHAIN_ID, midenTxId)
+    : null;
   const noteUrl = midenNoteId ? midenscanNoteUrl(midenNoteId) : null;
 
   const stillWaiting = isPolling && !evmCompleted && !midenTxId;
@@ -155,13 +158,17 @@ export function IntentStatus({ result, error, flowStatus, isPolling }: Props) {
         <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
           <Spinner className="mt-0.5 h-4 w-4 shrink-0 animate-spin text-amber-700" />
           <div className="flex-1 text-[12px] text-amber-900">
-            <div className="font-semibold text-amber-800">Waiting for SIO execution…</div>
+            <div className="font-semibold text-amber-800">
+              Waiting for SIO execution…
+            </div>
             <div className="mt-0.5">
               {flowStatus?.latestStatusLabel
                 ? `Status: ${flowStatus.latestStatusLabel}${
-                    flowStatus.latestChainId ? ` · chain ${flowStatus.latestChainId}` : ''
+                    flowStatus.latestChainId
+                      ? ` · chain ${flowStatus.latestChainId}`
+                      : ""
                   } · polling every 5s`
-                : 'Solver picking up intent · polling every 5s'}
+                : "Solver picking up intent · polling every 5s"}
             </div>
           </div>
         </div>
@@ -172,7 +179,7 @@ export function IntentStatus({ result, error, flowStatus, isPolling }: Props) {
         value={depositTxHash}
         href={depositTxUrl}
         buttonLabel="View on Explorer ↗"
-        tone={depositTxHash ? 'success' : 'neutral'}
+        tone={depositTxHash ? "success" : "neutral"}
         hint={depositChainId != null ? `chain ${depositChainId}` : undefined}
       />
 
@@ -181,7 +188,7 @@ export function IntentStatus({ result, error, flowStatus, isPolling }: Props) {
         value={midenTxId}
         href={midenTxUrl}
         buttonLabel="View on Midenscan ↗"
-        tone={midenTxId ? 'success' : 'neutral'}
+        tone={midenTxId ? "success" : "neutral"}
       />
 
       <StatusRow

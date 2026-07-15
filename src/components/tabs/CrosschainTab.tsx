@@ -1,21 +1,22 @@
-import { IntentForm } from '../crosschain/IntentForm';
-import { IntentStatus } from '../crosschain/IntentStatus';
-import { useEpochIntent } from '../../hooks/useEpochIntent';
-import { useIntentFlowStatus } from '../../hooks/useIntentFlowStatus';
-import { useMidenWalletAdapter } from '../../hooks/useMidenWalletAdapter';
+import { IntentForm } from "../crosschain/IntentForm";
+import { IntentStatus } from "../crosschain/IntentStatus";
+import { useEpochIntent } from "../../hooks/useEpochIntent";
+import { useIntentFlowStatus } from "../../hooks/useIntentFlowStatus";
+import { useMidenWalletAdapter } from "../../hooks/useMidenWalletAdapter";
 
 export function CrosschainTab() {
   const midenWallet = useMidenWalletAdapter({ enabled: true });
 
   const epoch = useEpochIntent();
   const intentNonce = epoch.intentResult?.intentNonce;
-  const evmAddress = epoch.intentResult?.intentData?.recipient as string | undefined;
+  const evmAddress = epoch.intentResult?.intentData?.recipient as
+    string | undefined;
   // Destination chain id is serialized to string in intentData; coerce for the
   // status hook so it can prefer the destination-chain settlement row over the
   // Compact-claim row (on the dispatcher chain, e.g. Base Sepolia 84532).
   const rawDestChain = epoch.intentResult?.intentData?.destinationChainId;
   const destinationChainId =
-    typeof rawDestChain === 'string' || typeof rawDestChain === 'number'
+    typeof rawDestChain === "string" || typeof rawDestChain === "number"
       ? Number(rawDestChain)
       : undefined;
   const intentStatus = useIntentFlowStatus(
@@ -27,10 +28,12 @@ export function CrosschainTab() {
   return (
     <div className="ui-tab-panel space-y-6">
       <header className="space-y-2">
-        <h2 className="text-lg font-semibold tracking-tight text-neutral-900 sm:text-xl">Bridge to EVM</h2>
+        <h2 className="text-lg font-semibold tracking-tight text-neutral-900 sm:text-xl">
+          Bridge to EVM
+        </h2>
         <p className="max-w-2xl text-sm leading-relaxed text-neutral-600">
-          Connect an Ethereum wallet, pick your Miden wallet and token, then get a quote. Confirm to lock funds and
-          submit the cross-chain intent.
+          Connect an Ethereum wallet, pick your Miden wallet and token, then get
+          a quote. Confirm to lock funds and submit the cross-chain intent.
         </p>
       </header>
       <IntentForm
@@ -40,9 +43,7 @@ export function CrosschainTab() {
         onFetchQuote={epoch.fetchQuote}
         onConfirmIntent={epoch.confirmIntent}
         onClearQuote={epoch.clearQuote}
-        pendingQuote={epoch.pendingQuote}
-        isFetchingQuote={epoch.isFetchingQuote}
-        isConfirmBusy={epoch.isLoading}
+        quotePhase={epoch.quotePhase}
         isSDKReady={epoch.isSDKReady}
         intentNonce={intentNonce}
         intentUserAddress={evmAddress}

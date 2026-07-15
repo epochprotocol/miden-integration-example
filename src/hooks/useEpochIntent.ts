@@ -1,76 +1,72 @@
-import { useState, useCallback, useEffect } from 'react';
-import { useAccount, useWalletClient } from 'wagmi';
+import { useCallback, useMemo, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAccount } from "wagmi";
 import {
   buildCrossChainIntent,
   getCrossChainQuote,
   type CrossChainQuote,
-} from '../services/epoch-bridge';
-import type { CrossChainIntentParams, IntentResult } from '../types/miden';
-import { MIDEN_DESTINATION_CHAIN_ID } from '../constants/chains';
-import { CollateralType, type SolveIntentParams } from '@epoch-protocol/epoch-intents-sdk/dist/types';
+} from "../services/epoch-bridge";
+import type { CrossChainIntentParams, IntentResult } from "../types/miden";
+import {
+  CollateralType,
+  MIDEN_VIRTUAL_CHAIN_ID,
+  type SolveIntentParams,
+} from "@epoch-protocol/epoch-intents-sdk";
+import { useEpochSdk } from "../lib/epoch-sdk";
+import { readIntentError } from "../lib/intent-result";
+
+export type IntentQuotePhase =
+  | { status: "idle" }
+  | { status: "fetching" }
+  | { status: "ready"; quote: CrossChainQuote }
+  | { status: "confirming"; quote: CrossChainQuote };
 
 export function useEpochIntent() {
   const [intentResult, setIntentResult] = useState<IntentResult | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [pendingQuote, setPendingQuote] = useState<CrossChainQuote | null>(
+    null,
+  );
   const [isFetchingQuote, setIsFetchingQuote] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [pendingQuote, setPendingQuote] = useState<CrossChainQuote | null>(null);
-  const [sdk, setSdk] = useState<any>(null);
+  const [quoteError, setQuoteError] = useState<string | null>(null);
 
-  const { data: walletClient } = useWalletClient();
+  const sdk = useEpochSdk(MIDEN_VIRTUAL_CHAIN_ID);
   const { address } = useAccount();
-
-  useEffect(() => {
-    if (!walletClient) {
-      setSdk(null);
-      return;
-    }
-    let cancelled = false;
-    import('@epoch-protocol/epoch-intents-sdk').then(({ EpochIntentSDK }) => {
-      if (cancelled) return;
-      const apiBaseUrl = import.meta.env.VITE_ALLOCATOR_URL || 'http://localhost:3000';
-      const midenWalletClient = {
-        ...(walletClient as any),
-        chain: { ...((walletClient as any)?.chain ?? {}), id: MIDEN_DESTINATION_CHAIN_ID },
-      };
-      setSdk(new EpochIntentSDK({ apiBaseUrl, walletClient: midenWalletClient }));
-    }).catch((err) => {
-      if (cancelled) return;
-      console.error('[CrossChain] Failed to load Epoch SDK:', err);
-      setSdk(null);
-    });
-    return () => { cancelled = true; };
-  }, [walletClient]);
+  const queryClient = useQueryClient();
 
   /** Step 1: fetch a reverse quote (tokenInAmount=0 → backend computes required Miden input). */
-  const fetchQuote = useCallback(async (params: CrossChainIntentParams) => {
-    if (!sdk) throw new Error('Epoch SDK not ready — connect EVM wallet first');
-    if (!address) throw new Error('Connect EVM wallet first');
-    setIsFetchingQuote(true);
-    setError(null);
-    setPendingQuote(null);
-    try {
-      const quote = await getCrossChainQuote(sdk, params, address);
-      setPendingQuote(quote);
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Quote failed';
-      setError(msg);
-      throw err;
-    } finally {
-      setIsFetchingQuote(false);
-    }
-  }, [sdk, address]);
+  const fetchQuote = useCallback(
+    async (params: CrossChainIntentParams) => {
+      if (!sdk)
+        throw new Error("Epoch SDK not ready — connect EVM wallet first");
+      if (!address) throw new Error("Connect EVM wallet first");
+      setIsFetchingQuote(true);
+      setQuoteError(null);
+      setPendingQuote(null);
+      try {
+        setPendingQuote(await getCrossChainQuote(sdk, params, address));
+      } catch (err) {
+        setQuoteError(err instanceof Error ? err.message : "Quote failed");
+        throw err;
+      } finally {
+        setIsFetchingQuote(false);
+      }
+    },
+    [sdk, address],
+  );
 
-  /** Step 2: execute the stored quote by creating the P2ID note and submitting the intent. */
-  const confirmIntent = useCallback(async (
-    createMidenP2IDNote: SolveIntentParams['createMidenP2IDNote'],
-  ) => {
-    if (!sdk) throw new Error('Epoch SDK not ready');
-    if (!pendingQuote) throw new Error('Fetch a quote first');
-    setIsLoading(true);
-    setError(null);
-    setIntentResult(null);
-    try {
+  const {
+    mutateAsync: confirmIntent,
+    reset: resetConfirm,
+    isPending: isConfirming,
+    error: confirmError,
+  } = useMutation({
+    mutationFn: async (
+      createMidenP2IDNote: SolveIntentParams["createMidenP2IDNote"],
+    ) => {
+      if (!sdk) throw new Error("Epoch SDK not ready");
+      if (!pendingQuote) throw new Error("Fetch a quote first");
+
+      setIntentResult(null);
       const result = await buildCrossChainIntent(sdk, {
         ...pendingQuote.params,
         collateralType: CollateralType.Miden,
@@ -78,66 +74,41 @@ export function useEpochIntent() {
         createMidenP2IDNote,
         preFetchedQuote: pendingQuote,
       });
-      if (result?.error) {
-        // Keep the existing quote visible so user can retry confirmation.
-        setIntentResult(result);
-        setError(result.error);
-        throw new Error(result.error);
-      }
+      // Set before throwing: an in-band failure still has a result worth showing.
       setIntentResult(result);
+      const solverError = readIntentError(result);
+      if (solverError) throw new Error(solverError);
+
       setPendingQuote(null);
       return result;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to confirm intent';
-      setError(msg);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [sdk, pendingQuote]);
-
-  /** Direct-bridge path: skip quote, call buildCrossChainIntent with explicit midenAmount. */
-  const submitDirectIntent = useCallback(async (
-    params: CrossChainIntentParams,
-    createMidenP2IDNote: SolveIntentParams['createMidenP2IDNote'],
-  ) => {
-    if (!sdk) throw new Error('Epoch SDK not ready');
-    setIsLoading(true);
-    setError(null);
-    setIntentResult(null);
-    try {
-      const result = await buildCrossChainIntent(sdk, {
-        ...params,
-        collateralType: CollateralType.Miden,
-        midenSourceAccount: params.midenAccountId,
-        createMidenP2IDNote,
-      });
-      setIntentResult(result);
-      return result;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to submit direct intent';
-      setError(msg);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [sdk]);
+    },
+    // Not onSuccess: a minted note means funds moved even if the intent failed.
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ["midenAssets"] });
+    },
+  });
 
   const clearQuote = useCallback(() => {
     setPendingQuote(null);
-    setError(null);
-  }, []);
+    setQuoteError(null);
+    resetConfirm();
+  }, [resetConfirm]);
+
+  const quotePhase = useMemo<IntentQuotePhase>(() => {
+    if (isFetchingQuote) return { status: "fetching" };
+    if (!pendingQuote) return { status: "idle" };
+    return isConfirming
+      ? { status: "confirming", quote: pendingQuote }
+      : { status: "ready", quote: pendingQuote };
+  }, [isFetchingQuote, isConfirming, pendingQuote]);
 
   return {
     fetchQuote,
     confirmIntent,
-    submitDirectIntent,
     clearQuote,
-    pendingQuote,
+    quotePhase,
     intentResult,
-    isLoading,
-    isFetchingQuote,
-    error,
+    error: quoteError ?? confirmError?.message ?? null,
     isSDKReady: !!sdk,
   };
 }

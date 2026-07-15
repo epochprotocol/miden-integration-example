@@ -1,7 +1,7 @@
-import * as React from 'react';
-import { X } from '@phosphor-icons/react';
-import { Dialog as DialogPrimitive } from 'radix-ui';
-import { cn } from '@/lib/utils';
+import * as React from "react";
+import { X } from "@phosphor-icons/react";
+import { Dialog as DialogPrimitive } from "radix-ui";
+import { cn } from "@/lib/utils";
 
 const Dialog = DialogPrimitive.Root;
 const DialogTrigger = DialogPrimitive.Trigger;
@@ -14,7 +14,10 @@ const DialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
-    className={cn('fixed inset-0 z-50 bg-neutral-950/40 backdrop-blur-[2px]', className)}
+    className={cn(
+      "fixed inset-0 z-50 bg-neutral-950/40 backdrop-blur-[2px]",
+      className,
+    )}
     {...props}
   />
 ));
@@ -31,7 +34,7 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed top-1/2 left-1/2 z-50 grid max-h-[min(90vh,32rem)] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl outline-none',
+        "fixed top-1/2 left-1/2 z-50 grid max-h-[min(90vh,32rem)] w-[calc(100%-2rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 overflow-y-auto rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl outline-none",
         className,
       )}
       {...props}
@@ -53,12 +56,27 @@ const DialogContent = React.forwardRef<
 ));
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
-const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col gap-1.5 pr-10 text-left', className)} {...props} />
+const DialogHeader = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("flex flex-col gap-1.5 pr-10 text-left", className)}
+    {...props}
+  />
 );
 
-const DialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn('flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)} {...props} />
+const DialogFooter = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn(
+      "flex flex-col-reverse gap-2 sm:flex-row sm:justify-end",
+      className,
+    )}
+    {...props}
+  />
 );
 
 const DialogTitle = React.forwardRef<
@@ -67,7 +85,10 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('text-lg font-semibold tracking-tight text-neutral-900', className)}
+    className={cn(
+      "text-lg font-semibold tracking-tight text-neutral-900",
+      className,
+    )}
     {...props}
   />
 ));
@@ -79,7 +100,7 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn('text-sm leading-relaxed text-neutral-600', className)}
+    className={cn("text-sm leading-relaxed text-neutral-600", className)}
     {...props}
   />
 ));

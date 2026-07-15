@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useMidenFiWallet } from "@miden-sdk/miden-wallet-adapter-react";
 import { useAssetMetadata } from "@miden-sdk/react";
 import { AccountId, Address } from "@miden-sdk/miden-sdk";
-import type { Asset } from "@miden-sdk/miden-wallet-adapter-base";
 
 export interface NormalizedMidenAccountId {
   hex: string;
@@ -93,41 +93,48 @@ export function useMidenWalletAdapter(
   } = useMidenFiWallet();
 
   const accountId = useMemo(() => normalizeAccountId(address), [address]);
-  const [rawAssets, setRawAssets] = useState<Asset[]>([]);
-  const [isLoadingAssets, setIsLoadingAssets] = useState(false);
-  const [assetsError, setAssetsError] = useState<string | null>(null);
+
+  // Keyed on address so App + the active tab share one requestAssets() call.
+  const {
+    data: rawAssets,
+    isFetching,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["midenAssets", address],
+    queryFn: async () => (await requestAssets!()) ?? [],
+    enabled: enabled && connected && !!address && !!requestAssets,
+    // requestAssets() opens the wallet's approval prompt, so it must never
+    // refetch automatically. Only an address change, a bridge's
+    // invalidateQueries, or refreshAssets() should trigger it.
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnReconnect: false,
+  });
+
+  const unsupported = enabled && connected && !requestAssets;
+  const assetsError = unsupported
+    ? "Connected wallet does not support requestAssets()"
+    : error
+      ? error instanceof Error
+        ? error.message
+        : "Failed to load assets"
+      : null;
 
   const refreshAssets = useCallback(async () => {
-    if (!enabled || !connected) return;
-    if (!requestAssets) {
-      setRawAssets([]);
-      setAssetsError("Connected wallet does not support requestAssets()");
-      return;
-    }
-    setIsLoadingAssets(true);
-    setAssetsError(null);
-    try {
-      const raw = await requestAssets();
-      setRawAssets(raw ?? []);
-    } catch (err) {
-      setRawAssets([]);
-      setAssetsError(
-        err instanceof Error ? err.message : "Failed to load assets",
-      );
-    } finally {
-      setIsLoadingAssets(false);
-    }
-  }, [enabled, connected, requestAssets]);
+    await refetch();
+  }, [refetch]);
 
   const faucetIds = useMemo(
-    () => rawAssets.map((a) => a.faucetId),
+    () => (rawAssets ?? []).map((a) => a.faucetId),
     [rawAssets],
   );
   const { assetMetadata } = useAssetMetadata(faucetIds);
 
   const assets = useMemo<MidenWalletAsset[]>(
     () =>
-      rawAssets.map((a) => {
+      (rawAssets ?? []).map((a) => {
         const meta = assetMetadata.get(a.faucetId);
         let display = a.faucetId;
         try {
@@ -144,24 +151,10 @@ export function useMidenWalletAdapter(
       }),
     [rawAssets, assetMetadata],
   );
-  console.log("rawAssets", rawAssets);
-
-  console.log("assets", assets);
 
   const connect = useCallback(async () => {
     if (!connected) await adapterConnect();
-    await refreshAssets();
-  }, [connected, adapterConnect, refreshAssets]);
-
-  useEffect(() => {
-    if (!enabled || !connected) {
-      setRawAssets([]);
-      setAssetsError(null);
-      setIsLoadingAssets(false);
-      return;
-    }
-    void refreshAssets();
-  }, [enabled, connected, refreshAssets]);
+  }, [connected, adapterConnect]);
 
   return {
     connected,
@@ -169,7 +162,7 @@ export function useMidenWalletAdapter(
     address,
     accountId,
     assets,
-    isLoadingAssets,
+    isLoadingAssets: isFetching,
     assetsError,
     refreshAssets,
   };

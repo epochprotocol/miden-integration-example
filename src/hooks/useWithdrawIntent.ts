@@ -1,59 +1,52 @@
-import { useState, useCallback, useEffect } from 'react';
-import { useAccount, useWalletClient } from 'wagmi';
+import { useCallback, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAccount, useWalletClient } from "wagmi";
 import {
   buildEVMToMidenIntent,
   getEVMToMidenQuote,
   type EVMToMidenQuote,
-} from '../services/epoch-bridge';
-import type { EVMToMidenIntentParams, IntentResult } from '../types/miden';
+} from "../services/epoch-bridge";
+import type { EVMToMidenIntentParams, IntentResult } from "../types/miden";
+import { useEpochSdk } from "../lib/epoch-sdk";
+import { extractIntentIdentity } from "../lib/intent-result";
 
+/** Mirrors useEpochIntent: quoting is a read (useState), confirming is a mutation. */
 export function useWithdrawIntent() {
-  const [withdrawResult, setWithdrawResult] = useState<IntentResult | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [withdrawResult, setWithdrawResult] = useState<IntentResult | null>(
+    null,
+  );
+  const [pendingQuote, setPendingQuote] = useState<EVMToMidenQuote | null>(
+    null,
+  );
   const [isFetchingQuote, setIsFetchingQuote] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [pendingQuote, setPendingQuote] = useState<EVMToMidenQuote | null>(null);
-  const [sdk, setSdk] = useState<any>(null);
+  const [quoteError, setQuoteError] = useState<string | null>(null);
 
+  const sdk = useEpochSdk();
   const { data: walletClient } = useWalletClient();
   const { address } = useAccount();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    if (!walletClient) {
-      setSdk(null);
-      return;
-    }
-    let cancelled = false;
-    import('@epoch-protocol/epoch-intents-sdk').then(({ EpochIntentSDK }) => {
-      if (cancelled) return;
-      const apiBaseUrl = import.meta.env.VITE_ALLOCATOR_URL || 'http://localhost:3000';
-      setSdk(new EpochIntentSDK({ apiBaseUrl, walletClient: walletClient as any }));
-    }).catch((err) => {
-      if (cancelled) return;
-      console.error('[Withdraw] Failed to load Epoch SDK:', err);
-      setSdk(null);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [walletClient]);
+  // Read at render — inside the callback a stale client stamped the old chain.
+  const depositChainId = walletClient?.chain?.id;
 
   const fetchQuote = useCallback(
     async (params: EVMToMidenIntentParams) => {
-      if (!sdk) throw new Error('Epoch SDK not ready — connect your EVM wallet');
-      if (!address) throw new Error('Connect EVM wallet first');
+      if (!sdk)
+        throw new Error("Epoch SDK not ready — connect your EVM wallet");
+      if (!address) throw new Error("Connect EVM wallet first");
       setIsFetchingQuote(true);
-      setError(null);
+      setQuoteError(null);
       setPendingQuote(null);
       try {
         const quote = await getEVMToMidenQuote(sdk, params, address);
-        if (!quote.quoteResult.tokenIn || quote.quoteResult.tokenIn === '0') {
-          throw new Error('Quote returned no EVM input amount — try different minTokenOut or token pair');
+        if (!quote.quoteResult.tokenIn || quote.quoteResult.tokenIn === "0") {
+          throw new Error(
+            "Quote returned no EVM input amount — try different minTokenOut or token pair",
+          );
         }
         setPendingQuote(quote);
       } catch (err) {
-        const msg = err instanceof Error ? err.message : 'Quote failed';
-        setError(msg);
+        setQuoteError(err instanceof Error ? err.message : "Quote failed");
         throw err;
       } finally {
         setIsFetchingQuote(false);
@@ -62,56 +55,45 @@ export function useWithdrawIntent() {
     [sdk, address],
   );
 
-  const confirmWithdraw = useCallback(async () => {
-    if (!sdk) throw new Error('Epoch SDK not ready');
-    if (!address) throw new Error('Connect EVM wallet first');
-    if (!pendingQuote) throw new Error('Fetch a quote first');
-    setIsLoading(true);
-    setError(null);
-    setWithdrawResult(null);
-    try {
+  const {
+    mutateAsync: confirmWithdraw,
+    reset: resetConfirm,
+    isPending: isLoading,
+    error: confirmError,
+  } = useMutation({
+    mutationFn: async () => {
+      if (!sdk) throw new Error("Epoch SDK not ready");
+      if (!address) throw new Error("Connect EVM wallet first");
+      if (!pendingQuote) throw new Error("Fetch a quote first");
+
+      setWithdrawResult(null);
       const result = await buildEVMToMidenIntent(sdk, {
         ...pendingQuote.params,
         evmSourceAddress: address,
         preFetchedQuote: pendingQuote,
       });
-      const r = result as any;
-      const isNonceLike = (v: unknown) =>
-        typeof v === 'string' || typeof v === 'number' || typeof v === 'bigint';
-      const rawNonce = isNonceLike(r?.intentNonce)
-        ? r.intentNonce
-        : isNonceLike(r?.solveResult?.nonce)
-          ? r.solveResult.nonce
-          : isNonceLike(r?.solveResult?.submittedIntentData?.nonce)
-            ? r.solveResult.submittedIntentData.nonce
-            : isNonceLike(r?.solveResult?.compact?.nonce)
-              ? r.solveResult.compact.nonce
-              : undefined;
-      const nonce = rawNonce != null ? String(rawNonce) : undefined;
-      // Chain the deposit tx landed on — taken from the wallet client at submit
-      // time; this is the chain where `depositERC20AndRegister` was called.
-      const depositChainId = walletClient?.chain?.id;
+
+      const { nonce } = extractIntentIdentity(result);
       const resultWithNonce: IntentResult = {
-        ...(result as IntentResult),
+        ...result,
         ...(nonce ? { intentNonce: nonce } : {}),
         ...(depositChainId != null ? { depositChainId } : {}),
       };
       setWithdrawResult(resultWithNonce);
       setPendingQuote(null);
       return resultWithNonce;
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to confirm withdraw intent';
-      setError(msg);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [sdk, address, pendingQuote]);
+    },
+    // Best-effort — the Miden credit actually lands later, via the status poll.
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ["midenAssets"] });
+    },
+  });
 
   const clearQuote = useCallback(() => {
     setPendingQuote(null);
-    setError(null);
-  }, []);
+    setQuoteError(null);
+    resetConfirm();
+  }, [resetConfirm]);
 
   return {
     fetchQuote,
@@ -121,7 +103,7 @@ export function useWithdrawIntent() {
     withdrawResult,
     isLoading,
     isFetchingQuote,
-    error,
+    error: quoteError ?? confirmError?.message ?? null,
     address,
     isSDKReady: !!sdk,
   };

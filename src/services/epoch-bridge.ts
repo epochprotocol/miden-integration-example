@@ -4,17 +4,18 @@ import type {
   EVMToMidenIntentParams,
   IntentResult,
 } from "../types/miden";
-import { MIDEN_DESTINATION_CHAIN_ID } from "../constants/chains";
-import type {
-  EpochIntentSDK,
-  IntentQuoteResult,
+import {
+  EVM_TO_MIDEN_EXTRA_TYPESTRING,
+  EVM_ZERO_ADDRESS,
+  MIDEN_TO_EVM_EXTRA_TYPESTRING,
+  MIDEN_VIRTUAL_CHAIN_ID,
+  type CollateralType,
+  type EpochIntentSDK,
+  type GetTaskDataParams,
+  type IntentQuoteResult,
+  type SolveIntentParams,
+  type TaskType,
 } from "@epoch-protocol/epoch-intents-sdk";
-import type {
-  CollateralType,
-  GetTaskDataParams,
-  SolveIntentParams,
-  TaskType,
-} from "@epoch-protocol/epoch-intents-sdk/dist/types";
 import { AccountId, Address } from "@miden-sdk/miden-sdk";
 
 export interface CrossChainQuote {
@@ -65,7 +66,6 @@ export function formatQuoteTokenIn(
  * intent is fulfilled — privacy-preserving on the Miden side, trustless on EVM side.
  */
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 const ZERO_HASH =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
 
@@ -113,18 +113,21 @@ export function buildEpochTaskDataParams(
   const midenSourceAccountHex = normalizeMidenIdToHex(params.midenAccountId);
   const midenFaucetIdHex = normalizeMidenIdToHex(params.midenFaucetId);
 
-  const outputToken = params.outputTokenAddress || ZERO_ADDRESS;
+  const outputToken = params.outputTokenAddress || EVM_ZERO_ADDRESS;
 
   // midenAmount and minTokenOut are both base units. "0" / empty → reverse-quote route.
   const tokenInAmount = (params.midenAmount ?? "").trim() || "0";
   const scaledMinTokenOut = (params.minTokenOut ?? "").trim() || "0";
+
+  // No local shape-checking of the ids: getTaskData validates this extraData
+  // internally and throws the SDK's MidenValidationError.
 
   const taskDataParams = {
     taskType: "gettokenout" as TaskType,
     intentData: {
       // isNative must be false — tokenIn is zero-address (Miden-sourced) but tokenOut is a real EVM token
       isNative: false,
-      depositTokenAddress: ZERO_ADDRESS,
+      depositTokenAddress: EVM_ZERO_ADDRESS,
       tokenInAmount,
       outputTokenAddress: outputToken,
       minTokenOut: scaledMinTokenOut,
@@ -132,18 +135,14 @@ export function buildEpochTaskDataParams(
       protocolHashIdentifier: ZERO_HASH,
       recipient: params.evmRecipient,
     },
-    // Mirror EpochSwapWidget Miden extraData pattern exactly
-    extraDataTypestring:
-      "string midenSourceAccount,string midenFaucetId,string midenNoteType,string midenNoteId,uint256 midenReclaimHeight",
+    extraDataTypestring: MIDEN_TO_EVM_EXTRA_TYPESTRING,
     extraData: {
       midenSourceAccount: midenSourceAccountHex,
       midenFaucetId: midenFaucetIdHex,
+      // Mirrors the SDK's internal MIDEN_COLLATERAL_NOTE_TYPE (not part of its
+      // public surface). Gates the allocator's reclaim-window check.
       midenNoteType: "P2IDE",
       midenNoteId: "",
-      midenReclaimHeight:
-        params.midenReclaimHeight != null
-          ? String(params.midenReclaimHeight)
-          : "1000",
     },
   };
 
@@ -174,10 +173,10 @@ export function buildEVMToMidenTaskDataParams(params: EVMToMidenIntentParams) {
   }
 
   const destinationChainId =
-    params.destinationChainId ?? MIDEN_DESTINATION_CHAIN_ID;
-  if (destinationChainId !== MIDEN_DESTINATION_CHAIN_ID) {
+    params.destinationChainId ?? MIDEN_VIRTUAL_CHAIN_ID;
+  if (destinationChainId !== MIDEN_VIRTUAL_CHAIN_ID) {
     throw new Error(
-      `EVM→Miden: destinationChainId must be ${MIDEN_DESTINATION_CHAIN_ID} (Miden output). Got ${destinationChainId}.`,
+      `EVM→Miden: destinationChainId must be ${MIDEN_VIRTUAL_CHAIN_ID} (Miden output). Got ${destinationChainId}.`,
     );
   }
 
@@ -187,18 +186,16 @@ export function buildEVMToMidenTaskDataParams(params: EVMToMidenIntentParams) {
       isNative: false,
       depositTokenAddress: params.evmTokenAddress,
       tokenInAmount: amountInWei,
-      outputTokenAddress: ZERO_ADDRESS,
+      outputTokenAddress: EVM_ZERO_ADDRESS,
       minTokenOut: scaledMinMidenOut, // Miden-side minimum out (base units)
       destinationChainId: String(destinationChainId),
       protocolHashIdentifier: ZERO_HASH,
       recipient: params.evmSourceAddress,
     },
-    extraDataTypestring:
-      "string midenRecipientAccount,string midenFaucetId,string midenNoteType",
+    extraDataTypestring: EVM_TO_MIDEN_EXTRA_TYPESTRING,
     extraData: {
       midenRecipientAccount: midenRecipientHex,
       midenFaucetId: midenFaucetHex,
-      midenNoteType: "P2ID",
     },
   };
 

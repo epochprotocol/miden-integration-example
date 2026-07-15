@@ -9,12 +9,12 @@ Two flows:
 
 ## Supported testnet chains
 
-| Network | Chain ID |
-| ------- | -------- |
-| Ethereum Sepolia | 11155111 |
-| Base Sepolia | 84532 |
-| Optimism Sepolia | 11155420 |
-| Miden (virtual) | 999999999 |
+| Network          | Chain ID  |
+| ---------------- | --------- |
+| Ethereum Sepolia | 11155111  |
+| Base Sepolia     | 84532     |
+| Optimism Sepolia | 11155420  |
+| Miden (virtual)  | 999999999 |
 
 Testnet tokens (USDC, DAI, USDT, etc.) share the same contract addresses across all EVM testnet chains. See [Supported Chains & Tokens](../docs/docs-new/supported-chains-and-tokens.md).
 
@@ -54,16 +54,16 @@ Testnet tokens (USDC, DAI, USDT, etc.) share the same contract addresses across 
 
 ## Key Files
 
-| Path | Purpose |
-|------|---------|
-| `src/services/epoch-bridge.ts` | Epoch SDK wrapper (intent build / submit / poll) |
-| `src/hooks/useEpochIntent.ts` | Miden→EVM intent submission flow |
-| `src/hooks/useWithdrawIntent.ts` | EVM→Miden withdraw flow |
-| `src/hooks/useMidenWalletAdapter.ts` | Miden wallet connect/state |
-| `src/hooks/useMidenTransfer.ts` | P2IDE note creation on Miden |
-| `src/hooks/useIntentFlowStatus.ts` | Intent lifecycle polling |
-| `src/constants/chains.ts` | Testnet EVM chains + Miden virtual chain id (`999999999`) |
-| `src/config/wagmi.ts` | wagmi/RainbowKit config |
+| Path                                 | Purpose                                                   |
+| ------------------------------------ | --------------------------------------------------------- |
+| `src/services/epoch-bridge.ts`       | Epoch SDK wrapper (intent build / submit / poll)          |
+| `src/hooks/useEpochIntent.ts`        | Miden→EVM intent submission flow                          |
+| `src/hooks/useWithdrawIntent.ts`     | EVM→Miden withdraw flow                                   |
+| `src/hooks/useMidenWalletAdapter.ts` | Miden wallet connect/state                                |
+| `src/hooks/useMidenTransfer.ts`      | P2IDE note creation on Miden                              |
+| `src/hooks/useIntentFlowStatus.ts`   | Intent lifecycle polling                                  |
+| `src/constants/chains.ts`            | Testnet EVM chains + Miden virtual chain id (`999999999`) |
+| `src/config/wagmi.ts`                | wagmi/RainbowKit config                                   |
 
 ## Notes
 

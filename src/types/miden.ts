@@ -1,11 +1,11 @@
 export interface MidenAccount {
   id: string;
   label: string;
-  type: 'wallet' | 'faucet';
+  type: "wallet" | "faucet";
 }
 
 export interface MidenFaucetInfo extends MidenAccount {
-  type: 'faucet';
+  type: "faucet";
   symbol: string;
   maxSupply: string;
 }
@@ -13,6 +13,13 @@ export interface MidenFaucetInfo extends MidenAccount {
 export interface VaultAsset {
   faucetId: string;
   amount: string;
+}
+
+/** A spendable Miden asset as reported by the wallet adapter. */
+export interface MidenAssetOption {
+  assetId: string;
+  amount: bigint;
+  symbol?: string;
 }
 
 export interface CrossChainIntentParams {
@@ -23,8 +30,6 @@ export interface CrossChainIntentParams {
    * Omit / pass "0" to use reverse-quote route.
    */
   midenAmount?: string;
-  /** Optional absolute reclaim height (block number) for P2IDE notes */
-  midenReclaimHeight?: number;
   evmRecipient: string;
   destinationChainId: number;
   outputTokenAddress: string;
@@ -36,7 +41,7 @@ export interface EVMToMidenIntentParams {
   /** EVM chain where `evmTokenAddress` is deployed (align with wallet; mirrors deposit tab chain id). */
   sourceChainId: number;
   /**
-   * Intent output chain: must be `MIDEN_DESTINATION_CHAIN_ID` (currently `999999999`) for Miden credit in this stack.
+   * Intent output chain: must be the SDK's `MIDEN_VIRTUAL_CHAIN_ID` for Miden credit in this stack.
    * Maps to mandate `destinationChainId` in task data (SIO `tokenOut.chainId`); not the EVM `sourceChainId`.
    */
   destinationChainId: number;
@@ -65,7 +70,8 @@ export interface IntentResult {
       data: string;
       value?: string;
     }>;
-    compact?: any;
+    /** Opaque Compact envelope — only ever read through readMidenNoteId's probe. */
+    compact?: unknown;
     hash?: string;
     nonce?: string;
     /**

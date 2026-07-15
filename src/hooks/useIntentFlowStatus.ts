@@ -1,14 +1,16 @@
 import { useMemo } from "react";
-import { useIntentTransactionStatus } from "./useIntentTransactionStatus";
+import { useIntentStatusQuery } from "./useIntentStatusQuery";
+import { selectDestinationSettlement } from "../lib/intent-settlement";
+import { readMidenNoteId } from "../lib/intent-result";
 import type { IntentFlowStatus } from "../components/crosschain/IntentStatus";
-import { MIDEN_CHAIN_ID } from "../lib/explorers";
+import { MIDEN_VIRTUAL_CHAIN_ID } from "@epoch-protocol/epoch-intents-sdk";
 
 export function useIntentFlowStatus(
   userAddress?: string,
   intentNonce?: string,
   destinationChainId?: number,
 ) {
-  const { statuses, isPolling, error } = useIntentTransactionStatus(
+  const { statuses, isPolling, error } = useIntentStatusQuery(
     userAddress,
     intentNonce,
     destinationChainId,
@@ -17,37 +19,18 @@ export function useIntentFlowStatus(
   const status = useMemo<IntentFlowStatus | null>(() => {
     if (!userAddress || !intentNonce) return null;
 
-    const midenRow = statuses.find((s) => Number(s.chainId) === MIDEN_CHAIN_ID);
+    const midenRow = statuses.find(
+      (s) => Number(s.chainId) === MIDEN_VIRTUAL_CHAIN_ID,
+    );
 
-    // Strict: only the destination-chain settlement.
-    //   - Hide while any destination-chain row is still pending (SIO can list
-    //     a prior-step success alongside the in-flight user tx).
-    //   - Once no pending remains, take the LAST destination-chain success.
-    //   - Other EVM rows (e.g. Compact claim on dispatcher chain) ignored.
-    let completedEvm: (typeof statuses)[number] | undefined;
-    if (destinationChainId != null) {
-      const destRows = statuses.filter(
-        (s) => Number(s.chainId) === destinationChainId,
-      );
-      const anyPending = destRows.some(
-        (s) => String(s.status).toLowerCase() === "pending",
-      );
-      if (!anyPending) {
-        const successes = destRows.filter(
-          (s) =>
-            String(s.status).toLowerCase() === "success" &&
-            typeof s.transactionHash === "string" &&
-            s.transactionHash.length > 0,
-        );
-        completedEvm = successes[successes.length - 1];
-      }
-    }
+    const { completed: completedEvm } = selectDestinationSettlement(
+      statuses,
+      destinationChainId,
+    );
     const latest = statuses[statuses.length - 1];
 
     const midenNoteId =
-      (midenRow as any)?.midenNoteId ??
-      (completedEvm as any)?.midenNoteId ??
-      undefined;
+      readMidenNoteId(midenRow) ?? readMidenNoteId(completedEvm);
 
     return {
       evmCompleted: !!completedEvm,

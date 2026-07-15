@@ -8,7 +8,9 @@ export function Header() {
         >
           M
         </div>
-        <h1 className="text-xl font-semibold tracking-tight text-neutral-900">Miden × Epoch</h1>
+        <h1 className="text-xl font-semibold tracking-tight text-neutral-900">
+          Miden × Epoch
+        </h1>
         <span className="ui-chip">Testnet</span>
       </div>
     </header>

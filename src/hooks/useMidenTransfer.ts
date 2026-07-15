@@ -1,5 +1,5 @@
-import { useAccounts, useSend, useSyncState } from '@miden-sdk/react';
-import { useCallback, useMemo } from 'react';
+import { useAccounts, useSend, useSyncState } from "@miden-sdk/react";
+import { useCallback, useMemo } from "react";
 
 interface UseMidenTransferReturn {
   sendTokens: (
@@ -8,7 +8,9 @@ interface UseMidenTransferReturn {
     faucetId: string,
     amount: bigint,
     recallHeight?: number,
-  ) => Promise<{ success: boolean; noteId?: string; txId?: string } | undefined>;
+  ) => Promise<
+    { success: boolean; noteId?: string; txId?: string } | undefined
+  >;
   isSending: boolean;
   error: string | null;
 }
@@ -33,7 +35,7 @@ export function useMidenTransfer(): UseMidenTransferReturn {
           to: receiverId,
           assetId: faucetId,
           amount,
-          noteType: recallHeight != null ? 'public' : 'private',
+          noteType: recallHeight != null ? "public" : "private",
           recallHeight: recallHeight ?? undefined,
         });
         let noteId: string | undefined;
@@ -48,7 +50,7 @@ export function useMidenTransfer(): UseMidenTransferReturn {
         await refetchAccounts();
         return { success: true, noteId, txId: out.txId };
       } catch (err) {
-        console.error('[Miden] Send error:', err);
+        console.error("[Miden] Send error:", err);
         throw err;
       }
     },

@@ -1,30 +1,30 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import { WagmiProvider } from 'wagmi';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { RainbowKitProvider, lightTheme } from '@rainbow-me/rainbowkit';
-import '@rainbow-me/rainbowkit/styles.css';
-import 'sonner/dist/styles.css';
-import './index.css';
-import { Toaster } from 'sonner';
-import App from './App';
-import { config } from './config/wagmi';
-import { MidenFiSignerProvider } from '@miden-sdk/miden-wallet-adapter-react';
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { WagmiProvider } from "wagmi";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
+import "@rainbow-me/rainbowkit/styles.css";
+import "sonner/dist/styles.css";
+import "./index.css";
+import { Toaster } from "sonner";
+import App from "./App";
+import { config } from "./config/wagmi";
+import { MidenFiSignerProvider } from "@miden-sdk/miden-wallet-adapter-react";
 import {
   AllowedPrivateData,
   WalletAdapterNetwork,
-} from '@miden-sdk/miden-wallet-adapter-base';
+} from "@miden-sdk/miden-wallet-adapter-base";
 
 const queryClient = new QueryClient();
 
 const rkTheme = lightTheme({
-  accentColor: '#ff5c00',
-  accentColorForeground: '#ffffff',
-  borderRadius: 'medium',
-  fontStack: 'system',
+  accentColor: "#ff5c00",
+  accentColorForeground: "#ffffff",
+  borderRadius: "medium",
+  fontStack: "system",
 });
 
-createRoot(document.getElementById('root')!).render(
+createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
