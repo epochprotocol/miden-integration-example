@@ -26,3 +26,6 @@ dist-ssr
 
 .agents/
 .env
+
+# Local agent settings — machine-specific, not shared.
+.claude/settings.local.json
