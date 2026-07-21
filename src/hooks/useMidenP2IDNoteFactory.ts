@@ -1,23 +1,62 @@
 import { useCallback } from "react";
 import { useMidenFiWallet } from "@miden-sdk/miden-wallet-adapter-react";
-import { SendTransaction } from "@miden-sdk/miden-wallet-adapter-base";
+import { Transaction } from "@miden-sdk/miden-wallet-adapter-base";
+import { useMiden } from "@miden-sdk/react";
+import {
+  Note,
+  NoteType,
+  AccountId,
+  NoteAssets,
+  FungibleAsset,
+  NoteArray,
+  NoteAttachment,
+  TransactionRequestBuilder,
+} from "@miden-sdk/miden-sdk";
 import type { SolveIntentParams } from "@epoch-protocol/epoch-intents-sdk";
-
-const WAIT_FOR_TRANSACTION_TIMEOUT_MS = 120_000;
+import { encodeEvmRecipientToFelts } from "@epoch-protocol/epoch-intents-sdk";
 
 interface Options {
   midenAccountId: string | null;
+  /**
+   * EVM payout recipient to bind into the note (F-01). Written as a note
+   * attachment so the allocator can reject any intent whose recipient does not
+   * match — closing the note-theft path.
+   */
+  evmRecipient: string | null;
   onStatus: (message: string) => void;
   onNoteCreated: (noteId: string) => void;
 }
 
-/** Mints the recallable P2IDE note the SDK asks for when an intent needs a resource lock. */
+const WAIT_FOR_TRANSACTION_TIMEOUT_MS = 120_000;
+
+/** Epoch Miden ids are 0x-hex; fall back to bech32 for wallet-formatted ids. */
+function toAccountId(id: string): AccountId {
+  const s = id.trim();
+  return s.startsWith("0x") ? AccountId.fromHex(s) : AccountId.fromBech32(s);
+}
+
+/**
+ * Mints the recallable P2IDE collateral note AND binds it to the EVM payout
+ * recipient via a note attachment (F-01).
+ *
+ * Submitted through the WALLET (`requestTransaction` + `createCustomTransaction`)
+ * rather than the SDK client's `useTransaction`: the wallet holds the account's
+ * state, whereas the SDK client's local store may not (which caused
+ * "account data wasn't found"). The wallet's `SendTransaction` can't carry an
+ * attachment, so we build a custom `TransactionRequest` whose output note is a
+ * P2IDE note created with `Note.createP2IDENote(..., reclaim, type, attachment)`
+ * — the one API that supports reclaim + attachment together.
+ */
 export function useMidenP2IDNoteFactory({
   midenAccountId,
+  evmRecipient,
   onStatus,
   onNoteCreated,
 }: Options): SolveIntentParams["createMidenP2IDNote"] {
-  const { requestSend, waitForTransaction } = useMidenFiWallet();
+  const { requestTransaction, waitForTransaction } = useMidenFiWallet();
+  // useMiden() is non-throwing (unlike useMidenClient, which throws before the
+  // client initializes); we gate on readiness inside the callback instead.
+  const { client, isReady } = useMiden();
 
   return useCallback<NonNullable<SolveIntentParams["createMidenP2IDNote"]>>(
     async (faucetIdParam, amountParam, allocatorId, recallBlocks) => {
@@ -26,41 +65,73 @@ export function useMidenP2IDNoteFactory({
         if (!midenAccountId) {
           throw new Error("Missing Miden account id");
         }
-        if (!requestSend) {
-          throw new Error("Miden wallet adapter not available");
+        if (!evmRecipient) {
+          throw new Error("Missing EVM recipient for note binding");
         }
-        // Before requestSend: broadcasting first would strand the user's funds.
-        if (!waitForTransaction) {
-          throw new Error("waitForTransaction not available in adapter");
+        if (!requestTransaction) {
+          throw new Error("Wallet does not support custom transactions");
+        }
+        if (!isReady || !client) {
+          throw new Error(
+            "Miden client not ready yet — retry once it initializes",
+          );
         }
 
-        const normalizedAmount = BigInt(amountParam);
-        if (normalizedAmount > BigInt(Number.MAX_SAFE_INTEGER)) {
-          throw new Error("Amount too large for wallet adapter send");
+        const assets = new NoteAssets([
+          new FungibleAsset(toAccountId(faucetIdParam), BigInt(amountParam)),
+        ]);
+        // F-01 binding: recipient packed into the note attachment (part of the
+        // note commitment, tamper-proof).
+        const attachment = new NoteAttachment(
+          BigUint64Array.from(encodeEvmRecipientToFelts(evmRecipient)),
+        );
+
+        // P2IDE reclaim height is ABSOLUTE; the SDK gives a RELATIVE recallBlocks
+        // (allocator min + buffer). Convert against the client's synced chain tip
+        // (getSyncHeight needs the chain, not the account).
+        const currentBlock = await client.getSyncHeight();
+        if (!Number.isFinite(currentBlock) || currentBlock <= 0) {
+          throw new Error(
+            "Miden client not synced yet — retry once the block height is available",
+          );
+        }
+        const reclaimHeight = currentBlock + recallBlocks;
+        const note = Note.createP2IDENote(
+          toAccountId(midenAccountId),
+          toAccountId(allocatorId),
+          assets,
+          reclaimHeight,
+          undefined, // no time-lock
+          NoteType.Public,
+          attachment,
+        );
+        const noteId = note.id().toString();
+
+        const txRequest = new TransactionRequestBuilder()
+          .withOwnOutputNotes(new NoteArray([note]))
+          .build();
+
+        if (!noteId) {
+          throw new Error("Could not compute note id for the minted note");
         }
 
-        // recallBlocks comes from the SDK (allocator's published reclaim minimum
-        // + buffer). Without it the note mints as a plain P2ID with no recall
-        // window, so a failed intent would strand the funds.
-        const payload = new SendTransaction(
+        // Submit through the wallet (holds the account + signs).
+        const customTx = Transaction.createCustomTransaction(
           midenAccountId,
           allocatorId,
-          faucetIdParam,
-          "public",
-          Number(normalizedAmount),
-          recallBlocks,
+          txRequest,
         );
-        const txId = await requestSend(payload);
+        const txId = await requestTransaction(customTx);
 
-        const finalized = await waitForTransaction(
-          txId,
-          WAIT_FOR_TRANSACTION_TIMEOUT_MS,
-        );
-        const first = finalized.outputNotes?.[0];
-        const noteId = first ? first.id().toString() : "";
-        if (!noteId) {
-          throw new Error(`Could not read output note id for tx ${txId}`);
+        // Wait for finalization before returning, so the note is committed and
+        // queryable when the allocator fetches it during intent validation.
+        // Without this the intent can race ahead of the note and be rejected
+        // "not found on-chain".
+        if (waitForTransaction) {
+          onStatus("P2IDE note created — waiting for finalization on Miden…");
+          await waitForTransaction(txId, WAIT_FOR_TRANSACTION_TIMEOUT_MS);
         }
+
         onNoteCreated(noteId);
         return { success: true, noteId };
       } catch (err) {
@@ -70,6 +141,15 @@ export function useMidenP2IDNoteFactory({
         };
       }
     },
-    [midenAccountId, requestSend, waitForTransaction, onStatus, onNoteCreated],
+    [
+      midenAccountId,
+      evmRecipient,
+      requestTransaction,
+      waitForTransaction,
+      client,
+      isReady,
+      onStatus,
+      onNoteCreated,
+    ],
   );
 }

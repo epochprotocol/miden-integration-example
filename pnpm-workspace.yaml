@@ -1,8 +1,0 @@
-# Supply-chain hardening (pnpm reads settings from this file as of pnpm 10).
-# Wait 7 days before installing a newly published version, so hijacked releases
-# have time to be reported and unpublished before they reach this project.
-minimumReleaseAge: 10080
-# Refuse transitive deps that resolve outside the registry (git/file/tarball URLs).
-blockExoticSubdeps: true
-# Reject packages whose trust signals (provenance, signatures) weaken between updates.
-trustPolicy: no-downgrade

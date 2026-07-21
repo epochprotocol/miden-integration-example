@@ -10,6 +10,7 @@ import { Toaster } from "sonner";
 import App from "./App";
 import { config } from "./config/wagmi";
 import { MidenFiSignerProvider } from "@miden-sdk/miden-wallet-adapter-react";
+import { MidenProvider } from "@miden-sdk/react";
 import {
   AllowedPrivateData,
   WalletAdapterNetwork,
@@ -34,7 +35,12 @@ createRoot(document.getElementById("root")!).render(
             appName="Miden Integration Example"
             allowedPrivateData={AllowedPrivateData.Assets}
           >
-            <App />
+            {/* MidenProvider powers the @miden-sdk/react hooks (useSend /
+                useSyncState) that the P2IDE note factory uses to write the F-01
+                recipient-binding attachment. */}
+            <MidenProvider config={{ rpcUrl: "testnet" }}>
+              <App />
+            </MidenProvider>
             <Toaster position="bottom-right" closeButton duration={5_000} />
           </MidenFiSignerProvider>
         </RainbowKitProvider>
