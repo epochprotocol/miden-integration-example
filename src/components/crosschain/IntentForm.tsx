@@ -116,7 +116,6 @@ export function IntentForm({
 
   const createMidenP2IDNote = useMidenP2IDNoteFactory({
     midenAccountId,
-    evmRecipient: destination.evmAddress?.trim() || null,
     onStatus: setConfirmStatus,
     onNoteCreated: setLocalMidenNoteId,
   });

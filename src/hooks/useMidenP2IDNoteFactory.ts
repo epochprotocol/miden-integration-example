@@ -13,16 +13,9 @@ import {
   TransactionRequestBuilder,
 } from "@miden-sdk/miden-sdk";
 import type { SolveIntentParams } from "@epoch-protocol/epoch-intents-sdk";
-import { encodeEvmRecipientToFelts } from "@epoch-protocol/epoch-intents-sdk";
 
 interface Options {
   midenAccountId: string | null;
-  /**
-   * EVM payout recipient to bind into the note (F-01). Written as a note
-   * attachment so the allocator can reject any intent whose recipient does not
-   * match — closing the note-theft path.
-   */
-  evmRecipient: string | null;
   onStatus: (message: string) => void;
   onNoteCreated: (noteId: string) => void;
 }
@@ -36,8 +29,8 @@ function toAccountId(id: string): AccountId {
 }
 
 /**
- * Mints the recallable P2IDE collateral note AND binds it to the EVM payout
- * recipient via a note attachment (F-01).
+ * Mints the recallable P2IDE collateral note, binding it to the intent's mandate
+ * via the attachment felts the SDK computed (Compact-equivalent witness hash).
  *
  * Submitted through the WALLET (`requestTransaction` + `createCustomTransaction`)
  * rather than the SDK client's `useTransaction`: the wallet holds the account's
@@ -49,7 +42,6 @@ function toAccountId(id: string): AccountId {
  */
 export function useMidenP2IDNoteFactory({
   midenAccountId,
-  evmRecipient,
   onStatus,
   onNoteCreated,
 }: Options): SolveIntentParams["createMidenP2IDNote"] {
@@ -59,14 +51,20 @@ export function useMidenP2IDNoteFactory({
   const { client, isReady } = useMiden();
 
   return useCallback<NonNullable<SolveIntentParams["createMidenP2IDNote"]>>(
-    async (faucetIdParam, amountParam, allocatorId, recallBlocks) => {
+    async (
+      faucetIdParam,
+      amountParam,
+      allocatorId,
+      recallBlocks,
+      bindingAttachmentFelts,
+    ) => {
       onStatus("Resource lock required — creating P2IDE note on Miden…");
       try {
         if (!midenAccountId) {
           throw new Error("Missing Miden account id");
         }
-        if (!evmRecipient) {
-          throw new Error("Missing EVM recipient for note binding");
+        if (!bindingAttachmentFelts?.length) {
+          throw new Error("Missing mandate-binding attachment felts from SDK");
         }
         if (!requestTransaction) {
           throw new Error("Wallet does not support custom transactions");
@@ -80,10 +78,10 @@ export function useMidenP2IDNoteFactory({
         const assets = new NoteAssets([
           new FungibleAsset(toAccountId(faucetIdParam), BigInt(amountParam)),
         ]);
-        // F-01 binding: recipient packed into the note attachment (part of the
-        // note commitment, tamper-proof).
+        // Mandate binding: witness hash the SDK computed, written verbatim as the
+        // note attachment (part of the note commitment, tamper-proof).
         const attachment = new NoteAttachment(
-          BigUint64Array.from(encodeEvmRecipientToFelts(evmRecipient)),
+          BigUint64Array.from(bindingAttachmentFelts),
         );
 
         // P2IDE reclaim height is ABSOLUTE; the SDK gives a RELATIVE recallBlocks
@@ -143,7 +141,6 @@ export function useMidenP2IDNoteFactory({
     },
     [
       midenAccountId,
-      evmRecipient,
       requestTransaction,
       waitForTransaction,
       client,
