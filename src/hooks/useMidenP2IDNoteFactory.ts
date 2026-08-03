@@ -39,6 +39,11 @@ function toAccountId(id: string): AccountId {
  * attachment, so we build a custom `TransactionRequest` whose output note is a
  * P2IDE note created with `Note.createP2IDENote(..., reclaim, type, attachment)`
  * — the one API that supports reclaim + attachment together.
+ *
+ * Visibility is chosen by the SDK, not here, so it always matches what the
+ * allocator was told to expect. For a private mint the serialized note is
+ * returned alongside the id: the chain stores only the commitment, so the
+ * allocator has no other way to validate or later consume it.
  */
 export function useMidenP2IDNoteFactory({
   midenAccountId,
@@ -57,8 +62,12 @@ export function useMidenP2IDNoteFactory({
       allocatorId,
       recallBlocks,
       bindingAttachmentFelts,
+      noteVisibility,
     ) => {
-      onStatus("Resource lock required — creating P2IDE note on Miden…");
+      const isPrivate = noteVisibility === "private";
+      onStatus(
+        `Resource lock required — creating ${isPrivate ? "private" : "public"} P2IDE note on Miden…`,
+      );
       try {
         if (!midenAccountId) {
           throw new Error("Missing Miden account id");
@@ -100,10 +109,22 @@ export function useMidenP2IDNoteFactory({
           assets,
           reclaimHeight,
           undefined, // no time-lock
-          NoteType.Public,
+          isPrivate ? NoteType.Private : NoteType.Public,
           attachment,
         );
         const noteId = note.id().toString();
+
+        // A private note publishes only its commitment, so these bytes are the
+        // only readable copy of the body. Serialize BEFORE submitting: if the
+        // note lands on-chain and the body is lost, the collateral is gone for
+        // good — reclaiming a P2IDE means consuming it, which needs this data,
+        // and the serial number is random.
+        const noteBytes = isPrivate ? note.serialize() : undefined;
+        if (isPrivate && !noteBytes?.length) {
+          throw new Error(
+            "Could not serialize the private note — refusing to mint a note whose body cannot be recovered",
+          );
+        }
 
         const txRequest = new TransactionRequestBuilder()
           .withOwnOutputNotes(new NoteArray([note]))
@@ -131,7 +152,7 @@ export function useMidenP2IDNoteFactory({
         }
 
         onNoteCreated(noteId);
-        return { success: true, noteId };
+        return { success: true, noteId, noteBytes };
       } catch (err) {
         return {
           success: false,

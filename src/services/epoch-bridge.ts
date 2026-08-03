@@ -303,6 +303,8 @@ export async function buildCrossChainIntent(
     collateralType?: CollateralType;
     midenSourceAccount?: string;
     createMidenP2IDNote?: SolveIntentParams["createMidenP2IDNote"];
+    /** Defaults to "public" in the SDK when omitted. */
+    midenNoteVisibility?: SolveIntentParams["midenNoteVisibility"];
     /** Pre-fetched quote from getCrossChainQuote — skips getTaskData step. */
     preFetchedQuote?: CrossChainQuote;
   },
@@ -333,6 +335,7 @@ export async function buildCrossChainIntent(
       midenFaucetId: midenFaucetIdHex,
       midenSourceAccount: midenSourceHex,
       createMidenP2IDNote: params.createMidenP2IDNote,
+      midenNoteVisibility: params.midenNoteVisibility,
     });
 
     return {
