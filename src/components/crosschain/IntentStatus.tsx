@@ -14,6 +14,8 @@ export interface IntentFlowStatus {
   midenTxId?: string;
   midenStatus?: string;
   midenNoteId?: string;
+  /** Base64 NoteFile — private EVM→Miden payouts only. */
+  midenNoteBytes?: string;
   latestStatusLabel?: string;
   latestChainId?: string;
   statusCount?: number;

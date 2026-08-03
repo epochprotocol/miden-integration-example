@@ -43,6 +43,8 @@ export function useIntentFlowStatus(
       midenStatus:
         midenRow?.status != null ? String(midenRow.status) : undefined,
       midenNoteId,
+      // Only the Miden row carries it, and only for a private payout.
+      midenNoteBytes: midenRow?.midenNoteBytes,
       latestStatusLabel:
         latest?.status != null ? String(latest.status) : undefined,
       latestChainId:

@@ -1,9 +1,13 @@
+import type { ReactNode } from "react";
+
 interface Props {
   amountText: string;
   /** "Miden" or "EVM" — which wallet must hold the funds. */
   walletNoun: string;
   clearLabel: string;
   onClear: () => void;
+  /** Rendered under the amount, above the reminder. */
+  detail?: ReactNode;
 }
 
 export function QuoteSummaryCard({
@@ -11,6 +15,7 @@ export function QuoteSummaryCard({
   walletNoun,
   clearLabel,
   onClear,
+  detail,
 }: Props) {
   return (
     <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-3">
@@ -32,6 +37,7 @@ export function QuoteSummaryCard({
           {amountText}
         </p>
       </div>
+      {detail}
       <p className="text-xs text-neutral-500 italic">
         Keep at least this amount in your {walletNoun} wallet before confirming.
       </p>

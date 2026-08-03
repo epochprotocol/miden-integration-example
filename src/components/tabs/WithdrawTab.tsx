@@ -11,6 +11,8 @@ import { useWithdrawIntent } from "../../hooks/useWithdrawIntent";
 import { useIntentFlowStatus } from "../../hooks/useIntentFlowStatus";
 import { truncateHash } from "../../lib/explorers";
 import type { MidenAccount } from "../../types/miden";
+import { WithdrawNoteFileCard } from "../crosschain/withdraw/WithdrawNoteFileCard";
+import { RecoverNotesCard } from "../crosschain/withdraw/RecoverNotesCard";
 
 export function WithdrawTab() {
   const midenWallet = useMidenWalletAdapter({ enabled: true });
@@ -39,9 +41,15 @@ export function WithdrawTab() {
     string | undefined;
   const intentStatus = useIntentFlowStatus(evmAddress, intentNonce);
 
+  // Recovery keys off the CONNECTED wallet, not the last withdraw.
+  const walletAddress = withdraw.address;
+
   // Stage 2 toast lifecycle: resolve the "waiting for Miden settlement" toast
   // (opened by WithdrawForm.handleConfirm) once SIO surfaces the synthetic
   // Miden row, or when the terminal EVM-success row lands without a Miden row.
+  const liveNoteBytes = intentStatus.status?.midenNoteBytes;
+  const liveNoteId = intentStatus.status?.midenNoteId;
+
   const midenTxId = intentStatus.status?.midenTxId;
   const evmCompleted = intentStatus.status?.evmCompleted;
   useEffect(() => {
@@ -86,12 +94,16 @@ export function WithdrawTab() {
         isLoading={withdraw.isLoading}
         isSDKReady={withdraw.isSDKReady}
       />
+      <RecoverNotesCard connectedAddress={walletAddress} />
       <IntentStatus
         result={withdraw.withdrawResult}
         error={withdraw.error}
         flowStatus={intentStatus.status}
         isPolling={intentStatus.isPolling}
       />
+      {/* Renders itself only when the payout was private. Placed after the
+          status block so it is the last thing the user sees on success. */}
+      <WithdrawNoteFileCard noteBytes={liveNoteBytes} noteId={liveNoteId} />
     </div>
   );
 }

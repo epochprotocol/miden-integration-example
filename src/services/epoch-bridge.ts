@@ -7,6 +7,7 @@ import type {
 import {
   EVM_TO_MIDEN_EXTRA_TYPESTRING,
   EVM_ZERO_ADDRESS,
+  MANDATE_SALT_FIELD_NAME,
   MIDEN_TO_EVM_EXTRA_TYPESTRING,
   MIDEN_VIRTUAL_CHAIN_ID,
   type CollateralType,
@@ -196,6 +197,9 @@ export function buildEVMToMidenTaskDataParams(params: EVMToMidenIntentParams) {
     extraData: {
       midenRecipientAccount: midenRecipientHex,
       midenFaucetId: midenFaucetHex,
+      // getTaskData declares this in the typestring for BOTH values, so public
+      // and private intents are indistinguishable on-chain.
+      midenNoteVisibility: params.midenNoteVisibility ?? "public",
     },
   };
 
@@ -229,6 +233,21 @@ export async function getEVMToMidenQuote(
   return { taskTypeString, intentData, quoteResult, params: quoteParams };
 }
 
+/**
+ * The privacy salt `getTaskData` injects into EVM→Miden mandates.
+ *
+ * EVM→Miden registers a Compact on the origin chain, publishing a claim hash
+ * over the mandate. Every other mandate field is guessable, so without the salt
+ * that hash confirms a guessed intent to any chain observer. Miden→EVM returns
+ * undefined — it registers no compact, so there is nothing to salt.
+ */
+export function getMandateSalt(intentData: unknown): string | undefined {
+  const salt = (intentData as Record<string, unknown> | null | undefined)?.[
+    MANDATE_SALT_FIELD_NAME
+  ];
+  return typeof salt === "string" ? salt : undefined;
+}
+
 export async function buildEVMToMidenIntent(
   sdk: EpochIntentSDK,
   params: EVMToMidenIntentParams & { preFetchedQuote?: EVMToMidenQuote },
@@ -237,6 +256,9 @@ export async function buildEVMToMidenIntent(
   let intentData: unknown;
   let quoteResult: IntentQuoteResult | undefined;
 
+  // The quote's task data must be reused verbatim, never rebuilt: getTaskData
+  // mints a fresh salt per call, and a second one would change the claim hash
+  // away from the one registered on-chain.
   if (params.preFetchedQuote) {
     ({ taskTypeString, intentData, quoteResult } = params.preFetchedQuote);
   } else {
