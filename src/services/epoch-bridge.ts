@@ -66,7 +66,7 @@ export function formatQuoteTokenIn(
  * intent is fulfilled — privacy-preserving on the Miden side, trustless on EVM side.
  */
 
-const ZERO_HASH =
+export const ZERO_HASH =
   "0x0000000000000000000000000000000000000000000000000000000000000000";
 
 export function normalizeMidenIdToHex(id: string): string {

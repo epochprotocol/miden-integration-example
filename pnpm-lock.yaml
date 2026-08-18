@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@epoch-protocol/epoch-intents-sdk':
-        specifier: ^1.0.35
-        version: 1.0.35(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2))(zod@4.4.2)
+        specifier: file:../smallocator/sdk
+        version: file:../smallocator/sdk(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2))(zod@4.4.2)
       '@fontsource-variable/jetbrains-mono':
         specifier: ^5.2.8
         version: 5.2.8
@@ -315,11 +315,11 @@ packages:
   '@emotion/hash@0.9.2':
     resolution: {integrity: sha512-MyqliTZGuOm3+5ZRSaaBGP3USLw6+EGykkwZns2EPC5g8jJ4z9OrdZY9apkl3+UP9+sdz76YYkwCKP5gh8iY3g==}
 
-  '@epoch-protocol/epoch-commons-sdk@0.1.18':
-    resolution: {integrity: sha512-FJ15pOddF5ndbkRUO6ZJr67zHQe1YfVw3sQgtrxzsgsv8mc+MPKaWCkvaTQ9uSvNKJcvwqQmgqn4gcayejJtug==}
+  '@epoch-protocol/epoch-commons-sdk@0.1.19':
+    resolution: {integrity: sha512-M1ZSzK5LQyTWFPx4gHLVVOaAFHT23DKKP3c2G3cPsavmnyckxFayoIXIS9UyMTDn1g0QPeoL5R1YmKBmP7HE8Q==}
 
-  '@epoch-protocol/epoch-intents-sdk@1.0.35':
-    resolution: {integrity: sha512-69rFadIgAFKVgYgnZW3zyFKEYbpRUS3GXF7gAUEUqbojJzBWEVwCv/EwAQfd9tNVT6EVWFtJd2m29QZUE3sijQ==}
+  '@epoch-protocol/epoch-intents-sdk@file:../smallocator/sdk':
+    resolution: {directory: ../smallocator/sdk, type: directory}
     peerDependencies:
       viem: ^2.x
 
@@ -5730,7 +5730,7 @@ snapshots:
 
   '@emotion/hash@0.9.2': {}
 
-  '@epoch-protocol/epoch-commons-sdk@0.1.18(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2)':
+  '@epoch-protocol/epoch-commons-sdk@0.1.19(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2)':
     dependencies:
       ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       viem: 2.42.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2)
@@ -5740,9 +5740,9 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@epoch-protocol/epoch-intents-sdk@1.0.35(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2))(zod@4.4.2)':
+  '@epoch-protocol/epoch-intents-sdk@file:../smallocator/sdk(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2))(zod@4.4.2)':
     dependencies:
-      '@epoch-protocol/epoch-commons-sdk': 0.1.18(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2)
+      '@epoch-protocol/epoch-commons-sdk': 0.1.19(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2)
       '@metamask/delegation-toolkit': 0.13.0(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2))
       viem: 2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.4.2)
     transitivePeerDependencies:
