@@ -10,6 +10,7 @@ import { IntentStatus } from "../crosschain/IntentStatus";
 import { useWithdrawIntent } from "../../hooks/useWithdrawIntent";
 import { useIntentFlowStatus } from "../../hooks/useIntentFlowStatus";
 import { truncateHash } from "../../lib/explorers";
+import { readPrivatePayoutNote } from "../../lib/intent-result";
 import type { MidenAccount } from "../../types/miden";
 import { WithdrawNoteFileCard } from "../crosschain/withdraw/WithdrawNoteFileCard";
 import { RecoverNotesCard } from "../crosschain/withdraw/RecoverNotesCard";
@@ -47,7 +48,12 @@ export function WithdrawTab() {
   // Stage 2 toast lifecycle: resolve the "waiting for Miden settlement" toast
   // (opened by WithdrawForm.handleConfirm) once SIO surfaces the synthetic
   // Miden row, or when the terminal EVM-success row lands without a Miden row.
-  const liveNoteBytes = intentStatus.status?.midenNoteBytes;
+  // The note body arrives on the response to the submission that created it,
+  // not on the status poll — the allocator does not serve it unauthenticated.
+  const privateNote = readPrivatePayoutNote(withdraw.withdrawResult);
+  // Settled private payout whose body we no longer hold (reload, other device):
+  // the recovery card below is the way back to it.
+  const needsRecovery = !privateNote && intentStatus.status?.hasPrivateNote;
   const liveNoteId = intentStatus.status?.midenNoteId;
 
   const midenTxId = intentStatus.status?.midenTxId;
@@ -103,7 +109,11 @@ export function WithdrawTab() {
       />
       {/* Renders itself only when the payout was private. Placed after the
           status block so it is the last thing the user sees on success. */}
-      <WithdrawNoteFileCard noteBytes={liveNoteBytes} noteId={liveNoteId} />
+      <WithdrawNoteFileCard
+        noteBytes={privateNote?.midenNoteBytes}
+        noteId={privateNote?.midenNoteId ?? liveNoteId}
+        needsRecovery={needsRecovery}
+      />
     </div>
   );
 }

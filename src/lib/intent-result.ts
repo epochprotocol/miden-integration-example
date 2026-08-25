@@ -72,3 +72,29 @@ export function readMidenNoteId(result: unknown): string | undefined {
   const found = candidates.find((c) => typeof c === "string" && c.length > 0);
   return typeof found === "string" ? found : undefined;
 }
+
+/**
+ * The private payout note handed back by the submission that created it.
+ *
+ * Lives on the submit response rather than the status poll: a private note's
+ * body is the only thing that can consume it, so the allocator serves it to the
+ * caller that created the intent and withholds it from the unauthenticated
+ * status route. If this is absent — a reload, a different device — the body is
+ * still recoverable through the wallet-authenticated flow (RecoverNotesCard).
+ */
+export function readPrivatePayoutNote(
+  result: unknown,
+): { midenNoteBytes: string; midenNoteId?: string } | undefined {
+  const bytes = at(
+    result,
+    "solveResult",
+    "submittedIntentData",
+    "midenNoteBytes",
+  );
+  if (typeof bytes !== "string" || bytes.length === 0) return undefined;
+  const id = at(result, "solveResult", "submittedIntentData", "midenNoteId");
+  return {
+    midenNoteBytes: bytes,
+    ...(typeof id === "string" && id.length > 0 ? { midenNoteId: id } : {}),
+  };
+}

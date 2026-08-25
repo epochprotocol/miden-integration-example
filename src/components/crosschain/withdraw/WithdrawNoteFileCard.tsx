@@ -4,15 +4,44 @@ import { Button } from "@/components/ui/button";
 import { downloadNoteFile } from "../../../lib/note-file";
 
 interface Props {
-  /** Base64 `NoteFile` from the Miden settlement row. Absent for public payouts. */
+  /**
+   * Base64 `NoteFile` from the response to this withdrawal. Absent for a public
+   * payout, and absent after a reload — the allocator does not serve it on the
+   * status poll, so it cannot be recovered from a refresh.
+   */
   noteBytes?: string;
   noteId?: string;
+  /**
+   * A private note exists but its body is no longer in hand. Point the user at
+   * the wallet-authenticated recovery flow rather than silently showing nothing
+   * — the funds are reachable, but only with the note file.
+   */
+  needsRecovery?: boolean;
 }
 
 /** The body of a PRIVATE payout note — the only thing that can claim it. */
-export function WithdrawNoteFileCard({ noteBytes, noteId }: Props) {
+export function WithdrawNoteFileCard({
+  noteBytes,
+  noteId,
+  needsRecovery,
+}: Props) {
   const [saved, setSaved] = useState(false);
-  if (!noteBytes) return null;
+
+  if (!noteBytes) {
+    if (!needsRecovery) return null;
+    return (
+      <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3">
+        <p className="text-sm font-semibold text-amber-900">
+          Your private note file is not on this page
+        </p>
+        <p className="mt-1 text-xs text-amber-800">
+          This payout minted a private note, and its body is the only way to
+          claim it. It was returned when you submitted, so a reload loses it.
+          Use “Lost a private note?” below to sign in and download it again.
+        </p>
+      </div>
+    );
+  }
 
   const fileName = `miden-note-${(noteId ?? "payout").replace(/^0x/, "").slice(0, 16)}.mno`;
 

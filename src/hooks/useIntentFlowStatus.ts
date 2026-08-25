@@ -43,8 +43,11 @@ export function useIntentFlowStatus(
       midenStatus:
         midenRow?.status != null ? String(midenRow.status) : undefined,
       midenNoteId,
-      // Only the Miden row carries it, and only for a private payout.
-      midenNoteBytes: midenRow?.midenNoteBytes,
+      // The body is NOT on this shape — the allocator withholds it (and a
+      // private payout's note id) from this unauthenticated route. All the poll
+      // can tell us is that a note exists; the body comes from the submit
+      // response, or from the wallet-authenticated recovery flow.
+      hasPrivateNote: midenRow?.hasPrivateNote === true,
       latestStatusLabel:
         latest?.status != null ? String(latest.status) : undefined,
       latestChainId:
