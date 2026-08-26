@@ -15,6 +15,12 @@ import {
 import { useEpochSdk } from "../lib/epoch-sdk";
 import { readIntentError } from "../lib/intent-result";
 
+/** What the form hands over at confirm time — the minter plus how to mint. */
+export interface ConfirmIntentArgs {
+  createMidenP2IDNote: SolveIntentParams["createMidenP2IDNote"];
+  midenNoteVisibility: SolveIntentParams["midenNoteVisibility"];
+}
+
 export type IntentQuotePhase =
   | { status: "idle" }
   | { status: "fetching" }
@@ -60,9 +66,10 @@ export function useEpochIntent() {
     isPending: isConfirming,
     error: confirmError,
   } = useMutation({
-    mutationFn: async (
-      createMidenP2IDNote: SolveIntentParams["createMidenP2IDNote"],
-    ) => {
+    mutationFn: async ({
+      createMidenP2IDNote,
+      midenNoteVisibility,
+    }: ConfirmIntentArgs) => {
       if (!sdk) throw new Error("Epoch SDK not ready");
       if (!pendingQuote) throw new Error("Fetch a quote first");
 
@@ -72,6 +79,7 @@ export function useEpochIntent() {
         collateralType: CollateralType.Miden,
         midenSourceAccount: pendingQuote.params.midenAccountId,
         createMidenP2IDNote,
+        midenNoteVisibility,
         preFetchedQuote: pendingQuote,
       });
       // Set before throwing: an in-band failure still has a result worth showing.

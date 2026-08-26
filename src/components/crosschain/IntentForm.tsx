@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useAccount, useChainId } from "wagmi";
 import { toast } from "sonner";
-import type { SolveIntentParams } from "@epoch-protocol/epoch-intents-sdk";
+import type {
+  MidenNoteVisibility,
+  SolveIntentParams,
+} from "@epoch-protocol/epoch-intents-sdk";
 import type {
   CrossChainIntentParams,
   MidenAssetOption,
@@ -20,12 +23,14 @@ import {
 } from "../../lib/intent-result";
 import { useIntentSettlementView } from "../../hooks/useIntentSettlementView";
 import { useMidenP2IDNoteFactory } from "../../hooks/useMidenP2IDNoteFactory";
+import { useMidenPrivateNotesSupport } from "../../hooks/useMidenPrivateNotesSupport";
 import { Button } from "@/components/ui/button";
 import { IntentSourceAssetField } from "./intent/IntentSourceAssetField";
 import {
   IntentDestinationFields,
   type IntentDestination,
 } from "./intent/IntentDestinationFields";
+import { IntentNoteVisibilityField } from "./intent/IntentNoteVisibilityField";
 import { IntentQuoteSummary } from "./intent/IntentQuoteSummary";
 import { SettlementPendingCard } from "./intent/SettlementPendingCard";
 import { ExplorerHashCard } from "./intent/ExplorerHashCard";
@@ -35,9 +40,10 @@ interface Props {
   midenAssets: MidenAssetOption[];
   isLoadingMidenAssets: boolean;
   onFetchQuote: (params: CrossChainIntentParams) => Promise<void>;
-  onConfirmIntent: (
-    createMidenP2IDNote: SolveIntentParams["createMidenP2IDNote"],
-  ) => Promise<unknown>;
+  onConfirmIntent: (args: {
+    createMidenP2IDNote: SolveIntentParams["createMidenP2IDNote"];
+    midenNoteVisibility: SolveIntentParams["midenNoteVisibility"];
+  }) => Promise<unknown>;
   onClearQuote: () => void;
   quotePhase: IntentQuotePhase;
   isSDKReady: boolean;
@@ -120,6 +126,17 @@ export function IntentForm({
     onNoteCreated: setLocalMidenNoteId,
   });
 
+  const { isSupported: isPrivateSupported, isLoading: isLoadingSupport } =
+    useMidenPrivateNotesSupport();
+  const [noteVisibility, setNoteVisibility] =
+    useState<MidenNoteVisibility>("public");
+  // The select disables "private" when unsupported, but that state can go stale
+  // (allocator config change, a different backend). Block the submit rather than
+  // quietly downgrading: silently publishing the account and amount someone
+  // asked to keep off-chain is worse than refusing.
+  const privateUnavailable =
+    noteVisibility === "private" && !isPrivateSupported;
+
   const buildParams = (): CrossChainIntentParams => {
     if (!destination.evmAddress) {
       throw new Error("Connect EVM wallet first");
@@ -176,11 +193,20 @@ export function IntentForm({
 
   const handleConfirm = () => {
     if (quotePhase.status !== "ready") return;
+    if (privateUnavailable) {
+      toast.error(
+        "This allocator cannot accept private notes yet. Switch to public, or point at an allocator that advertises midenPrivateNotesSupported.",
+      );
+      return;
+    }
 
     void toast.promise(
       (async () => {
         setConfirmStatus("Submitting intent…");
-        const result = await onConfirmIntent(createMidenP2IDNote);
+        const result = await onConfirmIntent({
+          createMidenP2IDNote,
+          midenNoteVisibility: noteVisibility,
+        });
 
         const solverError = readIntentError(result);
         if (solverError) throw new Error(solverError);
@@ -241,6 +267,13 @@ export function IntentForm({
         <IntentDestinationFields
           values={destination}
           onChange={editDestination}
+        />
+
+        <IntentNoteVisibilityField
+          value={noteVisibility}
+          onSelect={setNoteVisibility}
+          isPrivateSupported={isPrivateSupported}
+          isLoadingSupport={isLoadingSupport}
         />
 
         {activeQuote && (

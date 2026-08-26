@@ -1,3 +1,5 @@
+import type { MidenNoteVisibility } from "@epoch-protocol/epoch-intents-sdk";
+
 export interface MidenAccount {
   id: string;
   label: string;
@@ -52,6 +54,12 @@ export interface EVMToMidenIntentParams {
   evmTokenDecimals?: number;
   midenRecipientId: string;
   midenFaucetId: string;
+  /**
+   * Visibility of the Miden note you RECEIVE. Goes into the signed mandate, so
+   * no service downstream can quietly downgrade it. Defaults to public — a
+   * private note is unrecoverable if its body is lost, so it is never assumed.
+   */
+  midenNoteVisibility?: MidenNoteVisibility;
   /**
    * Minimum Miden-side output you want.
    * Reverse-quote path: paired with `tokenInAmount: "0"` so SIO derives required EVM `tokenIn`.

@@ -14,6 +14,12 @@ export interface IntentFlowStatus {
   midenTxId?: string;
   midenStatus?: string;
   midenNoteId?: string;
+  /**
+   * A private payout note exists. The body is NOT on the status shape — the
+   * allocator withholds it (and a private note's id) from that unauthenticated
+   * route — so this is only a signal that recovery is worth offering.
+   */
+  hasPrivateNote?: boolean;
   latestStatusLabel?: string;
   latestChainId?: string;
   statusCount?: number;

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { MidenNoteVisibility } from "@epoch-protocol/epoch-intents-sdk";
 import { useAccount, useChainId } from "wagmi";
 import { toast } from "sonner";
 import { MIDEN_VIRTUAL_CHAIN_ID } from "@epoch-protocol/epoch-intents-sdk";
@@ -17,6 +18,7 @@ import {
   WITHDRAW_SETTLE_TOAST_ID,
 } from "./withdraw/withdraw-toasts";
 import { WithdrawTokenFields } from "./withdraw/WithdrawTokenFields";
+import { WithdrawNoteVisibilityField } from "./withdraw/WithdrawNoteVisibilityField";
 import { WithdrawAccountFields } from "./withdraw/WithdrawAccountFields";
 import { WithdrawQuoteSummary } from "./withdraw/WithdrawQuoteSummary";
 
@@ -49,6 +51,8 @@ export function WithdrawForm({
     "0xfc90f0f4da30e51168453b60eafed7",
   );
   const [status, setStatus] = useState("");
+  const [noteVisibility, setNoteVisibility] =
+    useState<MidenNoteVisibility>("public");
 
   const { address: connectedAddress } = useAccount();
   const walletChainId = useChainId();
@@ -79,6 +83,7 @@ export function WithdrawForm({
       midenRecipientId,
       midenFaucetId: resolvedFaucetId,
       minTokenOut: minTokenOut.trim(),
+      midenNoteVisibility: noteVisibility,
     };
   };
 
@@ -190,6 +195,16 @@ export function WithdrawForm({
           }}
           onMinTokenOutChange={(v) => {
             setMinTokenOut(v);
+            onClearQuote();
+          }}
+        />
+
+        <WithdrawNoteVisibilityField
+          value={noteVisibility}
+          onSelect={(v) => {
+            setNoteVisibility(v);
+            // The choice is part of the signed mandate, so a stale quote would
+            // register a claim hash for the OTHER visibility.
             onClearQuote();
           }}
         />
