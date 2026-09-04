@@ -1,0 +1,374 @@
+{
+  ".lintstagedrc.json": {
+    "mtime": 1787046378.7406423,
+    "seen": 1788525444.5581062,
+    "ast_hash": "aad9588c1f3693beb66ffd2ca9316d78",
+    "semantic_hash": "aad9588c1f3693beb66ffd2ca9316d78"
+  },
+  ".prettierrc.json": {
+    "mtime": 1787046378.7408414,
+    "seen": 1788525444.558107,
+    "ast_hash": "344234bde3f1d80b9943b5a7775eea38",
+    "semantic_hash": "344234bde3f1d80b9943b5a7775eea38"
+  },
+  "components.json": {
+    "mtime": 1787046378.7413335,
+    "seen": 1788525444.5581079,
+    "ast_hash": "3d46c5111cdb061b0a6c8b19787a930c",
+    "semantic_hash": "3d46c5111cdb061b0a6c8b19787a930c"
+  },
+  "eslint.config.js": {
+    "mtime": 1787046378.7414484,
+    "seen": 1788525444.558109,
+    "ast_hash": "9ebc7db128d258203801386d6158882c",
+    "semantic_hash": "9ebc7db128d258203801386d6158882c"
+  },
+  "package.json": {
+    "mtime": 1787656366.9359474,
+    "seen": 1788525444.55811,
+    "ast_hash": "d048f451f31b9cd368736bc59ccf4eaf",
+    "semantic_hash": "d048f451f31b9cd368736bc59ccf4eaf"
+  },
+  "postcss.config.js": {
+    "mtime": 1787046378.7429736,
+    "seen": 1788525444.558111,
+    "ast_hash": "c735540bb63936a123bc867d950c9f69",
+    "semantic_hash": "c735540bb63936a123bc867d950c9f69"
+  },
+  "skills-lock.json": {
+    "mtime": 1787046378.7432437,
+    "seen": 1788525444.558112,
+    "ast_hash": "f435218737d3b2aa0aa50d363b492721",
+    "semantic_hash": "f435218737d3b2aa0aa50d363b492721"
+  },
+  "src/App.tsx": {
+    "mtime": 1787046378.7434285,
+    "seen": 1788525444.558112,
+    "ast_hash": "cf29ec7b903541af0257adaa5f9a3671",
+    "semantic_hash": "cf29ec7b903541af0257adaa5f9a3671"
+  },
+  "src/components/crosschain/EVMWalletConnect.tsx": {
+    "mtime": 1787046378.7436602,
+    "seen": 1788525444.558113,
+    "ast_hash": "ea65dabf24ca8ce85d37b4f0694fcf14",
+    "semantic_hash": "ea65dabf24ca8ce85d37b4f0694fcf14"
+  },
+  "src/components/crosschain/IntentForm.tsx": {
+    "mtime": 1787656366.9394803,
+    "seen": 1788525444.558114,
+    "ast_hash": "99a0b8e1ec59e508311e708a44a67085",
+    "semantic_hash": "99a0b8e1ec59e508311e708a44a67085"
+  },
+  "src/components/crosschain/IntentStatus.tsx": {
+    "mtime": 1787656366.9403155,
+    "seen": 1788525444.558115,
+    "ast_hash": "edffdb9522bcec2981dafb3dac8e697e",
+    "semantic_hash": "edffdb9522bcec2981dafb3dac8e697e"
+  },
+  "src/components/crosschain/QuoteSummaryCard.tsx": {
+    "mtime": 1787656366.9410498,
+    "seen": 1788525444.5581162,
+    "ast_hash": "2218147c1251e65190b838ec5cf10cc6",
+    "semantic_hash": "2218147c1251e65190b838ec5cf10cc6"
+  },
+  "src/components/crosschain/WithdrawForm.tsx": {
+    "mtime": 1787656366.9423032,
+    "seen": 1788525444.5581162,
+    "ast_hash": "f75afd591d73e8b6476feec3f71c37a3",
+    "semantic_hash": "f75afd591d73e8b6476feec3f71c37a3"
+  },
+  "src/components/crosschain/intent/ExplorerHashCard.tsx": {
+    "mtime": 1787046378.7444859,
+    "seen": 1788525444.5581172,
+    "ast_hash": "2cef26cb3e842a4e8a5cb4cf986a6616",
+    "semantic_hash": "2cef26cb3e842a4e8a5cb4cf986a6616"
+  },
+  "src/components/crosschain/intent/IntentDestinationFields.tsx": {
+    "mtime": 1787046378.7445955,
+    "seen": 1788525444.5581179,
+    "ast_hash": "1826ea622ee7d6d307f89af7f9fb624b",
+    "semantic_hash": "1826ea622ee7d6d307f89af7f9fb624b"
+  },
+  "src/components/crosschain/intent/IntentNoteVisibilityField.tsx": {
+    "mtime": 1787656366.9425275,
+    "seen": 1788525444.5581188,
+    "ast_hash": "510d00a18f855764e21daef2a072225d",
+    "semantic_hash": "510d00a18f855764e21daef2a072225d"
+  },
+  "src/components/crosschain/intent/IntentQuoteSummary.tsx": {
+    "mtime": 1787046378.744698,
+    "seen": 1788525444.55812,
+    "ast_hash": "f55202104adf26001486128704b09f30",
+    "semantic_hash": "f55202104adf26001486128704b09f30"
+  },
+  "src/components/crosschain/intent/IntentSourceAssetField.tsx": {
+    "mtime": 1787046378.7448018,
+    "seen": 1788525444.558121,
+    "ast_hash": "95c02c9c056903cfabf2c8a1a8c8b70e",
+    "semantic_hash": "95c02c9c056903cfabf2c8a1a8c8b70e"
+  },
+  "src/components/crosschain/intent/SettlementPendingCard.tsx": {
+    "mtime": 1787046378.7448993,
+    "seen": 1788525444.558121,
+    "ast_hash": "06acd781ab871b2612b3c028db68838d",
+    "semantic_hash": "06acd781ab871b2612b3c028db68838d"
+  },
+  "src/components/crosschain/withdraw/RecoverNotesCard.tsx": {
+    "mtime": 1787656366.9431307,
+    "seen": 1788525444.558122,
+    "ast_hash": "0a10c814dd67c911c2f4676e3e812e70",
+    "semantic_hash": "0a10c814dd67c911c2f4676e3e812e70"
+  },
+  "src/components/crosschain/withdraw/WithdrawAccountFields.tsx": {
+    "mtime": 1787046378.7450619,
+    "seen": 1788525444.558123,
+    "ast_hash": "64f4b4ff1c14205194cdfddde6147526",
+    "semantic_hash": "64f4b4ff1c14205194cdfddde6147526"
+  },
+  "src/components/crosschain/withdraw/WithdrawNoteFileCard.tsx": {
+    "mtime": 1787656366.9441154,
+    "seen": 1788525444.558124,
+    "ast_hash": "b4e239c47faf63468313e56b6cfeff7b",
+    "semantic_hash": "b4e239c47faf63468313e56b6cfeff7b"
+  },
+  "src/components/crosschain/withdraw/WithdrawNoteVisibilityField.tsx": {
+    "mtime": 1787656366.9443161,
+    "seen": 1788525444.558125,
+    "ast_hash": "552c71ba6f1861306d5ba8274f4e408c",
+    "semantic_hash": "552c71ba6f1861306d5ba8274f4e408c"
+  },
+  "src/components/crosschain/withdraw/WithdrawQuoteSummary.tsx": {
+    "mtime": 1787656366.944537,
+    "seen": 1788525444.558126,
+    "ast_hash": "d8ff1ecb7794e03a24664c9074e37676",
+    "semantic_hash": "d8ff1ecb7794e03a24664c9074e37676"
+  },
+  "src/components/crosschain/withdraw/WithdrawTokenFields.tsx": {
+    "mtime": 1787046378.7452624,
+    "seen": 1788525444.558126,
+    "ast_hash": "008cc68b0d6a99b9c527245caec9a8b8",
+    "semantic_hash": "008cc68b0d6a99b9c527245caec9a8b8"
+  },
+  "src/components/crosschain/withdraw/withdraw-toasts.ts": {
+    "mtime": 1787046378.745358,
+    "seen": 1788525444.5581272,
+    "ast_hash": "3cadb57d24ec77661c6a4d7aee4536c5",
+    "semantic_hash": "3cadb57d24ec77661c6a4d7aee4536c5"
+  },
+  "src/components/crosschain/withdraw/withdraw-tokens.ts": {
+    "mtime": 1787046378.7454574,
+    "seen": 1788525444.558128,
+    "ast_hash": "a4099101653d9b5ee314d51db5b17b28",
+    "semantic_hash": "a4099101653d9b5ee314d51db5b17b28"
+  },
+  "src/components/layout/Header.tsx": {
+    "mtime": 1787046378.745629,
+    "seen": 1788525444.5581288,
+    "ast_hash": "993a5e461b28dbe715e6f52fa37f2a2a",
+    "semantic_hash": "993a5e461b28dbe715e6f52fa37f2a2a"
+  },
+  "src/components/layout/TabNav.tsx": {
+    "mtime": 1787046378.7457328,
+    "seen": 1788525444.5581288,
+    "ast_hash": "3be3000148d09a875a2839772d29f5a3",
+    "semantic_hash": "3be3000148d09a875a2839772d29f5a3"
+  },
+  "src/components/tabs/CrosschainTab.tsx": {
+    "mtime": 1787046378.7459393,
+    "seen": 1788525444.55813,
+    "ast_hash": "ef147144aa6c3859ed8bfc1043d5e68a",
+    "semantic_hash": "ef147144aa6c3859ed8bfc1043d5e68a"
+  },
+  "src/components/tabs/WithdrawTab.tsx": {
+    "mtime": 1787656366.944878,
+    "seen": 1788525444.558131,
+    "ast_hash": "5ca36f708cd40e2ee6a69792e2200d1c",
+    "semantic_hash": "5ca36f708cd40e2ee6a69792e2200d1c"
+  },
+  "src/components/ui/button.tsx": {
+    "mtime": 1787046378.7462356,
+    "seen": 1788525444.558132,
+    "ast_hash": "b032a07afed289458f43d2dda2815346",
+    "semantic_hash": "b032a07afed289458f43d2dda2815346"
+  },
+  "src/components/ui/dialog.tsx": {
+    "mtime": 1787046378.746338,
+    "seen": 1788525444.558132,
+    "ast_hash": "61b8adb7d35a166abcabebb7b9225bca",
+    "semantic_hash": "61b8adb7d35a166abcabebb7b9225bca"
+  },
+  "src/components/ui/input.tsx": {
+    "mtime": 1787046378.7464328,
+    "seen": 1788525444.558133,
+    "ast_hash": "390290800d6435888c5cdd899193ee03",
+    "semantic_hash": "390290800d6435888c5cdd899193ee03"
+  },
+  "src/components/ui/label.tsx": {
+    "mtime": 1787046378.7465327,
+    "seen": 1788525444.558134,
+    "ast_hash": "0fea7cb74feb50bed7cd56163b582e3a",
+    "semantic_hash": "0fea7cb74feb50bed7cd56163b582e3a"
+  },
+  "src/components/ui/select.tsx": {
+    "mtime": 1787046378.7466404,
+    "seen": 1788525444.558135,
+    "ast_hash": "f2d7877f66a8b6ada67ab3a460ea879f",
+    "semantic_hash": "f2d7877f66a8b6ada67ab3a460ea879f"
+  },
+  "src/config/wagmi.ts": {
+    "mtime": 1787046378.7468138,
+    "seen": 1788525444.558135,
+    "ast_hash": "55ebb468ea9e54287d5327d6d863c685",
+    "semantic_hash": "55ebb468ea9e54287d5327d6d863c685"
+  },
+  "src/constants/chains.ts": {
+    "mtime": 1787046378.7469778,
+    "seen": 1788525444.558136,
+    "ast_hash": "16aea119a24287f1627997ac1406b9f4",
+    "semantic_hash": "16aea119a24287f1627997ac1406b9f4"
+  },
+  "src/constants/evm-tokens.ts": {
+    "mtime": 1787046378.747087,
+    "seen": 1788525444.5581372,
+    "ast_hash": "45a9f2a644e55ad745c596701d9a106e",
+    "semantic_hash": "45a9f2a644e55ad745c596701d9a106e"
+  },
+  "src/constants/miden-tokens.ts": {
+    "mtime": 1787046378.7471874,
+    "seen": 1788525444.5581381,
+    "ast_hash": "50cae998987d7adcbb58f3520b4e6816",
+    "semantic_hash": "50cae998987d7adcbb58f3520b4e6816"
+  },
+  "src/hooks/useEpochIntent.ts": {
+    "mtime": 1787656366.9451642,
+    "seen": 1788525444.5581388,
+    "ast_hash": "e3eabcee39e1d05c69002a4587b232b1",
+    "semantic_hash": "e3eabcee39e1d05c69002a4587b232b1"
+  },
+  "src/hooks/useEpochSession.ts": {
+    "mtime": 1787656366.9453204,
+    "seen": 1788525444.5581388,
+    "ast_hash": "54c298a9b8522a1d848fa0bd43d8968d",
+    "semantic_hash": "54c298a9b8522a1d848fa0bd43d8968d"
+  },
+  "src/hooks/useIntentFlowStatus.ts": {
+    "mtime": 1787656366.9457164,
+    "seen": 1788525444.5581398,
+    "ast_hash": "439413dd5501b2568aa15209f79a76b3",
+    "semantic_hash": "439413dd5501b2568aa15209f79a76b3"
+  },
+  "src/hooks/useIntentSettlementView.ts": {
+    "mtime": 1787046378.7475457,
+    "seen": 1788525444.558141,
+    "ast_hash": "45ba599d690b4542b6e7817627388d21",
+    "semantic_hash": "45ba599d690b4542b6e7817627388d21"
+  },
+  "src/hooks/useIntentStatusQuery.ts": {
+    "mtime": 1787046378.747638,
+    "seen": 1788525444.558142,
+    "ast_hash": "6323ddd08ee28ff1fa559bf5cb5153b7",
+    "semantic_hash": "6323ddd08ee28ff1fa559bf5cb5153b7"
+  },
+  "src/hooks/useMidenP2IDNoteFactory.ts": {
+    "mtime": 1787656366.9460475,
+    "seen": 1788525444.558143,
+    "ast_hash": "e159de4ea7740ee8919550c0e99a1745",
+    "semantic_hash": "e159de4ea7740ee8919550c0e99a1745"
+  },
+  "src/hooks/useMidenPrivateNotesSupport.ts": {
+    "mtime": 1787656366.9461832,
+    "seen": 1788525444.558143,
+    "ast_hash": "ccca08d1442e5c2c565d3d3a0fd9c481",
+    "semantic_hash": "ccca08d1442e5c2c565d3d3a0fd9c481"
+  },
+  "src/hooks/useMidenTransfer.ts": {
+    "mtime": 1787046378.747863,
+    "seen": 1788525444.558144,
+    "ast_hash": "cca20c7827758cd2db414c6db4cea021",
+    "semantic_hash": "cca20c7827758cd2db414c6db4cea021"
+  },
+  "src/hooks/useMidenWalletAdapter.ts": {
+    "mtime": 1787046378.748014,
+    "seen": 1788525444.558145,
+    "ast_hash": "f55e39310e7fc8e9c771994bc9a36052",
+    "semantic_hash": "f55e39310e7fc8e9c771994bc9a36052"
+  },
+  "src/hooks/useWithdrawIntent.ts": {
+    "mtime": 1787046378.748135,
+    "seen": 1788525444.558146,
+    "ast_hash": "930663055495804002d96817ebaf7a93",
+    "semantic_hash": "930663055495804002d96817ebaf7a93"
+  },
+  "src/lib/epoch-sdk.ts": {
+    "mtime": 1787046378.7484057,
+    "seen": 1788525444.558147,
+    "ast_hash": "17e7e5777541e13fbf6547bd4b7d7c54",
+    "semantic_hash": "17e7e5777541e13fbf6547bd4b7d7c54"
+  },
+  "src/lib/explorers.ts": {
+    "mtime": 1787046378.7485163,
+    "seen": 1788525444.558147,
+    "ast_hash": "a62c90cf164971986f79cacc67053d27",
+    "semantic_hash": "a62c90cf164971986f79cacc67053d27"
+  },
+  "src/lib/intent-result.ts": {
+    "mtime": 1787046378.7486138,
+    "seen": 1788525444.5581481,
+    "ast_hash": "1b6b3995abf87d7e21e0eb3ebb724a71",
+    "semantic_hash": "1b6b3995abf87d7e21e0eb3ebb724a71"
+  },
+  "src/lib/intent-settlement.ts": {
+    "mtime": 1787046378.748707,
+    "seen": 1788525444.558149,
+    "ast_hash": "8e3bdc73634700e37d4efd7aec08299c",
+    "semantic_hash": "8e3bdc73634700e37d4efd7aec08299c"
+  },
+  "src/lib/note-file.ts": {
+    "mtime": 1787656366.9463227,
+    "seen": 1788525444.5581498,
+    "ast_hash": "e4b3d3552b002016d4bbb42719509ae8",
+    "semantic_hash": "e4b3d3552b002016d4bbb42719509ae8"
+  },
+  "src/lib/utils.ts": {
+    "mtime": 1787046378.7487967,
+    "seen": 1788525444.5581498,
+    "ast_hash": "618d00bf4537ce84f9ba62c5b215fb30",
+    "semantic_hash": "618d00bf4537ce84f9ba62c5b215fb30"
+  },
+  "src/main.tsx": {
+    "mtime": 1787244318.8200724,
+    "seen": 1788525444.558151,
+    "ast_hash": "7129a5492125ec6374623a699c7cc5b7",
+    "semantic_hash": "7129a5492125ec6374623a699c7cc5b7"
+  },
+  "src/services/epoch-bridge.ts": {
+    "mtime": 1787656366.9471335,
+    "seen": 1788525444.558152,
+    "ast_hash": "5bd172daacc1a6ca556429d2b1d8101f",
+    "semantic_hash": "5bd172daacc1a6ca556429d2b1d8101f"
+  },
+  "src/types/miden.ts": {
+    "mtime": 1787656366.9475973,
+    "seen": 1788525444.558153,
+    "ast_hash": "6db1bf2e99a4a019b9ab154d2402b700",
+    "semantic_hash": "6db1bf2e99a4a019b9ab154d2402b700"
+  },
+  "tailwind.config.js": {
+    "mtime": 1787046378.7494705,
+    "seen": 1788525444.558153,
+    "ast_hash": "3471a189d3995b775d865b3c00cf61b6",
+    "semantic_hash": "3471a189d3995b775d865b3c00cf61b6"
+  },
+  "tsconfig.json": {
+    "mtime": 1787046378.7495708,
+    "seen": 1788525444.5581539,
+    "ast_hash": "b42b7faa5836f58539797e4a06aecfcf",
+    "semantic_hash": "b42b7faa5836f58539797e4a06aecfcf"
+  },
+  "vite.config.ts": {
+    "mtime": 1787244318.8204908,
+    "seen": 1788525444.558155,
+    "ast_hash": "33c6a83c4f69cbd10f7405a06f9bbe49",
+    "semantic_hash": "33c6a83c4f69cbd10f7405a06f9bbe49"
+  }
+}
