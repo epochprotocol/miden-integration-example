@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMidenFiWallet } from "@miden-sdk/miden-wallet-adapter-react";
 import { WalletReadyState } from "@miden-sdk/miden-wallet-adapter-base";
 import { useAssetMetadata } from "@miden-sdk/react";
 import { AccountId, Address } from "@miden-sdk/miden-sdk";
+import { useMidenNetwork } from "./useMidenNetwork";
 
 export interface NormalizedMidenAccountId {
   hex: string;
@@ -89,6 +90,7 @@ export function useMidenWalletAdapter(
   options: UseMidenWalletAdapterOptions = {},
 ): UseMidenWalletAdapterResult {
   const { enabled = true } = options;
+  const { network } = useMidenNetwork();
   const {
     connected,
     connect: adapterConnect,
@@ -97,7 +99,6 @@ export function useMidenWalletAdapter(
     connecting,
     wallet,
     wallets,
-    select,
   } = useMidenFiWallet();
 
   const detectedWallet = useMemo(
@@ -109,16 +110,6 @@ export function useMidenWalletAdapter(
       ),
     [wallets],
   );
-
-  // The adapter provider selects its single default wallet in an effect. Until
-  // that effect has completed, calling connect() throws WalletNotSelectedError.
-  // Selecting it here too makes the dependency explicit and lets the UI wait
-  // for the provider's selected-adapter state before enabling the button.
-  useEffect(() => {
-    if (!wallet && detectedWallet) {
-      select(detectedWallet.adapter.name);
-    }
-  }, [detectedWallet, select, wallet]);
 
   const walletReady =
     !!wallet &&
@@ -134,7 +125,7 @@ export function useMidenWalletAdapter(
     error,
     refetch,
   } = useQuery({
-    queryKey: ["midenAssets", address],
+    queryKey: ["midenAssets", network, address],
     queryFn: async () => (await requestAssets!()) ?? [],
     enabled: enabled && connected && !!address && !!requestAssets,
     // requestAssets() opens the wallet's approval prompt, so it must never

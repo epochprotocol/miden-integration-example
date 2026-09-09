@@ -1,4 +1,8 @@
-import { MIDEN_SDK_VERSION, type MidenNetwork } from "../../config/miden";
+import {
+  getMidenNetworkConfig,
+  MIDEN_SDK_VERSION,
+  type MidenNetwork,
+} from "../../config/miden";
 import { useMidenNetwork } from "../../hooks/useMidenNetwork";
 
 const NETWORKS: MidenNetwork[] = ["devnet", "testnet"];
@@ -26,12 +30,15 @@ export function Header() {
           >
             {NETWORKS.map((option) => {
               const active = network === option;
+              const config = getMidenNetworkConfig(option);
               return (
                 <button
                   key={option}
                   type="button"
                   aria-pressed={active}
-                  className={`rounded-md px-3 py-1.5 text-xs font-semibold capitalize transition-colors ${
+                  disabled={!config.enabled}
+                  title={config.enabled ? undefined : config.unavailableReason}
+                  className={`rounded-md px-3 py-1.5 text-xs font-semibold capitalize transition-colors disabled:cursor-not-allowed disabled:opacity-45 ${
                     active
                       ? "bg-primary text-primary-foreground"
                       : "text-neutral-600 hover:bg-neutral-100"

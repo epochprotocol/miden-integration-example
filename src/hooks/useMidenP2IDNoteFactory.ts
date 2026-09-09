@@ -45,13 +45,13 @@ export function useMidenP2IDNoteFactory({
   midenAccountId,
   onStatus,
   onNoteCreated,
-}: Options): SolveIntentParams["createMidenP2IDNote"] {
+}: Options): SolveIntentParams["createMidenP2IDENote"] {
   const { requestTransaction, waitForTransaction } = useMidenFiWallet();
   // useMiden() is non-throwing (unlike useMidenClient, which throws before the
   // client initializes); we gate on readiness inside the callback instead.
   const { client, isReady } = useMiden();
 
-  return useCallback<NonNullable<SolveIntentParams["createMidenP2IDNote"]>>(
+  return useCallback<NonNullable<SolveIntentParams["createMidenP2IDENote"]>>(
     async (
       faucetIdParam,
       amountParam,

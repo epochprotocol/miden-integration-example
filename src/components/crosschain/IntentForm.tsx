@@ -37,7 +37,7 @@ interface Props {
   isLoadingMidenAssets: boolean;
   onFetchQuote: (params: CrossChainIntentParams) => Promise<void>;
   onConfirmIntent: (
-    createMidenP2IDNote: SolveIntentParams["createMidenP2IDNote"],
+    createMidenP2IDENote: SolveIntentParams["createMidenP2IDENote"],
   ) => Promise<unknown>;
   onClearQuote: () => void;
   quotePhase: IntentQuotePhase;
@@ -116,7 +116,7 @@ export function IntentForm({
     hasValidDestinationChainId ? destinationChainIdNum : undefined,
   );
 
-  const createMidenP2IDNote = useMidenP2IDNoteFactory({
+  const createMidenP2IDENote = useMidenP2IDNoteFactory({
     midenAccountId,
     onStatus: setConfirmStatus,
     onNoteCreated: setLocalMidenNoteId,
@@ -182,7 +182,7 @@ export function IntentForm({
     void toast.promise(
       (async () => {
         setConfirmStatus("Submitting intent…");
-        const result = await onConfirmIntent(createMidenP2IDNote);
+        const result = await onConfirmIntent(createMidenP2IDENote);
 
         const solverError = readIntentError(result);
         if (solverError) throw new Error(solverError);

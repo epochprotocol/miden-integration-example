@@ -33,10 +33,13 @@ Testnet tokens (USDC, DAI, USDT, etc.) share the same contract addresses across 
    ```
    `.env`:
    ```
-   # Select Devnet or Testnet from the app header. The allocator must use the
-   # same network.
    # Run the devnet-compatible smallocator locally.
-   VITE_ALLOCATOR_URL=http://localhost:3000
+   VITE_DEVNET_ALLOCATOR_URL=http://localhost:3000
+
+   # Testnet stays disabled until both endpoints are configured for the same
+   # network. Do not point either value at a devnet service.
+   # VITE_MIDEN_TESTNET_RPC_URL=https://your-testnet-rpc.example
+   # VITE_TESTNET_ALLOCATOR_URL=https://your-testnet-allocator.example
    ```
 2. Install + start:
    ```bash
@@ -52,24 +55,24 @@ Testnet tokens (USDC, DAI, USDT, etc.) share the same contract addresses across 
 
 ## Test Funds
 
-- **Miden devnet tokens**: claim from the [official devnet faucet](https://faucet.devnet.miden.io/) in a devnet Miden wallet. Use the Devnet/Testnet selector in the app header to choose the matching Miden network.
+- **Miden devnet tokens**: claim from the [official devnet faucet](https://faucet.devnet.miden.io/) in a devnet Miden wallet. Testnet becomes selectable only after its RPC and Epoch allocator have both been configured.
 - **EVM testnet tokens**: ping Epoch team with your Ethereum address; team will send testnet USDC.
 
 ## Key Files
 
-| Path                                 | Purpose                                                   |
-| ------------------------------------ | --------------------------------------------------------- |
-| `src/services/epoch-bridge.ts`       | Epoch SDK wrapper (intent build / submit / poll)          |
-| `src/hooks/useEpochIntent.ts`        | Miden→EVM intent submission flow                          |
-| `src/hooks/useWithdrawIntent.ts`     | EVM→Miden withdraw flow                                   |
-| `src/hooks/useMidenWalletAdapter.ts` | Miden wallet connect/state                                |
-| `src/hooks/useMidenTransfer.ts`      | P2IDE note creation on Miden                              |
-| `src/hooks/useIntentFlowStatus.ts`   | Intent lifecycle polling                                  |
-| `src/constants/chains.ts`            | Testnet EVM chains + Miden virtual chain id (`999999999`) |
-| `src/config/wagmi.ts`                | wagmi/RainbowKit config                                   |
+| Path                                   | Purpose                                                   |
+| -------------------------------------- | --------------------------------------------------------- |
+| `src/services/epoch-bridge.ts`         | Epoch SDK wrapper (intent build / submit / poll)          |
+| `src/hooks/useEpochIntent.ts`          | Miden→EVM intent submission flow                          |
+| `src/hooks/useWithdrawIntent.ts`       | EVM→Miden withdraw flow                                   |
+| `src/hooks/useMidenWalletAdapter.ts`   | Miden wallet connect/state                                |
+| `src/hooks/useMidenP2IDNoteFactory.ts` | Wallet-submitted P2IDE collateral-note creation           |
+| `src/hooks/useIntentFlowStatus.ts`     | Intent lifecycle polling                                  |
+| `src/constants/chains.ts`              | Testnet EVM chains + Miden virtual chain id (`999999999`) |
+| `src/config/wagmi.ts`                  | wagmi/RainbowKit config                                   |
 
 ## Notes
 
 - `MIDEN_DESTINATION_CHAIN_ID = 999999999` is the virtual chain id used as `tokenOut.chainId` when Miden is the intent output. Do not set this to a real EVM chain id.
-- Allocator URL is configurable via `VITE_ALLOCATOR_URL`. Default points at Epoch testnet-dev.
+- Devnet allocator URL is configurable via `VITE_DEVNET_ALLOCATOR_URL` (with `VITE_ALLOCATOR_URL` retained as a compatibility fallback). Testnet requires both `VITE_MIDEN_TESTNET_RPC_URL` and `VITE_TESTNET_ALLOCATOR_URL`.
 - Build: `pnpm build` (`tsc -b && vite build`). Lint: `pnpm lint`.
