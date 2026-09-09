@@ -1,7 +1,7 @@
 import { normalizeMidenIdToHex } from "../services/epoch-bridge";
 
 /**
- * Hardcoded Miden faucet → decimals map.
+ * Hardcoded Miden testnet/devnet faucet → decimals map.
  *
  * Backend (sio/dex-solver/inventory) does not surface faucet decimals to the
  * frontend; relying on the wallet adapter's reported `decimals` is unreliable
@@ -10,9 +10,12 @@ import { normalizeMidenIdToHex } from "../services/epoch-bridge";
  *
  * Keys are normalized to lowercase hex without `0x` prefix. Lookups go through
  * `normalizeMidenIdToHex` first so bech32 faucet ids from the wallet adapter
- * (e.g. `mtst1qxxxxxxxxxxxxx_xxxxxx`) resolve correctly.
+ * (e.g. `mtst1...` or `mdev1...`) resolve correctly.
  */
 const MIDEN_FAUCET_DECIMALS: Record<string, number> = {
+  // Devnet native faucet from https://faucet.devnet.miden.io/get_metadata.
+  "157e8ac22390f771044593acdc153f": 6,
+  // Testnet faucets.
   fc90f0f4da30e51168453b60eafed7: 6, // USDC
   "176275876f2fd41103257e341832b9": 6, // DAI
   "7725b0e9bb9406912d2ebeaeb05f4d": 6, // USDT

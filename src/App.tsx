@@ -9,7 +9,23 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 function App() {
   const [activeTab, setActiveTab] = useState("crosschain");
+  const [midenConnectError, setMidenConnectError] = useState<string | null>(
+    null,
+  );
   const midenWallet = useMidenWalletAdapter({ enabled: true });
+
+  const connectMidenWallet = async () => {
+    setMidenConnectError(null);
+    try {
+      await midenWallet.connect();
+    } catch (error) {
+      setMidenConnectError(
+        error instanceof Error
+          ? error.message
+          : "Unable to connect Miden wallet.",
+      );
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -65,16 +81,32 @@ function App() {
                   </div>
                   <Button
                     type="button"
-                    onClick={() => void midenWallet.connect()}
-                    disabled={midenWallet.connected}
+                    onClick={() => void connectMidenWallet()}
+                    disabled={
+                      midenWallet.connected ||
+                      midenWallet.connecting ||
+                      !midenWallet.walletReady
+                    }
                   >
-                    {midenWallet.connected ? "Connected" : "Connect"}
+                    {midenWallet.connected
+                      ? "Connected"
+                      : midenWallet.connecting
+                        ? "Connecting…"
+                        : midenWallet.walletReady
+                          ? "Connect"
+                          : "Preparing…"}
                   </Button>
                 </div>
                 {!midenWallet.connected && (
                   <div className="mt-2 text-xs text-neutral-500">
-                    Required for Withdraw and for creating P2IDE notes on
-                    Cross-chain.
+                    {midenWallet.walletDetected
+                      ? "Preparing the Miden wallet connection…"
+                      : "Miden wallet extension not detected. Unlock or refresh the extension, then reload this page."}
+                  </div>
+                )}
+                {midenConnectError && (
+                  <div className="mt-2 text-xs text-red-600" role="alert">
+                    {midenConnectError}
                   </div>
                 )}
               </div>

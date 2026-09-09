@@ -1,6 +1,7 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMidenFiWallet } from "@miden-sdk/miden-wallet-adapter-react";
+import { WalletReadyState } from "@miden-sdk/miden-wallet-adapter-base";
 import { useAssetMetadata } from "@miden-sdk/react";
 import { AccountId, Address } from "@miden-sdk/miden-sdk";
 
@@ -21,6 +22,9 @@ export interface UseMidenWalletAdapterOptions {
 
 export interface UseMidenWalletAdapterResult {
   connected: boolean;
+  connecting: boolean;
+  walletDetected: boolean;
+  walletReady: boolean;
   connect: () => Promise<void>;
   address: string | null;
   accountId: NormalizedMidenAccountId | null;
@@ -90,7 +94,36 @@ export function useMidenWalletAdapter(
     connect: adapterConnect,
     address,
     requestAssets,
+    connecting,
+    wallet,
+    wallets,
+    select,
   } = useMidenFiWallet();
+
+  const detectedWallet = useMemo(
+    () =>
+      wallets.find(
+        ({ readyState }) =>
+          readyState === WalletReadyState.Installed ||
+          readyState === WalletReadyState.Loadable,
+      ),
+    [wallets],
+  );
+
+  // The adapter provider selects its single default wallet in an effect. Until
+  // that effect has completed, calling connect() throws WalletNotSelectedError.
+  // Selecting it here too makes the dependency explicit and lets the UI wait
+  // for the provider's selected-adapter state before enabling the button.
+  useEffect(() => {
+    if (!wallet && detectedWallet) {
+      select(detectedWallet.adapter.name);
+    }
+  }, [detectedWallet, select, wallet]);
+
+  const walletReady =
+    !!wallet &&
+    (wallet.readyState === WalletReadyState.Installed ||
+      wallet.readyState === WalletReadyState.Loadable);
 
   const accountId = useMemo(() => normalizeAccountId(address), [address]);
 
@@ -153,11 +186,20 @@ export function useMidenWalletAdapter(
   );
 
   const connect = useCallback(async () => {
-    if (!connected) await adapterConnect();
-  }, [connected, adapterConnect]);
+    if (connected || connecting) return;
+    if (!walletReady) {
+      throw new Error(
+        "Miden wallet is still initializing. Wait a moment and try again.",
+      );
+    }
+    await adapterConnect();
+  }, [adapterConnect, connected, connecting, walletReady]);
 
   return {
     connected,
+    connecting,
+    walletDetected: !!detectedWallet,
+    walletReady,
     connect,
     address,
     accountId,

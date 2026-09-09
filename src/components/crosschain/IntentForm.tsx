@@ -20,6 +20,7 @@ import {
 } from "../../lib/intent-result";
 import { useIntentSettlementView } from "../../hooks/useIntentSettlementView";
 import { useMidenP2IDNoteFactory } from "../../hooks/useMidenP2IDNoteFactory";
+import { useMidenNetwork } from "../../hooks/useMidenNetwork";
 import { Button } from "@/components/ui/button";
 import { IntentSourceAssetField } from "./intent/IntentSourceAssetField";
 import {
@@ -57,6 +58,7 @@ export function IntentForm({
   intentNonce,
   intentUserAddress,
 }: Props) {
+  const { network } = useMidenNetwork();
   const { address } = useAccount();
   const walletChainId = useChainId();
 
@@ -292,7 +294,7 @@ export function IntentForm({
           <ExplorerHashCard
             label="Miden note id (P2IDE)"
             value={localMidenNoteId}
-            href={midenscanNoteUrl(localMidenNoteId)}
+            href={midenscanNoteUrl(localMidenNoteId, network)}
             linkLabel="View on Midenscan"
             tone="neutral"
           />

@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { useMidenFiWallet } from "@miden-sdk/miden-wallet-adapter-react";
 import { Transaction } from "@miden-sdk/miden-wallet-adapter-base";
 import { useMiden } from "@miden-sdk/react";
+
 import {
   Note,
   NoteType,

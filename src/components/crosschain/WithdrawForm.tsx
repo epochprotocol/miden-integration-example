@@ -7,6 +7,8 @@ import type { EVMToMidenQuote } from "../../services/epoch-bridge";
 import { truncateHash } from "../../lib/explorers";
 import { readDepositHash, readIntentError } from "../../lib/intent-result";
 import { findEvmToken } from "../../constants/evm-tokens";
+import { getMidenNetworkConfig } from "../../config/miden";
+import { useMidenNetwork } from "../../hooks/useMidenNetwork";
 import { Button } from "@/components/ui/button";
 import {
   CUSTOM_TOKEN_DEFAULT_DECIMALS,
@@ -41,12 +43,13 @@ export function WithdrawForm({
   isLoading,
   isSDKReady,
 }: Props) {
+  const { network } = useMidenNetwork();
   const [evmToken, setEvmToken] = useState(WITHDRAW_TOKENS[0].address);
   const [customToken, setCustomToken] = useState("");
   const [minTokenOut, setMinTokenOut] = useState("1000000");
   const [midenRecipientInput, setMidenRecipientInput] = useState("");
   const [midenFaucetId, setMidenFaucetId] = useState(
-    "0xfc90f0f4da30e51168453b60eafed7",
+    () => getMidenNetworkConfig(network).defaultFaucetId,
   );
   const [status, setStatus] = useState("");
 

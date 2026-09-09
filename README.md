@@ -1,6 +1,6 @@
 # Miden ⇄ EVM Epoch Integration Example
 
-Reference dapp showing how to use [`@epoch-protocol/epoch-intents-sdk`](https://www.npmjs.com/package/@epoch-protocol/epoch-intents-sdk) to move value between Epoch testnet EVM chains and Miden testnet via Epoch intents.
+Reference dapp showing how to use [`@epoch-protocol/epoch-intents-sdk`](https://www.npmjs.com/package/@epoch-protocol/epoch-intents-sdk) to move value between Epoch testnet EVM chains and Miden devnet or testnet via Epoch intents.
 
 Two flows:
 
@@ -33,7 +33,10 @@ Testnet tokens (USDC, DAI, USDT, etc.) share the same contract addresses across 
    ```
    `.env`:
    ```
-   VITE_ALLOCATOR_URL=https://testnet-dev.epochprotocol.xyz
+   # Select Devnet or Testnet from the app header. The allocator must use the
+   # same network.
+   # Run the devnet-compatible smallocator locally.
+   VITE_ALLOCATOR_URL=http://localhost:3000
    ```
 2. Install + start:
    ```bash
@@ -49,7 +52,7 @@ Testnet tokens (USDC, DAI, USDT, etc.) share the same contract addresses across 
 
 ## Test Funds
 
-- **Miden testnet tokens**: claim from official Miden faucet in Miden Wallet.
+- **Miden devnet tokens**: claim from the [official devnet faucet](https://faucet.devnet.miden.io/) in a devnet Miden wallet. Use the Devnet/Testnet selector in the app header to choose the matching Miden network.
 - **EVM testnet tokens**: ping Epoch team with your Ethereum address; team will send testnet USDC.
 
 ## Key Files
