@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useMidenFiWallet } from "@miden-sdk/miden-wallet-adapter-react";
 import { Transaction } from "@miden-sdk/miden-wallet-adapter-base";
 import { useMiden } from "@miden-sdk/react";
@@ -12,6 +12,7 @@ import {
   NoteArray,
   NoteAttachment,
   TransactionRequestBuilder,
+  Word,
 } from "@miden-sdk/miden-sdk";
 import type { SolveIntentParams } from "@epoch-protocol/epoch-intents-sdk";
 
@@ -27,6 +28,14 @@ const WAIT_FOR_TRANSACTION_TIMEOUT_MS = 120_000;
 function toAccountId(id: string): AccountId {
   const s = id.trim();
   return s.startsWith("0x") ? AccountId.fromHex(s) : AccountId.fromBech32(s);
+}
+
+function createFeeConversionSalt(): Word {
+  // Each 32-bit limb is a valid Miden field element. Four independent limbs
+  // give the Guarded Multisig account a fresh replay guard for this request.
+  return new Word(
+    BigUint64Array.from(crypto.getRandomValues(new Uint32Array(4)), BigInt),
+  );
 }
 
 /**
@@ -47,9 +56,17 @@ export function useMidenP2IDNoteFactory({
   onNoteCreated,
 }: Options): SolveIntentParams["createMidenP2IDENote"] {
   const { requestTransaction, waitForTransaction } = useMidenFiWallet();
-  // useMiden() is non-throwing (unlike useMidenClient, which throws before the
-  // client initializes); we gate on readiness inside the callback instead.
+  // The app-owned client is used only for the public chain tip required to
+  // calculate the absolute reclaim height. The wallet owns the account and
+  // signs/submits the custom transaction below.
   const { client, isReady } = useMiden();
+  const hasLoggedClientReady = useRef(false);
+
+  useEffect(() => {
+    if (!isReady || !client || hasLoggedClientReady.current) return;
+    console.info("[Miden] App client initialized");
+    hasLoggedClientReady.current = true;
+  }, [client, isReady]);
 
   return useCallback<NonNullable<SolveIntentParams["createMidenP2IDENote"]>>(
     async (
@@ -106,7 +123,11 @@ export function useMidenP2IDNoteFactory({
         );
         const noteId = note.id().toString();
 
+        // This request crosses into the wallet, so it must carry its own fresh
+        // replay guard instead of asking this app-owned client to inspect the
+        // wallet account.
         const txRequest = new TransactionRequestBuilder()
+          .withFeeConversionSalt(createFeeConversionSalt())
           .withOwnOutputNotes(new NoteArray([note]))
           .build();
 

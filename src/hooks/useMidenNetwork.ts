@@ -3,7 +3,6 @@ import type { MidenNetwork } from "../config/miden";
 
 export interface MidenNetworkContextValue {
   network: MidenNetwork;
-  setNetwork: (network: MidenNetwork) => void;
 }
 
 export const MidenNetworkContext =
