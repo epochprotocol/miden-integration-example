@@ -15,8 +15,12 @@ import { normalizeMidenIdToHex } from "../services/epoch-bridge";
 const MIDEN_FAUCET_DECIMALS: Record<string, number> = {
   // Devnet native faucet from https://faucet.devnet.miden.io/get_metadata.
   "157e8ac22390f771044593acdc153f": 6,
-  // Testnet faucet.
-  "18101fa522c174b165efd4f70a0385": 6,
+  // Testnet dummy faucets.
+  "537c15a622074e91188aa894456c52": 6,
+  "6500ca8c2dd69e9147ab7eafad162c": 6,
+  d17976f0809a8191412f2a126625df: 6,
+  "4a09f13153d9cd114c078bfb62a7ec": 6,
+  "5fd2e6fd17712c51404d09c2b847f7": 6,
 };
 
 function toMapKey(faucetId: string): string {

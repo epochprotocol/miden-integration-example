@@ -29,7 +29,7 @@ const networkConfigs: Record<MidenNetwork, MidenNetworkConfig> = {
   testnet: {
     rpcUrl: testnetRpcUrl ?? "",
     allocatorUrl: testnetAllocatorUrl ?? null,
-    defaultFaucetId: "0x18101fa522c174b165efd4f70a0385",
+    defaultFaucetId: "0x537c15a622074e91188aa894456c52",
     midenscanBase: "https://testnet.midenscan.com",
     enabled: Boolean(testnetRpcUrl && testnetAllocatorUrl),
     unavailableReason:
