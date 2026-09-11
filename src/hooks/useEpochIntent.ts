@@ -61,7 +61,7 @@ export function useEpochIntent() {
     error: confirmError,
   } = useMutation({
     mutationFn: async (
-      createMidenP2IDNote: SolveIntentParams["createMidenP2IDNote"],
+      createMidenP2IDENote: SolveIntentParams["createMidenP2IDENote"],
     ) => {
       if (!sdk) throw new Error("Epoch SDK not ready");
       if (!pendingQuote) throw new Error("Fetch a quote first");
@@ -71,7 +71,7 @@ export function useEpochIntent() {
         ...pendingQuote.params,
         collateralType: CollateralType.Miden,
         midenSourceAccount: pendingQuote.params.midenAccountId,
-        createMidenP2IDNote,
+        createMidenP2IDENote,
         preFetchedQuote: pendingQuote,
       });
       // Set before throwing: an in-band failure still has a result worth showing.

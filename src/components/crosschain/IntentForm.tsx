@@ -20,6 +20,7 @@ import {
 } from "../../lib/intent-result";
 import { useIntentSettlementView } from "../../hooks/useIntentSettlementView";
 import { useMidenP2IDNoteFactory } from "../../hooks/useMidenP2IDNoteFactory";
+import { useMidenNetwork } from "../../hooks/useMidenNetwork";
 import { Button } from "@/components/ui/button";
 import { IntentSourceAssetField } from "./intent/IntentSourceAssetField";
 import {
@@ -36,7 +37,7 @@ interface Props {
   isLoadingMidenAssets: boolean;
   onFetchQuote: (params: CrossChainIntentParams) => Promise<void>;
   onConfirmIntent: (
-    createMidenP2IDNote: SolveIntentParams["createMidenP2IDNote"],
+    createMidenP2IDENote: SolveIntentParams["createMidenP2IDENote"],
   ) => Promise<unknown>;
   onClearQuote: () => void;
   quotePhase: IntentQuotePhase;
@@ -57,10 +58,17 @@ export function IntentForm({
   intentNonce,
   intentUserAddress,
 }: Props) {
+  const { network } = useMidenNetwork();
   const { address } = useAccount();
   const walletChainId = useChainId();
 
   const [selectedAssetId, setSelectedAssetId] = useState("");
+  const selectedAssetIdIsAvailable = midenAssets.some(
+    (asset) => asset.assetId === selectedAssetId,
+  );
+  const resolvedSelectedAssetId = selectedAssetIdIsAvailable
+    ? selectedAssetId
+    : (midenAssets[0]?.assetId ?? "");
 
   // Follows the connected wallet until the user overrides a field. Not
   // useState defaults: the wallet connects after this mounts.
@@ -99,13 +107,13 @@ export function IntentForm({
   );
 
   const selectedAsset = midenAssets.find(
-    (a) => a.assetId.toLowerCase() === selectedAssetId.toLowerCase(),
+    (a) => a.assetId.toLowerCase() === resolvedSelectedAssetId.toLowerCase(),
   );
   // Use the hardcoded faucet→decimals map. Do NOT fall back to the wallet
   // adapter's reported decimals (often defaults to 8 and silently mis-scales).
   // `undefined` here gates the form via `Number.isFinite` below.
-  const midenFaucetDecimals = selectedAssetId
-    ? getMidenFaucetDecimals(selectedAssetId)
+  const midenFaucetDecimals = resolvedSelectedAssetId
+    ? getMidenFaucetDecimals(resolvedSelectedAssetId, network)
     : undefined;
 
   const settlement = useIntentSettlementView(
@@ -114,7 +122,7 @@ export function IntentForm({
     hasValidDestinationChainId ? destinationChainIdNum : undefined,
   );
 
-  const createMidenP2IDNote = useMidenP2IDNoteFactory({
+  const createMidenP2IDENote = useMidenP2IDNoteFactory({
     midenAccountId,
     onStatus: setConfirmStatus,
     onNoteCreated: setLocalMidenNoteId,
@@ -137,12 +145,12 @@ export function IntentForm({
     }
     if (midenFaucetDecimals === undefined) {
       throw new Error(
-        `Unknown Miden faucet ${selectedAssetId} — add it to miden-tokens.ts before sending.`,
+        `Unknown Miden faucet ${resolvedSelectedAssetId} — add it to miden-tokens.ts before sending.`,
       );
     }
     return {
       midenAccountId,
-      midenFaucetId: selectedAssetId,
+      midenFaucetId: resolvedSelectedAssetId,
       evmRecipient: destination.evmAddress.trim(),
       destinationChainId: destinationChainIdNum,
       outputTokenAddress: destination.outputToken,
@@ -153,7 +161,7 @@ export function IntentForm({
   const canFetch =
     isSDKReady &&
     !!midenAccountId &&
-    !!selectedAssetId &&
+    !!resolvedSelectedAssetId &&
     hasValidEvmRecipient &&
     !!destination.outputToken &&
     hasValidDestinationChainId &&
@@ -180,7 +188,7 @@ export function IntentForm({
     void toast.promise(
       (async () => {
         setConfirmStatus("Submitting intent…");
-        const result = await onConfirmIntent(createMidenP2IDNote);
+        const result = await onConfirmIntent(createMidenP2IDENote);
 
         const solverError = readIntentError(result);
         if (solverError) throw new Error(solverError);
@@ -229,7 +237,7 @@ export function IntentForm({
       <div className="mt-4 space-y-4">
         <IntentSourceAssetField
           assets={midenAssets ?? []}
-          selectedAssetId={selectedAssetId}
+          selectedAssetId={resolvedSelectedAssetId}
           selectedAsset={selectedAsset}
           isLoadingAssets={isLoadingMidenAssets}
           onSelect={(assetId) => {
@@ -292,7 +300,7 @@ export function IntentForm({
           <ExplorerHashCard
             label="Miden note id (P2IDE)"
             value={localMidenNoteId}
-            href={midenscanNoteUrl(localMidenNoteId)}
+            href={midenscanNoteUrl(localMidenNoteId, network)}
             linkLabel="View on Midenscan"
             tone="neutral"
           />
