@@ -1,11 +1,22 @@
+import { useMemo } from "react";
 import { IntentForm } from "../crosschain/IntentForm";
 import { IntentStatus } from "../crosschain/IntentStatus";
 import { useEpochIntent } from "../../hooks/useEpochIntent";
 import { useIntentFlowStatus } from "../../hooks/useIntentFlowStatus";
 import { useMidenWalletAdapter } from "../../hooks/useMidenWalletAdapter";
+import { getMidenFaucetDecimals } from "../../constants/miden-tokens";
+import { useMidenNetwork } from "../../hooks/useMidenNetwork";
 
 export function CrosschainTab() {
   const midenWallet = useMidenWalletAdapter({ enabled: true });
+  const { network } = useMidenNetwork();
+  const bridgeableMidenAssets = useMemo(
+    () =>
+      midenWallet.assets.filter(
+        ({ assetId }) => getMidenFaucetDecimals(assetId, network) !== undefined,
+      ),
+    [midenWallet.assets, network],
+  );
 
   const epoch = useEpochIntent();
   const intentNonce = epoch.intentResult?.intentNonce;
@@ -38,7 +49,7 @@ export function CrosschainTab() {
       </header>
       <IntentForm
         midenAccountId={midenWallet.accountId?.hex ?? null}
-        midenAssets={midenWallet.assets}
+        midenAssets={bridgeableMidenAssets}
         isLoadingMidenAssets={midenWallet.isLoadingAssets}
         onFetchQuote={epoch.fetchQuote}
         onConfirmIntent={epoch.confirmIntent}

@@ -1,8 +1,10 @@
 import { useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useMidenFiWallet } from "@miden-sdk/miden-wallet-adapter-react";
+import { WalletReadyState } from "@miden-sdk/miden-wallet-adapter-base";
 import { useAssetMetadata } from "@miden-sdk/react";
 import { AccountId, Address } from "@miden-sdk/miden-sdk";
+import { useMidenNetwork } from "./useMidenNetwork";
 
 export interface NormalizedMidenAccountId {
   hex: string;
@@ -21,6 +23,9 @@ export interface UseMidenWalletAdapterOptions {
 
 export interface UseMidenWalletAdapterResult {
   connected: boolean;
+  connecting: boolean;
+  walletDetected: boolean;
+  walletReady: boolean;
   connect: () => Promise<void>;
   address: string | null;
   accountId: NormalizedMidenAccountId | null;
@@ -85,12 +90,31 @@ export function useMidenWalletAdapter(
   options: UseMidenWalletAdapterOptions = {},
 ): UseMidenWalletAdapterResult {
   const { enabled = true } = options;
+  const { network } = useMidenNetwork();
   const {
     connected,
     connect: adapterConnect,
     address,
     requestAssets,
+    connecting,
+    wallet,
+    wallets,
   } = useMidenFiWallet();
+
+  const detectedWallet = useMemo(
+    () =>
+      wallets.find(
+        ({ readyState }) =>
+          readyState === WalletReadyState.Installed ||
+          readyState === WalletReadyState.Loadable,
+      ),
+    [wallets],
+  );
+
+  const walletReady =
+    !!wallet &&
+    (wallet.readyState === WalletReadyState.Installed ||
+      wallet.readyState === WalletReadyState.Loadable);
 
   const accountId = useMemo(() => normalizeAccountId(address), [address]);
 
@@ -101,7 +125,7 @@ export function useMidenWalletAdapter(
     error,
     refetch,
   } = useQuery({
-    queryKey: ["midenAssets", address],
+    queryKey: ["midenAssets", network, address],
     queryFn: async () => (await requestAssets!()) ?? [],
     enabled: enabled && connected && !!address && !!requestAssets,
     // requestAssets() opens the wallet's approval prompt, so it must never
@@ -153,11 +177,20 @@ export function useMidenWalletAdapter(
   );
 
   const connect = useCallback(async () => {
-    if (!connected) await adapterConnect();
-  }, [connected, adapterConnect]);
+    if (connected || connecting) return;
+    if (!walletReady) {
+      throw new Error(
+        "Miden wallet is still initializing. Wait a moment and try again.",
+      );
+    }
+    await adapterConnect();
+  }, [adapterConnect, connected, connecting, walletReady]);
 
   return {
     connected,
+    connecting,
+    walletDetected: !!detectedWallet,
+    walletReady,
     connect,
     address,
     accountId,

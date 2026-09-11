@@ -1,7 +1,8 @@
 import { normalizeMidenIdToHex } from "../services/epoch-bridge";
+import type { MidenNetwork } from "../config/miden";
 
 /**
- * Hardcoded Miden faucet → decimals map.
+ * Hardcoded Miden testnet/devnet faucet → decimals map.
  *
  * Backend (sio/dex-solver/inventory) does not surface faucet decimals to the
  * frontend; relying on the wallet adapter's reported `decimals` is unreliable
@@ -10,15 +11,19 @@ import { normalizeMidenIdToHex } from "../services/epoch-bridge";
  *
  * Keys are normalized to lowercase hex without `0x` prefix. Lookups go through
  * `normalizeMidenIdToHex` first so bech32 faucet ids from the wallet adapter
- * (e.g. `mtst1qxxxxxxxxxxxxx_xxxxxx`) resolve correctly.
+ * (e.g. `mtst1...` or `mdev1...`) resolve correctly.
  */
-const MIDEN_FAUCET_DECIMALS: Record<string, number> = {
-  fc90f0f4da30e51168453b60eafed7: 6, // USDC
-  "176275876f2fd41103257e341832b9": 6, // DAI
-  "7725b0e9bb9406912d2ebeaeb05f4d": 6, // USDT
-  a54717f6bd3210d128aeeaa8a2b7f3: 6, // WETH
-  "151823cde4b7bd91352617729d7614": 6, // WBTC
-  "2458e5446128e6b150b75b8ebd9ce1": 6, // MIDEN
+const MIDEN_FAUCET_DECIMALS: Record<MidenNetwork, Record<string, number>> = {
+  devnet: {
+    "157e8ac22390f771044593acdc153f": 6,
+  },
+  testnet: {
+    "537c15a622074e91188aa894456c52": 6,
+    "6500ca8c2dd69e9147ab7eafad162c": 6,
+    d17976f0809a8191412f2a126625df: 6,
+    "4a09f13153d9cd114c078bfb62a7ec": 6,
+    "5fd2e6fd17712c51404d09c2b847f7": 6,
+  },
 };
 
 function toMapKey(faucetId: string): string {
@@ -28,10 +33,13 @@ function toMapKey(faucetId: string): string {
 }
 
 /** Returns Miden faucet decimals, or `undefined` if the faucet is unknown. */
-export function getMidenFaucetDecimals(faucetId: string): number | undefined {
+export function getMidenFaucetDecimals(
+  faucetId: string,
+  network: MidenNetwork,
+): number | undefined {
   if (!faucetId) return undefined;
   try {
-    return MIDEN_FAUCET_DECIMALS[toMapKey(faucetId)];
+    return MIDEN_FAUCET_DECIMALS[network][toMapKey(faucetId)];
   } catch {
     return undefined;
   }

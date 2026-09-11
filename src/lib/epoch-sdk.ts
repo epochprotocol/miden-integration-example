@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useWalletClient } from "wagmi";
 import type { WalletClient } from "viem";
 import type { EpochIntentSDK } from "@epoch-protocol/epoch-intents-sdk";
-
-export const EPOCH_API_BASE_URL: string =
-  import.meta.env.VITE_ALLOCATOR_URL || "http://localhost:3000";
+import { getMidenNetworkConfig } from "../config/miden";
+import { useMidenNetwork } from "../hooks/useMidenNetwork";
 
 interface SdkEntry {
   client: WalletClient;
   chainIdOverride?: number;
+  apiBaseUrl: string;
   sdk: EpochIntentSDK;
 }
 
@@ -23,9 +23,13 @@ interface SdkEntry {
 export function useEpochSdk(chainIdOverride?: number): EpochIntentSDK | null {
   const [entry, setEntry] = useState<SdkEntry | null>(null);
   const { data: walletClient } = useWalletClient();
+  const { network } = useMidenNetwork();
+  const apiBaseUrl = getMidenNetworkConfig(network).allocatorUrl;
 
   useEffect(() => {
-    if (!walletClient) return;
+    if (!walletClient || !apiBaseUrl) {
+      return;
+    }
     let cancelled = false;
 
     void import("@epoch-protocol/epoch-intents-sdk")
@@ -41,8 +45,9 @@ export function useEpochSdk(chainIdOverride?: number): EpochIntentSDK | null {
         setEntry({
           client: walletClient,
           chainIdOverride,
+          apiBaseUrl,
           sdk: new SDK({
-            apiBaseUrl: EPOCH_API_BASE_URL,
+            apiBaseUrl,
             walletClient: client,
           }),
         });
@@ -56,13 +61,14 @@ export function useEpochSdk(chainIdOverride?: number): EpochIntentSDK | null {
     return () => {
       cancelled = true;
     };
-  }, [walletClient, chainIdOverride]);
+  }, [walletClient, chainIdOverride, apiBaseUrl]);
 
   // An SDK is only valid for the client and chain it was built from; returning
   // it after either changes would hand callers the previous wallet's SDK.
   return entry &&
     entry.client === walletClient &&
-    entry.chainIdOverride === chainIdOverride
+    entry.chainIdOverride === chainIdOverride &&
+    entry.apiBaseUrl === apiBaseUrl
     ? entry.sdk
     : null;
 }

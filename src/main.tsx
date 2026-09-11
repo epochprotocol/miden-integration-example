@@ -6,15 +6,8 @@ import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
 import "sonner/dist/styles.css";
 import "./index.css";
-import { Toaster } from "sonner";
-import App from "./App";
 import { config } from "./config/wagmi";
-import { MidenFiSignerProvider } from "@miden-sdk/miden-wallet-adapter-react";
-import { MidenProvider } from "@miden-sdk/react";
-import {
-  AllowedPrivateData,
-  WalletAdapterNetwork,
-} from "@miden-sdk/miden-wallet-adapter-base";
+import { MidenNetworkApp } from "./components/providers/MidenNetworkApp";
 
 const queryClient = new QueryClient();
 
@@ -30,19 +23,7 @@ createRoot(document.getElementById("root")!).render(
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider theme={rkTheme}>
-          <MidenFiSignerProvider
-            network={WalletAdapterNetwork.Testnet}
-            appName="Miden Integration Example"
-            allowedPrivateData={AllowedPrivateData.Assets}
-          >
-            {/* MidenProvider powers the @miden-sdk/react hooks (useSend /
-                useSyncState) that the P2IDE note factory uses to write the F-01
-                recipient-binding attachment. */}
-            <MidenProvider config={{ rpcUrl: "testnet" }}>
-              <App />
-            </MidenProvider>
-            <Toaster position="bottom-right" closeButton duration={5_000} />
-          </MidenFiSignerProvider>
+          <MidenNetworkApp />
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
