@@ -5,3 +5,6 @@ allowBuilds:
   keccak: true
   msw: true
   utf-8-validate: true
+minimumReleaseAgeExclude:
+  - '@epoch-protocol/epoch-commons-sdk@0.1.20'
+  - '@epoch-protocol/epoch-intents-sdk@1.0.39'
