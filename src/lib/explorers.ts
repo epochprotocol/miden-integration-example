@@ -3,7 +3,7 @@
 // chain mapped here.
 
 import { MIDEN_VIRTUAL_CHAIN_ID } from "@epoch-protocol/epoch-intents-sdk";
-import { getMidenNetworkConfig, type MidenNetwork } from "../config/miden";
+import { getMidenNetworkConfig } from "../config/miden";
 
 const EVM_EXPLORERS: Record<number, string> = {
   1: "https://etherscan.io",
@@ -16,21 +16,15 @@ const EVM_EXPLORERS: Record<number, string> = {
   84532: "https://sepolia.basescan.org",
 };
 
-export const explorerTxUrl = (
-  chainId: number,
-  hash: string,
-  network: MidenNetwork = "devnet",
-): string | null => {
+export const explorerTxUrl = (chainId: number, hash: string): string | null => {
   if (chainId === MIDEN_VIRTUAL_CHAIN_ID)
-    return `${getMidenNetworkConfig(network).midenscanBase}/tx/${hash}`;
+    return `${getMidenNetworkConfig().midenscanBase}/tx/${hash}`;
   const base = EVM_EXPLORERS[chainId];
   return base ? `${base}/tx/${hash}` : null;
 };
 
-export const midenscanNoteUrl = (
-  noteId: string,
-  network: MidenNetwork = "devnet",
-): string => `${getMidenNetworkConfig(network).midenscanBase}/note/${noteId}`;
+export const midenscanNoteUrl = (noteId: string): string =>
+  `${getMidenNetworkConfig().midenscanBase}/note/${noteId}`;
 
 export const truncateHash = (
   hash: string | null | undefined,

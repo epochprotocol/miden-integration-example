@@ -6,7 +6,6 @@ import {
   truncateHash,
 } from "../../lib/explorers";
 import { readMidenNoteId } from "../../lib/intent-result";
-import { useMidenNetwork } from "../../hooks/useMidenNetwork";
 
 export interface IntentFlowStatus {
   evmCompleted: boolean;
@@ -118,7 +117,6 @@ function StatusRow({
 }
 
 export function IntentStatus({ result, error, flowStatus, isPolling }: Props) {
-  const { network } = useMidenNetwork();
   if (error) {
     return (
       <div className="ui-card border-red-200 bg-red-50/80">
@@ -145,12 +143,12 @@ export function IntentStatus({ result, error, flowStatus, isPolling }: Props) {
 
   const depositTxUrl =
     depositChainId != null && depositTxHash
-      ? explorerTxUrl(Number(depositChainId), depositTxHash, network)
+      ? explorerTxUrl(Number(depositChainId), depositTxHash)
       : null;
   const midenTxUrl = midenTxId
-    ? explorerTxUrl(MIDEN_VIRTUAL_CHAIN_ID, midenTxId, network)
+    ? explorerTxUrl(MIDEN_VIRTUAL_CHAIN_ID, midenTxId)
     : null;
-  const noteUrl = midenNoteId ? midenscanNoteUrl(midenNoteId, network) : null;
+  const noteUrl = midenNoteId ? midenscanNoteUrl(midenNoteId) : null;
 
   const stillWaiting = isPolling && !evmCompleted && !midenTxId;
 

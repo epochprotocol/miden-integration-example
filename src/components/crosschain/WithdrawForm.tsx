@@ -8,7 +8,6 @@ import { truncateHash } from "../../lib/explorers";
 import { readDepositHash, readIntentError } from "../../lib/intent-result";
 import { findEvmToken } from "../../constants/evm-tokens";
 import { getMidenNetworkConfig } from "../../config/miden";
-import { useMidenNetwork } from "../../hooks/useMidenNetwork";
 import { Button } from "@/components/ui/button";
 import {
   CUSTOM_TOKEN_DEFAULT_DECIMALS,
@@ -43,13 +42,12 @@ export function WithdrawForm({
   isLoading,
   isSDKReady,
 }: Props) {
-  const { network } = useMidenNetwork();
   const [evmToken, setEvmToken] = useState(WITHDRAW_TOKENS[0].address);
   const [customToken, setCustomToken] = useState("");
   const [minTokenOut, setMinTokenOut] = useState("1000000");
   const [midenRecipientInput, setMidenRecipientInput] = useState("");
   const [midenFaucetId, setMidenFaucetId] = useState(
-    () => getMidenNetworkConfig(network).defaultFaucetId,
+    () => getMidenNetworkConfig().defaultFaucetId,
   );
   const [status, setStatus] = useState("");
 

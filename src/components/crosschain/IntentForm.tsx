@@ -300,7 +300,7 @@ export function IntentForm({
           <ExplorerHashCard
             label="Miden note id (P2IDE)"
             value={localMidenNoteId}
-            href={midenscanNoteUrl(localMidenNoteId, network)}
+            href={midenscanNoteUrl(localMidenNoteId)}
             linkLabel="View on Midenscan"
             tone="neutral"
           />

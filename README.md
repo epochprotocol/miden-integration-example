@@ -27,26 +27,12 @@ Testnet tokens (USDC, DAI, USDT, etc.) share the same contract addresses across 
 
 ## Run Locally
 
-1. Copy env file:
-   ```bash
-   cp .env.example .env
-   ```
-   `.env`:
-   ```
-   # Run the devnet-compatible smallocator locally.
-   VITE_DEVNET_ALLOCATOR_URL=http://localhost:3000
-
-   # Testnet stays disabled until both endpoints are configured for the same
-   # network. Do not point either value at a devnet service.
-   # VITE_MIDEN_TESTNET_RPC_URL=https://your-testnet-rpc.example
-   # VITE_TESTNET_ALLOCATOR_URL=https://your-testnet-allocator.example
-   ```
-2. Install + start:
+1. Install + start:
    ```bash
    pnpm i
    pnpm run dev
    ```
-3. Open `http://localhost:5173`.
+2. Open `http://localhost:5173`.
 
 ## Wallets
 
@@ -55,7 +41,7 @@ Testnet tokens (USDC, DAI, USDT, etc.) share the same contract addresses across 
 
 ## Test Funds
 
-- **Miden devnet tokens**: claim from the [official devnet faucet](https://faucet.devnet.miden.io/) in a devnet Miden wallet. Testnet becomes selectable only after its RPC and Epoch allocator have both been configured.
+- **Miden testnet tokens**: claim from a configured testnet faucet in a testnet Miden wallet.
 - **EVM testnet tokens**: ping Epoch team with your Ethereum address; team will send testnet USDC.
 
 ## Key Files
@@ -74,5 +60,5 @@ Testnet tokens (USDC, DAI, USDT, etc.) share the same contract addresses across 
 ## Notes
 
 - `MIDEN_DESTINATION_CHAIN_ID = 999999999` is the virtual chain id used as `tokenOut.chainId` when Miden is the intent output. Do not set this to a real EVM chain id.
-- Devnet allocator URL is configurable via `VITE_DEVNET_ALLOCATOR_URL` (with `VITE_ALLOCATOR_URL` retained as a compatibility fallback). Testnet requires both `VITE_MIDEN_TESTNET_RPC_URL` and `VITE_TESTNET_ALLOCATOR_URL`.
+- The app uses Miden testnet and the Epoch testnet allocator by default. Set `VITE_MIDEN_RPC_URL` only to override the Miden RPC URL.
 - Build: `pnpm build` (`tsc -b && vite build`). Lint: `pnpm lint`.

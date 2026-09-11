@@ -3,7 +3,6 @@ import { useWalletClient } from "wagmi";
 import type { WalletClient } from "viem";
 import type { EpochIntentSDK } from "@epoch-protocol/epoch-intents-sdk";
 import { getMidenNetworkConfig } from "../config/miden";
-import { useMidenNetwork } from "../hooks/useMidenNetwork";
 
 interface SdkEntry {
   client: WalletClient;
@@ -23,8 +22,7 @@ interface SdkEntry {
 export function useEpochSdk(chainIdOverride?: number): EpochIntentSDK | null {
   const [entry, setEntry] = useState<SdkEntry | null>(null);
   const { data: walletClient } = useWalletClient();
-  const { network } = useMidenNetwork();
-  const apiBaseUrl = getMidenNetworkConfig(network).allocatorUrl;
+  const apiBaseUrl = getMidenNetworkConfig().allocatorUrl;
 
   useEffect(() => {
     if (!walletClient || !apiBaseUrl) {

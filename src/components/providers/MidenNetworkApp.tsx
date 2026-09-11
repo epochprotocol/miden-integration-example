@@ -14,7 +14,7 @@ import { MidenNetworkContext } from "../../hooks/useMidenNetwork";
 
 export function MidenNetworkApp() {
   const network = DEFAULT_MIDEN_NETWORK;
-  const networkConfig = getMidenNetworkConfig(network);
+  const networkConfig = getMidenNetworkConfig();
 
   return (
     <MidenNetworkContext.Provider value={{ network }}>
