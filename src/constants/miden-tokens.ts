@@ -1,4 +1,5 @@
 import { normalizeMidenIdToHex } from "../services/epoch-bridge";
+import type { MidenNetwork } from "../config/miden";
 
 /**
  * Hardcoded Miden testnet/devnet faucet → decimals map.
@@ -12,15 +13,17 @@ import { normalizeMidenIdToHex } from "../services/epoch-bridge";
  * `normalizeMidenIdToHex` first so bech32 faucet ids from the wallet adapter
  * (e.g. `mtst1...` or `mdev1...`) resolve correctly.
  */
-const MIDEN_FAUCET_DECIMALS: Record<string, number> = {
-  // Devnet native faucet from https://faucet.devnet.miden.io/get_metadata.
-  "157e8ac22390f771044593acdc153f": 6,
-  // Testnet dummy faucets.
-  "537c15a622074e91188aa894456c52": 6,
-  "6500ca8c2dd69e9147ab7eafad162c": 6,
-  d17976f0809a8191412f2a126625df: 6,
-  "4a09f13153d9cd114c078bfb62a7ec": 6,
-  "5fd2e6fd17712c51404d09c2b847f7": 6,
+const MIDEN_FAUCET_DECIMALS: Record<MidenNetwork, Record<string, number>> = {
+  devnet: {
+    "157e8ac22390f771044593acdc153f": 6,
+  },
+  testnet: {
+    "537c15a622074e91188aa894456c52": 6,
+    "6500ca8c2dd69e9147ab7eafad162c": 6,
+    d17976f0809a8191412f2a126625df: 6,
+    "4a09f13153d9cd114c078bfb62a7ec": 6,
+    "5fd2e6fd17712c51404d09c2b847f7": 6,
+  },
 };
 
 function toMapKey(faucetId: string): string {
@@ -30,10 +33,13 @@ function toMapKey(faucetId: string): string {
 }
 
 /** Returns Miden faucet decimals, or `undefined` if the faucet is unknown. */
-export function getMidenFaucetDecimals(faucetId: string): number | undefined {
+export function getMidenFaucetDecimals(
+  faucetId: string,
+  network: MidenNetwork,
+): number | undefined {
   if (!faucetId) return undefined;
   try {
-    return MIDEN_FAUCET_DECIMALS[toMapKey(faucetId)];
+    return MIDEN_FAUCET_DECIMALS[network][toMapKey(faucetId)];
   } catch {
     return undefined;
   }

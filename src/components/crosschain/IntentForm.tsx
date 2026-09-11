@@ -63,6 +63,12 @@ export function IntentForm({
   const walletChainId = useChainId();
 
   const [selectedAssetId, setSelectedAssetId] = useState("");
+  const selectedAssetIdIsAvailable = midenAssets.some(
+    (asset) => asset.assetId === selectedAssetId,
+  );
+  const resolvedSelectedAssetId = selectedAssetIdIsAvailable
+    ? selectedAssetId
+    : (midenAssets[0]?.assetId ?? "");
 
   // Follows the connected wallet until the user overrides a field. Not
   // useState defaults: the wallet connects after this mounts.
@@ -101,13 +107,13 @@ export function IntentForm({
   );
 
   const selectedAsset = midenAssets.find(
-    (a) => a.assetId.toLowerCase() === selectedAssetId.toLowerCase(),
+    (a) => a.assetId.toLowerCase() === resolvedSelectedAssetId.toLowerCase(),
   );
   // Use the hardcoded faucet→decimals map. Do NOT fall back to the wallet
   // adapter's reported decimals (often defaults to 8 and silently mis-scales).
   // `undefined` here gates the form via `Number.isFinite` below.
-  const midenFaucetDecimals = selectedAssetId
-    ? getMidenFaucetDecimals(selectedAssetId)
+  const midenFaucetDecimals = resolvedSelectedAssetId
+    ? getMidenFaucetDecimals(resolvedSelectedAssetId, network)
     : undefined;
 
   const settlement = useIntentSettlementView(
@@ -139,12 +145,12 @@ export function IntentForm({
     }
     if (midenFaucetDecimals === undefined) {
       throw new Error(
-        `Unknown Miden faucet ${selectedAssetId} — add it to miden-tokens.ts before sending.`,
+        `Unknown Miden faucet ${resolvedSelectedAssetId} — add it to miden-tokens.ts before sending.`,
       );
     }
     return {
       midenAccountId,
-      midenFaucetId: selectedAssetId,
+      midenFaucetId: resolvedSelectedAssetId,
       evmRecipient: destination.evmAddress.trim(),
       destinationChainId: destinationChainIdNum,
       outputTokenAddress: destination.outputToken,
@@ -155,7 +161,7 @@ export function IntentForm({
   const canFetch =
     isSDKReady &&
     !!midenAccountId &&
-    !!selectedAssetId &&
+    !!resolvedSelectedAssetId &&
     hasValidEvmRecipient &&
     !!destination.outputToken &&
     hasValidDestinationChainId &&
@@ -231,7 +237,7 @@ export function IntentForm({
       <div className="mt-4 space-y-4">
         <IntentSourceAssetField
           assets={midenAssets ?? []}
-          selectedAssetId={selectedAssetId}
+          selectedAssetId={resolvedSelectedAssetId}
           selectedAsset={selectedAsset}
           isLoadingAssets={isLoadingMidenAssets}
           onSelect={(assetId) => {
