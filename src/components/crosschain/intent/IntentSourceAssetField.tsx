@@ -48,8 +48,7 @@ export function IntentSourceAssetField({
       </p>
       {!isLoadingAssets && assets.length === 0 && (
         <p className="text-xs text-amber-800">
-          No Epoch-supported Miden assets found. Fund this wallet with a
-          configured testnet faucet before bridging.
+          No Miden assets found in this wallet. Fund it before bridging.
         </p>
       )}
     </div>

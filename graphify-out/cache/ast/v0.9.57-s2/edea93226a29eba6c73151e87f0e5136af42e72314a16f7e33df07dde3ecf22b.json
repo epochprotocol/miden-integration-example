@@ -1,0 +1,161 @@
+{
+  "nodes": [
+    {
+      "id": "$graphify-root$_readme_md",
+      "label": "README.md",
+      "file_type": "document",
+      "node_kind": "page",
+      "source_file": "README.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "$graphify-root$_readme_miden_evm_epoch_integration_example",
+      "label": "Miden \u21c4 EVM Epoch Integration Example",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "README.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "$graphify-root$_readme_supported_testnet_chains",
+      "label": "Supported testnet chains",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "README.md",
+      "source_location": "L10"
+    },
+    {
+      "id": "$graphify-root$_readme_stack",
+      "label": "Stack",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "README.md",
+      "source_location": "L21"
+    },
+    {
+      "id": "$graphify-root$_readme_run_locally",
+      "label": "Run Locally",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "README.md",
+      "source_location": "L28"
+    },
+    {
+      "id": "$graphify-root$_readme_wallets",
+      "label": "Wallets",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "README.md",
+      "source_location": "L37"
+    },
+    {
+      "id": "$graphify-root$_readme_test_funds",
+      "label": "Test Funds",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "README.md",
+      "source_location": "L42"
+    },
+    {
+      "id": "$graphify-root$_readme_key_files",
+      "label": "Key Files",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "README.md",
+      "source_location": "L47"
+    },
+    {
+      "id": "$graphify-root$_readme_notes",
+      "label": "Notes",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "README.md",
+      "source_location": "L60"
+    }
+  ],
+  "edges": [
+    {
+      "source": "$graphify-root$_readme_md",
+      "target": "$graphify-root$_readme_miden_evm_epoch_integration_example",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_readme_miden_evm_epoch_integration_example",
+      "target": "$graphify-root$_readme_supported_testnet_chains",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_readme_md",
+      "target": "users_jasspreetbawa_code_epoch_code_docs_docs_new_supported_chains_and_tokens_md",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L19",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_readme_miden_evm_epoch_integration_example",
+      "target": "$graphify-root$_readme_stack",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_readme_miden_evm_epoch_integration_example",
+      "target": "$graphify-root$_readme_run_locally",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L28",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_readme_miden_evm_epoch_integration_example",
+      "target": "$graphify-root$_readme_wallets",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L37",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_readme_miden_evm_epoch_integration_example",
+      "target": "$graphify-root$_readme_test_funds",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L42",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_readme_miden_evm_epoch_integration_example",
+      "target": "$graphify-root$_readme_key_files",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L47",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_readme_miden_evm_epoch_integration_example",
+      "target": "$graphify-root$_readme_notes",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "README.md",
+      "source_location": "L60",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

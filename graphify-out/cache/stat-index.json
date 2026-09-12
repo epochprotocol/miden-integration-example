@@ -1,1 +1,797 @@
-{".claude/skills/react-doctor/SKILL.md":{"size":2923,"mtime_ns":1787046378739657989,"indexed_at_ns":1788525444357805000,"word_count":385,"hashes":{".claude/skills/react-doctor/skill.md":"f569200cb5d162281d5e13e172e0c7a64ceaec956eded97655e0818ed700f0d9"}},".claude/skills/react-doctor/references/explain.md":{"size":4136,"mtime_ns":1787046378739892864,"indexed_at_ns":1788525444358007000,"word_count":568,"hashes":{".claude/skills/react-doctor/references/explain.md":"001a9b43b1340e49923db17dd7e3332113397fa05867431fd572aa7bd4c445f7"}},".github/workflows/react-doctor.yml":{"size":2770,"mtime_ns":1787046378740248406,"indexed_at_ns":1788525444358132000,"word_count":383,"hashes":{".github/workflows/react-doctor.yml":"822a388af42d7b4869d438e24c9f2d6d7f92ca3290bf033886ac81a15ca53b59"}},".lintstagedrc.json":{"size":133,"mtime_ns":1787046378740642281,"indexed_at_ns":1788525443891733000,"word_count":12,"hashes":{".lintstagedrc.json":"0e3fd8af6c8e51bb9e4911379e4eccbdb9f209a5a1536854bced62f8ebd711ac"}},".prettierrc.json":{"size":133,"mtime_ns":1787046378740841281,"indexed_at_ns":1788525443892312000,"word_count":14,"hashes":{".prettierrc.json":"47a9280aa9e432ae4ffbf00f892b21221bc88f94762aa2e75176cf021861ec0e"}},"CLAUDE.md":{"size":1581,"mtime_ns":1787046378740944781,"indexed_at_ns":1788525444358255000,"word_count":257,"hashes":{"claude.md":"9cb7daa8f73d1bbcfa8cac4465ff4b32255468bdf9b2cf2d396e0df0a3aeb125"}},"README.md":{"size":3220,"mtime_ns":1787244318815584462,"indexed_at_ns":1788525444358360000,"word_count":393,"hashes":{"readme.md":"ed0d7659b18e5f62d468c7faec393583209b297a7878635e261225d6462fbf7d"}},"components.json":{"size":536,"mtime_ns":1787046378741333448,"indexed_at_ns":1788525443892680000,"word_count":46,"hashes":{"components.json":"4f698890163e6dbb9bcd62aff20857509f80eb557c258482b374a651f4d099d8"}},"eslint.config.js":{"size":2213,"mtime_ns":1787046378741448323,"indexed_at_ns":1788525419984566000,"word_count":189},"index.html":{"size":673,"mtime_ns":1787046378741561656,"indexed_at_ns":1788525444358463000,"word_count":43,"hashes":{"index.html":"f058d9983fea0e10131bf6645da58402a3003d9e68c36f4e8422abf93a5952ae"}},"package.json":{"size":1858,"mtime_ns":1787656366935947364,"indexed_at_ns":1788525443892953000,"word_count":133,"hashes":{"package.json":"a01f93b444c5bd8715c94086c62ebbc888b8a80c08855075d2ae4610890479bf"}},"pnpm-workspace.yaml":{"size":118,"mtime_ns":1787656452016098011,"indexed_at_ns":1788525444358553000,"word_count":13,"hashes":{"pnpm-workspace.yaml":"9b697c0a7453ee58171d54b88dc1bc9bd8b92ccd2df26e36cf7e67f53660cfc0"}},"postcss.config.js":{"size":81,"mtime_ns":1787046378742973532,"indexed_at_ns":1788525419986356000,"word_count":11},"public/vite.svg":{"size":1497,"mtime_ns":1787046378743153199,"indexed_at_ns":1788525444358651000,"word_count":90,"hashes":{"public/vite.svg":"eb056daff894d0fae2c5f7f920d5dd5089f95a0277084db130e8f820a4f18838"}},"skills-lock.json":{"size":208,"mtime_ns":1787046378743243740,"indexed_at_ns":1788525443893273000,"word_count":16,"hashes":{"skills-lock.json":"8e6f5dfe35f9ca4945ac492666e7fa571cf557658a7d177296d7ae39f7ea6a49"}},"src/App.tsx":{"size":3623,"mtime_ns":1787046378743428366,"indexed_at_ns":1788525419987410000,"word_count":267},"src/components/crosschain/EVMWalletConnect.tsx":{"size":520,"mtime_ns":1787046378743660116,"indexed_at_ns":1788525419987845000,"word_count":55},"src/components/crosschain/IntentForm.tsx":{"size":11654,"mtime_ns":1787656366939480305,"indexed_at_ns":1788525419988257000,"word_count":1003},"src/components/crosschain/IntentStatus.tsx":{"size":5985,"mtime_ns":1787656366940315426,"indexed_at_ns":1788525419988883000,"word_count":547},"src/components/crosschain/QuoteSummaryCard.tsx":{"size":1336,"mtime_ns":1787656366941049714,"indexed_at_ns":1788525419989471000,"word_count":127},"src/components/crosschain/WithdrawForm.tsx":{"size":8913,"mtime_ns":1787656366942303166,"indexed_at_ns":1788525419989960000,"word_count":794},"src/components/crosschain/intent/ExplorerHashCard.tsx":{"size":2204,"mtime_ns":1787046378744485866,"indexed_at_ns":1788525419990646000,"word_count":200},"src/components/crosschain/intent/IntentDestinationFields.tsx":{"size":2889,"mtime_ns":1787046378744595574,"indexed_at_ns":1788525419991112000,"word_count":192},"src/components/crosschain/intent/IntentNoteVisibilityField.tsx":{"size":2098,"mtime_ns":1787656366942527415,"indexed_at_ns":1788525419991572000,"word_count":201},"src/components/crosschain/intent/IntentQuoteSummary.tsx":{"size":1101,"mtime_ns":1787046378744698075,"indexed_at_ns":1788525419992079000,"word_count":107},"src/components/crosschain/intent/IntentSourceAssetField.tsx":{"size":1386,"mtime_ns":1787046378744801700,"indexed_at_ns":1788525419992558000,"word_count":110},"src/components/crosschain/intent/SettlementPendingCard.tsx":{"size":1274,"mtime_ns":1787046378744899366,"indexed_at_ns":1788525419993028000,"word_count":102},"src/components/crosschain/withdraw/RecoverNotesCard.tsx":{"size":6344,"mtime_ns":1787656366943130745,"indexed_at_ns":1788525419993502000,"word_count":668},"src/components/crosschain/withdraw/WithdrawAccountFields.tsx":{"size":1549,"mtime_ns":1787046378745061908,"indexed_at_ns":1788525419994125000,"word_count":114},"src/components/crosschain/withdraw/WithdrawNoteFileCard.tsx":{"size":2609,"mtime_ns":1787656366944115448,"indexed_at_ns":1788525419994575000,"word_count":288},"src/components/crosschain/withdraw/WithdrawNoteVisibilityField.tsx":{"size":2392,"mtime_ns":1787656366944316239,"indexed_at_ns":1788525419995146000,"word_count":289},"src/components/crosschain/withdraw/WithdrawQuoteSummary.tsx":{"size":1978,"mtime_ns":1787656366944536946,"indexed_at_ns":1788525419995849000,"word_count":209},"src/components/crosschain/withdraw/WithdrawTokenFields.tsx":{"size":2593,"mtime_ns":1787046378745262450,"indexed_at_ns":1788525419996406000,"word_count":208},"src/components/crosschain/withdraw/withdraw-toasts.ts":{"size":265,"mtime_ns":1787046378745357991,"indexed_at_ns":1788525419996927000,"word_count":31},"src/components/crosschain/withdraw/withdraw-tokens.ts":{"size":551,"mtime_ns":1787046378745457492,"indexed_at_ns":1788525419997465000,"word_count":73},"src/components/layout/Header.tsx":{"size":639,"mtime_ns":1787046378745629033,"indexed_at_ns":1788525419998097000,"word_count":54},"src/components/layout/TabNav.tsx":{"size":1609,"mtime_ns":1787046378745732783,"indexed_at_ns":1788525419998559000,"word_count":132},"src/components/tabs/CrosschainTab.tsx":{"size":2356,"mtime_ns":1787046378745939242,"indexed_at_ns":1788525419999028000,"word_count":196},"src/components/tabs/WithdrawTab.tsx":{"size":4276,"mtime_ns":1787656366944878194,"indexed_at_ns":1788525419999442000,"word_count":406},"src/components/ui/button.tsx":{"size":1909,"mtime_ns":1787046378746235659,"indexed_at_ns":1788525420000003000,"word_count":159},"src/components/ui/dialog.tsx":{"size":3502,"mtime_ns":1787046378746337825,"indexed_at_ns":1788525420000917000,"word_count":276},"src/components/ui/input.tsx":{"size":960,"mtime_ns":1787046378746432700,"indexed_at_ns":1788525420001382000,"word_count":92},"src/components/ui/label.tsx":{"size":604,"mtime_ns":1787046378746532617,"indexed_at_ns":1788525420001832000,"word_count":63},"src/components/ui/select.tsx":{"size":3070,"mtime_ns":1787046378746640534,"indexed_at_ns":1788525420002332000,"word_count":230},"src/config/wagmi.ts":{"size":945,"mtime_ns":1787046378746813659,"indexed_at_ns":1788525420002775000,"word_count":123},"src/constants/chains.ts":{"size":1129,"mtime_ns":1787046378746977701,"indexed_at_ns":1788525420003172000,"word_count":126},"src/constants/evm-tokens.ts":{"size":2246,"mtime_ns":1787046378747087034,"indexed_at_ns":1788525420003578000,"word_count":240},"src/constants/miden-tokens.ts":{"size":1459,"mtime_ns":1787046378747187284,"indexed_at_ns":1788525420003986000,"word_count":175},"src/hooks/useEpochIntent.ts":{"size":4042,"mtime_ns":1787656366945164318,"indexed_at_ns":1788525420004377000,"word_count":411},"src/hooks/useEpochSession.ts":{"size":1440,"mtime_ns":1787656366945320401,"indexed_at_ns":1788525420004832000,"word_count":181},"src/hooks/useIntentFlowStatus.ts":{"size":1977,"mtime_ns":1787656366945716440,"indexed_at_ns":1788525420005270000,"word_count":182},"src/hooks/useIntentSettlementView.ts":{"size":1407,"mtime_ns":1787046378747545701,"indexed_at_ns":1788525420005698000,"word_count":131},"src/hooks/useIntentStatusQuery.ts":{"size":1646,"mtime_ns":1787046378747637993,"indexed_at_ns":1788525420006101000,"word_count":194},"src/hooks/useMidenP2IDNoteFactory.ts":{"size":6550,"mtime_ns":1787656366946047439,"indexed_at_ns":1788525420006504000,"word_count":752},"src/hooks/useMidenPrivateNotesSupport.ts":{"size":1334,"mtime_ns":1787656366946183313,"indexed_at_ns":1788525420007113000,"word_count":184},"src/hooks/useMidenTransfer.ts":{"size":1796,"mtime_ns":1787046378747863076,"indexed_at_ns":1788525420007530000,"word_count":209},"src/hooks/useMidenWalletAdapter.ts":{"size":4332,"mtime_ns":1787046378748013910,"indexed_at_ns":1788525420007979000,"word_count":489},"src/hooks/useWithdrawIntent.ts":{"size":3557,"mtime_ns":1787046378748134993,"indexed_at_ns":1788525420008580000,"word_count":373},"src/lib/epoch-sdk.ts":{"size":2167,"mtime_ns":1787046378748405576,"indexed_at_ns":1788525420009283000,"word_count":240},"src/lib/explorers.ts":{"size":1271,"mtime_ns":1787046378748516243,"indexed_at_ns":1788525420009756000,"word_count":138},"src/lib/intent-result.ts":{"size":2446,"mtime_ns":1787046378748613910,"indexed_at_ns":1788525420010476000,"word_count":302},"src/lib/intent-settlement.ts":{"size":2109,"mtime_ns":1787046378748706951,"indexed_at_ns":1788525420011054000,"word_count":254},"src/lib/note-file.ts":{"size":594,"mtime_ns":1787656366946322729,"indexed_at_ns":1788525420011560000,"word_count":70},"src/lib/utils.ts":{"size":169,"mtime_ns":1787046378748796743,"indexed_at_ns":1788525420011994000,"word_count":22},"src/main.tsx":{"size":1814,"mtime_ns":1787244318820072309,"indexed_at_ns":1788525420012506000,"word_count":147},"src/services/epoch-bridge.ts":{"size":12622,"mtime_ns":1787656366947133642,"indexed_at_ns":1788525420013259000,"word_count":1323},"src/types/miden.ts":{"size":3134,"mtime_ns":1787656366947597223,"indexed_at_ns":1788525420014180000,"word_count":388},"tailwind.config.js":{"size":600,"mtime_ns":1787046378749470577,"indexed_at_ns":1788525420014802000,"word_count":63},"tsconfig.json":{"size":1001,"mtime_ns":1787046378749570744,"indexed_at_ns":1788525443893577000,"word_count":88,"hashes":{"tsconfig.json":"5b0f7a59ed213cc4ff7ecc231cae214255cc644e0ae9fd5c41b61e869e59d1bd"}},"vite.config.ts":{"size":1037,"mtime_ns":1787244318820490852,"indexed_at_ns":1788525420015641000,"word_count":123}}
+{
+  ".claude/skills/react-doctor/SKILL.md": {
+    "size": 2923,
+    "mtime_ns": 1784801993439270682,
+    "indexed_at_ns": 1789201085085452000,
+    "word_count": 385,
+    "hashes": {
+      ".claude/skills/react-doctor/skill.md": "f569200cb5d162281d5e13e172e0c7a64ceaec956eded97655e0818ed700f0d9"
+    }
+  },
+  ".claude/skills/react-doctor/references/explain.md": {
+    "size": 4136,
+    "mtime_ns": 1784801993439646228,
+    "indexed_at_ns": 1789201085085533000,
+    "word_count": 568,
+    "hashes": {
+      ".claude/skills/react-doctor/references/explain.md": "001a9b43b1340e49923db17dd7e3332113397fa05867431fd572aa7bd4c445f7"
+    }
+  },
+  ".github/workflows/react-doctor.yml": {
+    "size": 2770,
+    "mtime_ns": 1784801993440017733,
+    "indexed_at_ns": 1789201085035488000,
+    "word_count": 383
+  },
+  ".lintstagedrc.json": {
+    "size": 133,
+    "mtime_ns": 1784801993441053539,
+    "indexed_at_ns": 1789201085084011000,
+    "word_count": 12,
+    "hashes": {
+      ".lintstagedrc.json": "0e3fd8af6c8e51bb9e4911379e4eccbdb9f209a5a1536854bced62f8ebd711ac"
+    }
+  },
+  ".prettierrc.json": {
+    "size": 133,
+    "mtime_ns": 1784801993441534212,
+    "indexed_at_ns": 1789201085084176000,
+    "word_count": 14,
+    "hashes": {
+      ".prettierrc.json": "47a9280aa9e432ae4ffbf00f892b21221bc88f94762aa2e75176cf021861ec0e"
+    }
+  },
+  "CLAUDE.md": {
+    "size": 2354,
+    "mtime_ns": 1789156772213034314,
+    "indexed_at_ns": 1789201085087858000,
+    "word_count": 363,
+    "hashes": {
+      "claude.md": "ec0bbf9c82be6045d1765cbef9dfc9dd79a9d360bb648ee7b0d529b51c05edda"
+    }
+  },
+  "README.md": {
+    "size": 3160,
+    "mtime_ns": 1789163969853744422,
+    "indexed_at_ns": 1789201085087925000,
+    "word_count": 394,
+    "hashes": {
+      "readme.md": "edea93226a29eba6c73151e87f0e5136af42e72314a16f7e33df07dde3ecf22b"
+    }
+  },
+  "components.json": {
+    "size": 536,
+    "mtime_ns": 1778063868472743555,
+    "indexed_at_ns": 1789201085084249000,
+    "word_count": 46,
+    "hashes": {
+      "components.json": "4f698890163e6dbb9bcd62aff20857509f80eb557c258482b374a651f4d099d8"
+    }
+  },
+  "eslint.config.js": {
+    "size": 2213,
+    "mtime_ns": 1784801993443297403,
+    "indexed_at_ns": 1789201085047935000,
+    "word_count": 189
+  },
+  "index.html": {
+    "size": 673,
+    "mtime_ns": 1778063868473021890,
+    "indexed_at_ns": 1789201085048233000,
+    "word_count": 43
+  },
+  "package.json": {
+    "size": 1837,
+    "mtime_ns": 1789160765869194512,
+    "indexed_at_ns": 1789201085084326000,
+    "word_count": 133,
+    "hashes": {
+      "package.json": "53e813c4396d767f2884563390733529e887b148140e1d057995913f1e954294"
+    }
+  },
+  "pnpm-workspace.yaml": {
+    "size": 238,
+    "mtime_ns": 1789160765871067351,
+    "indexed_at_ns": 1789201085048567000,
+    "word_count": 18
+  },
+  "postcss.config.js": {
+    "size": 81,
+    "mtime_ns": 1775305799522248450,
+    "indexed_at_ns": 1789201085048653000,
+    "word_count": 11
+  },
+  "public/vite.svg": {
+    "size": 1497,
+    "mtime_ns": 1774925065460363402,
+    "indexed_at_ns": 1789201085049026000,
+    "word_count": 90
+  },
+  "skills-lock.json": {
+    "size": 208,
+    "mtime_ns": 1778063868475021401,
+    "indexed_at_ns": 1789201085084406000,
+    "word_count": 16,
+    "hashes": {
+      "skills-lock.json": "8e6f5dfe35f9ca4945ac492666e7fa571cf557658a7d177296d7ae39f7ea6a49"
+    }
+  },
+  "src/App.tsx": {
+    "size": 4708,
+    "mtime_ns": 1789156772225756539,
+    "indexed_at_ns": 1789201085049415000,
+    "word_count": 344
+  },
+  "src/components/crosschain/EVMWalletConnect.tsx": {
+    "size": 520,
+    "mtime_ns": 1784801993445909396,
+    "indexed_at_ns": 1789201085049557000,
+    "word_count": 55
+  },
+  "src/components/crosschain/IntentForm.tsx": {
+    "size": 10521,
+    "mtime_ns": 1789201111859431688,
+    "indexed_at_ns": 1789201115915563000,
+    "word_count": 905
+  },
+  "src/components/crosschain/IntentStatus.tsx": {
+    "size": 5895,
+    "mtime_ns": 1789163974391273400,
+    "indexed_at_ns": 1789201085049846000,
+    "word_count": 536
+  },
+  "src/components/crosschain/QuoteSummaryCard.tsx": {
+    "size": 1192,
+    "mtime_ns": 1787738251738698272,
+    "indexed_at_ns": 1789201085049989000,
+    "word_count": 107
+  },
+  "src/components/crosschain/WithdrawForm.tsx": {
+    "size": 8357,
+    "mtime_ns": 1789162286683659518,
+    "indexed_at_ns": 1789201085050124000,
+    "word_count": 750
+  },
+  "src/components/crosschain/intent/ExplorerHashCard.tsx": {
+    "size": 2204,
+    "mtime_ns": 1784801993448095676,
+    "indexed_at_ns": 1789201085050289000,
+    "word_count": 200
+  },
+  "src/components/crosschain/intent/IntentDestinationFields.tsx": {
+    "size": 2889,
+    "mtime_ns": 1784801993448301428,
+    "indexed_at_ns": 1789201085050441000,
+    "word_count": 192
+  },
+  "src/components/crosschain/intent/IntentQuoteSummary.tsx": {
+    "size": 1101,
+    "mtime_ns": 1784801993448538723,
+    "indexed_at_ns": 1789201085050582000,
+    "word_count": 107
+  },
+  "src/components/crosschain/intent/IntentSourceAssetField.tsx": {
+    "size": 1580,
+    "mtime_ns": 1789201080438891022,
+    "indexed_at_ns": 1789201085050718000,
+    "word_count": 133
+  },
+  "src/components/crosschain/intent/SettlementPendingCard.tsx": {
+    "size": 1274,
+    "mtime_ns": 1784801993448980521,
+    "indexed_at_ns": 1789201085050850000,
+    "word_count": 102
+  },
+  "src/components/crosschain/withdraw/WithdrawAccountFields.tsx": {
+    "size": 1549,
+    "mtime_ns": 1784801993449246400,
+    "indexed_at_ns": 1789201085050998000,
+    "word_count": 114
+  },
+  "src/components/crosschain/withdraw/WithdrawQuoteSummary.tsx": {
+    "size": 1023,
+    "mtime_ns": 1787738251739647129,
+    "indexed_at_ns": 1789201085051144000,
+    "word_count": 94
+  },
+  "src/components/crosschain/withdraw/WithdrawTokenFields.tsx": {
+    "size": 2593,
+    "mtime_ns": 1784801993449714031,
+    "indexed_at_ns": 1789201085051290000,
+    "word_count": 208
+  },
+  "src/components/crosschain/withdraw/withdraw-toasts.ts": {
+    "size": 265,
+    "mtime_ns": 1784801993450000576,
+    "indexed_at_ns": 1789201085051437000,
+    "word_count": 31
+  },
+  "src/components/crosschain/withdraw/withdraw-tokens.ts": {
+    "size": 551,
+    "mtime_ns": 1784801993450223454,
+    "indexed_at_ns": 1789201085051573000,
+    "word_count": 73
+  },
+  "src/components/layout/Header.tsx": {
+    "size": 590,
+    "mtime_ns": 1789156772226853988,
+    "indexed_at_ns": 1789201085051699000,
+    "word_count": 52
+  },
+  "src/components/layout/TabNav.tsx": {
+    "size": 1609,
+    "mtime_ns": 1787224106272814348,
+    "indexed_at_ns": 1789201085051826000,
+    "word_count": 132
+  },
+  "src/components/tabs/CrosschainTab.tsx": {
+    "size": 2356,
+    "mtime_ns": 1789201080385067782,
+    "indexed_at_ns": 1789201085052093000,
+    "word_count": 196
+  },
+  "src/components/tabs/WithdrawTab.tsx": {
+    "size": 3598,
+    "mtime_ns": 1787738251740169296,
+    "indexed_at_ns": 1789201085052227000,
+    "word_count": 338
+  },
+  "src/components/ui/button.tsx": {
+    "size": 1909,
+    "mtime_ns": 1784801993451691516,
+    "indexed_at_ns": 1789201085052368000,
+    "word_count": 159
+  },
+  "src/components/ui/dialog.tsx": {
+    "size": 3502,
+    "mtime_ns": 1784801993452027020,
+    "indexed_at_ns": 1789201085052501000,
+    "word_count": 276
+  },
+  "src/components/ui/input.tsx": {
+    "size": 960,
+    "mtime_ns": 1784801993452297732,
+    "indexed_at_ns": 1789201085052638000,
+    "word_count": 92
+  },
+  "src/components/ui/label.tsx": {
+    "size": 604,
+    "mtime_ns": 1784801993452614153,
+    "indexed_at_ns": 1789201085052799000,
+    "word_count": 63
+  },
+  "src/components/ui/select.tsx": {
+    "size": 3070,
+    "mtime_ns": 1784801993452864407,
+    "indexed_at_ns": 1789201085052939000,
+    "word_count": 230
+  },
+  "src/config/wagmi.ts": {
+    "size": 945,
+    "mtime_ns": 1787224106273285849,
+    "indexed_at_ns": 1789201085053198000,
+    "word_count": 123
+  },
+  "src/constants/chains.ts": {
+    "size": 1129,
+    "mtime_ns": 1784801993453401956,
+    "indexed_at_ns": 1789201085053323000,
+    "word_count": 126
+  },
+  "src/constants/evm-tokens.ts": {
+    "size": 2246,
+    "mtime_ns": 1784801993453636834,
+    "indexed_at_ns": 1789201085053451000,
+    "word_count": 240
+  },
+  "src/constants/miden-tokens.ts": {
+    "size": 1506,
+    "mtime_ns": 1789162259059931635,
+    "indexed_at_ns": 1789201085053579000,
+    "word_count": 177
+  },
+  "src/hooks/useEpochIntent.ts": {
+    "size": 3759,
+    "mtime_ns": 1789156772227650106,
+    "indexed_at_ns": 1789201085053704000,
+    "word_count": 383
+  },
+  "src/hooks/useIntentFlowStatus.ts": {
+    "size": 1858,
+    "mtime_ns": 1787738251742327219,
+    "indexed_at_ns": 1789201085053834000,
+    "word_count": 167
+  },
+  "src/hooks/useIntentSettlementView.ts": {
+    "size": 1407,
+    "mtime_ns": 1784801993455289481,
+    "indexed_at_ns": 1789201085053956000,
+    "word_count": 131
+  },
+  "src/hooks/useIntentStatusQuery.ts": {
+    "size": 1646,
+    "mtime_ns": 1784801993455611694,
+    "indexed_at_ns": 1789201085054076000,
+    "word_count": 194
+  },
+  "src/hooks/useMidenP2IDNoteFactory.ts": {
+    "size": 6322,
+    "mtime_ns": 1789156772228064477,
+    "indexed_at_ns": 1789201085054304000,
+    "word_count": 690
+  },
+  "src/hooks/useMidenWalletAdapter.ts": {
+    "size": 5263,
+    "mtime_ns": 1789156772228790138,
+    "indexed_at_ns": 1789201085054440000,
+    "word_count": 578
+  },
+  "src/hooks/useWithdrawIntent.ts": {
+    "size": 3557,
+    "mtime_ns": 1784801993457149923,
+    "indexed_at_ns": 1789201085054561000,
+    "word_count": 373
+  },
+  "src/lib/epoch-sdk.ts": {
+    "size": 2279,
+    "mtime_ns": 1789162258588650910,
+    "indexed_at_ns": 1789201085054745000,
+    "word_count": 253
+  },
+  "src/lib/explorers.ts": {
+    "size": 1314,
+    "mtime_ns": 1789163974416560289,
+    "indexed_at_ns": 1789201085054859000,
+    "word_count": 139
+  },
+  "src/lib/intent-result.ts": {
+    "size": 2446,
+    "mtime_ns": 1787738251743400573,
+    "indexed_at_ns": 1789201085054970000,
+    "word_count": 302
+  },
+  "src/lib/intent-settlement.ts": {
+    "size": 2109,
+    "mtime_ns": 1784801993458350147,
+    "indexed_at_ns": 1789201085055086000,
+    "word_count": 254
+  },
+  "src/lib/utils.ts": {
+    "size": 169,
+    "mtime_ns": 1784801993458718902,
+    "indexed_at_ns": 1789201085055198000,
+    "word_count": 22
+  },
+  "src/main.tsx": {
+    "size": 997,
+    "mtime_ns": 1789156772229299175,
+    "indexed_at_ns": 1789201085055295000,
+    "word_count": 83
+  },
+  "src/services/epoch-bridge.ts": {
+    "size": 11374,
+    "mtime_ns": 1789156772229495090,
+    "indexed_at_ns": 1789201085055406000,
+    "word_count": 1154
+  },
+  "src/types/miden.ts": {
+    "size": 2760,
+    "mtime_ns": 1787738251744452829,
+    "indexed_at_ns": 1789201085055551000,
+    "word_count": 335
+  },
+  "tailwind.config.js": {
+    "size": 600,
+    "mtime_ns": 1784801993460315841,
+    "indexed_at_ns": 1789201085055661000,
+    "word_count": 63
+  },
+  "tsconfig.json": {
+    "size": 1001,
+    "mtime_ns": 1784801993460599886,
+    "indexed_at_ns": 1789201085084515000,
+    "word_count": 88,
+    "hashes": {
+      "tsconfig.json": "5b0f7a59ed213cc4ff7ecc231cae214255cc644e0ae9fd5c41b61e869e59d1bd"
+    }
+  },
+  "vite.config.ts": {
+    "size": 1037,
+    "mtime_ns": 1787224111072429341,
+    "indexed_at_ns": 1789201085056091000,
+    "word_count": 123
+  },
+  ".claude/CLAUDE.md": {
+    "size": 226,
+    "mtime_ns": 1789156772201874909,
+    "indexed_at_ns": 1789201085084594000,
+    "word_count": 29,
+    "hashes": {
+      ".claude/claude.md": "c6f7fc2f062904d246b700d446ba3ad03e77f41809b12eccfb5e090a11f4fad2"
+    }
+  },
+  ".claude/settings.json": {
+    "size": 473,
+    "mtime_ns": 1789156772202018449,
+    "indexed_at_ns": 1789201085082918000,
+    "word_count": 38,
+    "hashes": {
+      ".claude/settings.json": "95931f0fbb861eebd7fae7353ab460c98db93838e7758e31e811992c6a016dfa"
+    }
+  },
+  ".claude/skills/graphify/SKILL.md": {
+    "size": 41276,
+    "mtime_ns": 1789156772202432612,
+    "indexed_at_ns": 1789201085084676000,
+    "word_count": 5211,
+    "hashes": {
+      ".claude/skills/graphify/skill.md": "abf02c8c54dbf7115484f8db245c276f22f59c3c6356a9e043067a82478300ea"
+    }
+  },
+  ".claude/skills/graphify/references/add-watch.md": {
+    "size": 2486,
+    "mtime_ns": 1789156772202864067,
+    "indexed_at_ns": 1789201085084808000,
+    "word_count": 366,
+    "hashes": {
+      ".claude/skills/graphify/references/add-watch.md": "cb5e2f3284265c08c88c08f445b96958b13a9115c0afc0a33206c293d1b1c187"
+    }
+  },
+  ".claude/skills/graphify/references/exports.md": {
+    "size": 3362,
+    "mtime_ns": 1789156772202994774,
+    "indexed_at_ns": 1789201085084888000,
+    "word_count": 470,
+    "hashes": {
+      ".claude/skills/graphify/references/exports.md": "7aa8b606e5c19334b6c9fe62a12fc30eb46c0320d1dbb5726cfda0becdd04a5a"
+    }
+  },
+  ".claude/skills/graphify/references/extraction-spec.md": {
+    "size": 7960,
+    "mtime_ns": 1789156772203152106,
+    "indexed_at_ns": 1789201085084971000,
+    "word_count": 1038,
+    "hashes": {
+      ".claude/skills/graphify/references/extraction-spec.md": "9cf5d515d0d8584aeef36708df34f560078772a568ed599cac5ba20b089e563d"
+    }
+  },
+  ".claude/skills/graphify/references/github-and-merge.md": {
+    "size": 2177,
+    "mtime_ns": 1789156772203306063,
+    "indexed_at_ns": 1789201085085053000,
+    "word_count": 271,
+    "hashes": {
+      ".claude/skills/graphify/references/github-and-merge.md": "609de4b1331ddb2f8c80e97aac0a5de782a373d6f5af858e10a731c20b35c0e2"
+    }
+  },
+  ".claude/skills/graphify/references/hooks.md": {
+    "size": 1267,
+    "mtime_ns": 1789156772203578144,
+    "indexed_at_ns": 1789201085085128000,
+    "word_count": 193,
+    "hashes": {
+      ".claude/skills/graphify/references/hooks.md": "7c7827f2f29d6e2cb6cc6902558dac08380f60c414b4968f83e1bc4e61b3e268"
+    }
+  },
+  ".claude/skills/graphify/references/query.md": {
+    "size": 13456,
+    "mtime_ns": 1789156772203885808,
+    "indexed_at_ns": 1789201085085205000,
+    "word_count": 1763,
+    "hashes": {
+      ".claude/skills/graphify/references/query.md": "54526cc3e2392922d344f14767f09037ef85fb7ec5cc7911b749b35bcb004fbf"
+    }
+  },
+  ".claude/skills/graphify/references/transcribe.md": {
+    "size": 3173,
+    "mtime_ns": 1789156772204121473,
+    "indexed_at_ns": 1789201085085292000,
+    "word_count": 418,
+    "hashes": {
+      ".claude/skills/graphify/references/transcribe.md": "1d5afbaccf36e952e71082591edfc9e4fbd9946eb85b01855a1d0bd810b7623d"
+    }
+  },
+  ".claude/skills/graphify/references/update.md": {
+    "size": 10425,
+    "mtime_ns": 1789156772204337513,
+    "indexed_at_ns": 1789201085085369000,
+    "word_count": 1196,
+    "hashes": {
+      ".claude/skills/graphify/references/update.md": "0249cd6ceae6effdfc7371b51d00c462f51d95700101dcedd36255bab1b4ce7a"
+    }
+  },
+  ".codex/hooks.json": {
+    "size": 248,
+    "mtime_ns": 1789156772204639927,
+    "indexed_at_ns": 1789201085083923000,
+    "word_count": 22,
+    "hashes": {
+      ".codex/hooks.json": "6c2c43279103f75b87c59b57a22069ea0727633cde660b9c906d55fe510b4940"
+    }
+  },
+  ".codex/skills/graphify/SKILL.md": {
+    "size": 41318,
+    "mtime_ns": 1789156772205266255,
+    "indexed_at_ns": 1789201085085611000,
+    "word_count": 5211,
+    "hashes": {
+      ".codex/skills/graphify/skill.md": "f3bdf81c964bf38fec1cd7d3865a72d611e103111a82688f1f5360d310006fe2"
+    }
+  },
+  ".codex/skills/graphify/references/add-watch.md": {
+    "size": 2486,
+    "mtime_ns": 1789156772205510253,
+    "indexed_at_ns": 1789201085085715000,
+    "word_count": 366,
+    "hashes": {
+      ".codex/skills/graphify/references/add-watch.md": "3d10b446efec5f2ba6d95ffc523ce2b4dd83a1981ec1b6802b6936566f5bee58"
+    }
+  },
+  ".codex/skills/graphify/references/exports.md": {
+    "size": 3362,
+    "mtime_ns": 1789156772205673210,
+    "indexed_at_ns": 1789201085085787000,
+    "word_count": 470,
+    "hashes": {
+      ".codex/skills/graphify/references/exports.md": "6b63e3ac1bfe4f031e335e2d64bc9d60c709046084ac0a7716e25577cf26d258"
+    }
+  },
+  ".codex/skills/graphify/references/extraction-spec.md": {
+    "size": 4431,
+    "mtime_ns": 1789156772205842292,
+    "indexed_at_ns": 1789201085085860000,
+    "word_count": 536,
+    "hashes": {
+      ".codex/skills/graphify/references/extraction-spec.md": "24967657d38b77421b058e00d3ab3c7e199006f6ceae8f7dea92a783e3aa562e"
+    }
+  },
+  ".codex/skills/graphify/references/github-and-merge.md": {
+    "size": 2177,
+    "mtime_ns": 1789156772205982916,
+    "indexed_at_ns": 1789201085085942000,
+    "word_count": 271,
+    "hashes": {
+      ".codex/skills/graphify/references/github-and-merge.md": "bc0e497b056935a0b89d81dc5253b5077f0dc2fe3cfd4f16c53472f57dfc183a"
+    }
+  },
+  ".codex/skills/graphify/references/hooks.md": {
+    "size": 1267,
+    "mtime_ns": 1789156772206116748,
+    "indexed_at_ns": 1789201085086017000,
+    "word_count": 193,
+    "hashes": {
+      ".codex/skills/graphify/references/hooks.md": "00f2d24dba0e13e6664993e62ec63e377236d3419e19d442ffdc88bd708cdb5e"
+    }
+  },
+  ".codex/skills/graphify/references/query.md": {
+    "size": 13456,
+    "mtime_ns": 1789156772206306705,
+    "indexed_at_ns": 1789201085086095000,
+    "word_count": 1763,
+    "hashes": {
+      ".codex/skills/graphify/references/query.md": "03b8b6cbef88addf4cab611c8b7041ab037764e9bc6ddcf1b6a8aa79de5168cb"
+    }
+  },
+  ".codex/skills/graphify/references/transcribe.md": {
+    "size": 3173,
+    "mtime_ns": 1789156772206438162,
+    "indexed_at_ns": 1789201085086185000,
+    "word_count": 418,
+    "hashes": {
+      ".codex/skills/graphify/references/transcribe.md": "9760f8f239d46595b278ded854cb70c704e3dc78ec57896258b51f6d599c55e1"
+    }
+  },
+  ".codex/skills/graphify/references/update.md": {
+    "size": 10425,
+    "mtime_ns": 1789156772206755242,
+    "indexed_at_ns": 1789201085086259000,
+    "word_count": 1196,
+    "hashes": {
+      ".codex/skills/graphify/references/update.md": "3ab9fdcfd44c1ee795d6deda18723812b245394cfb8c8b222955b74258570ed6"
+    }
+  },
+  ".opencode/opencode.json": {
+    "size": 50,
+    "mtime_ns": 1789156772207762609,
+    "indexed_at_ns": 1789201085084099000,
+    "word_count": 4,
+    "hashes": {
+      ".opencode/opencode.json": "0b43570be7f8bf5eb093d5864063897370191c9c85e0bbcc2531628b0ed0b9b3"
+    }
+  },
+  ".opencode/plugins/graphify.js": {
+    "size": 1402,
+    "mtime_ns": 1789156772207961482,
+    "indexed_at_ns": 1789201085037185000,
+    "word_count": 197
+  },
+  ".opencode/skills/graphify/SKILL.md": {
+    "size": 40723,
+    "mtime_ns": 1789156772208578227,
+    "indexed_at_ns": 1789201085086334000,
+    "word_count": 5133,
+    "hashes": {
+      ".opencode/skills/graphify/skill.md": "3450265e3349cff9e202bd612da429bf860620909089384cda30d9e09fecfade"
+    }
+  },
+  ".opencode/skills/graphify/references/add-watch.md": {
+    "size": 2486,
+    "mtime_ns": 1789156772208937974,
+    "indexed_at_ns": 1789201085086439000,
+    "word_count": 366,
+    "hashes": {
+      ".opencode/skills/graphify/references/add-watch.md": "6bec8d7b7639dd44721489d74f0db437d47de24051db65346dbf69a77b33adcb"
+    }
+  },
+  ".opencode/skills/graphify/references/exports.md": {
+    "size": 3362,
+    "mtime_ns": 1789156772209181513,
+    "indexed_at_ns": 1789201085086510000,
+    "word_count": 470,
+    "hashes": {
+      ".opencode/skills/graphify/references/exports.md": "96964729c8e8be4db3175c1430d035241d1e580d622147ecf1e8e3aaa6a9f100"
+    }
+  },
+  ".opencode/skills/graphify/references/extraction-spec.md": {
+    "size": 7960,
+    "mtime_ns": 1789156772209418178,
+    "indexed_at_ns": 1789201085086586000,
+    "word_count": 1038,
+    "hashes": {
+      ".opencode/skills/graphify/references/extraction-spec.md": "d3547a8b5bab6a898c4c6df5640a49d2d036cf950f543426b9ba7c191bbd0bd9"
+    }
+  },
+  ".opencode/skills/graphify/references/github-and-merge.md": {
+    "size": 2177,
+    "mtime_ns": 1789156772209621635,
+    "indexed_at_ns": 1789201085086662000,
+    "word_count": 271,
+    "hashes": {
+      ".opencode/skills/graphify/references/github-and-merge.md": "1b9a86f459755461cd7c4890070527c0d23e80778f91bfa6eb1e924894229416"
+    }
+  },
+  ".opencode/skills/graphify/references/hooks.md": {
+    "size": 1267,
+    "mtime_ns": 1789156772209750925,
+    "indexed_at_ns": 1789201085086737000,
+    "word_count": 193,
+    "hashes": {
+      ".opencode/skills/graphify/references/hooks.md": "fbb873a50ea67a61eb625bf540db64aab21d11489329f349e5eabb0a6ba67abb"
+    }
+  },
+  ".opencode/skills/graphify/references/query.md": {
+    "size": 13456,
+    "mtime_ns": 1789156772209975548,
+    "indexed_at_ns": 1789201085086810000,
+    "word_count": 1763,
+    "hashes": {
+      ".opencode/skills/graphify/references/query.md": "c774beafd384cb11d61525a6d4ade43848b76161a24bd7ce20f4f1868eeafc3f"
+    }
+  },
+  ".opencode/skills/graphify/references/transcribe.md": {
+    "size": 3173,
+    "mtime_ns": 1789156772210114922,
+    "indexed_at_ns": 1789201085086888000,
+    "word_count": 418,
+    "hashes": {
+      ".opencode/skills/graphify/references/transcribe.md": "46192f1eac124b5cc309c6c28f7b9106a0413e2f1a65c388513f5db585a0eb13"
+    }
+  },
+  ".opencode/skills/graphify/references/update.md": {
+    "size": 10425,
+    "mtime_ns": 1789156772210288920,
+    "indexed_at_ns": 1789201085086968000,
+    "word_count": 1196,
+    "hashes": {
+      ".opencode/skills/graphify/references/update.md": "82e17358f26169787e0f905071c6ca6677ea954fa20f7debffa98e12b8d3084b"
+    }
+  },
+  ".pi/agent/skills/graphify/SKILL.md": {
+    "size": 41276,
+    "mtime_ns": 1789156772210794458,
+    "indexed_at_ns": 1789201085087044000,
+    "word_count": 5211,
+    "hashes": {
+      ".pi/agent/skills/graphify/skill.md": "3db09f55925565e27c42943eca5a374ee826483808a550cd8563dde073a1cfcb"
+    }
+  },
+  ".pi/agent/skills/graphify/references/add-watch.md": {
+    "size": 2486,
+    "mtime_ns": 1789156772211081997,
+    "indexed_at_ns": 1789201085087178000,
+    "word_count": 366,
+    "hashes": {
+      ".pi/agent/skills/graphify/references/add-watch.md": "7ebbc1968baa04ad6ddaa7337ec967a58f5fd5a89bc54f93410373dfb85ce2b2"
+    }
+  },
+  ".pi/agent/skills/graphify/references/exports.md": {
+    "size": 3362,
+    "mtime_ns": 1789156772211295287,
+    "indexed_at_ns": 1789201085087257000,
+    "word_count": 470,
+    "hashes": {
+      ".pi/agent/skills/graphify/references/exports.md": "cc5230db6c358e2491408aceaff03ef4ae9cc8a3e8458cc9126721de12f10a76"
+    }
+  },
+  ".pi/agent/skills/graphify/references/extraction-spec.md": {
+    "size": 4431,
+    "mtime_ns": 1789156772211458744,
+    "indexed_at_ns": 1789201085087331000,
+    "word_count": 536,
+    "hashes": {
+      ".pi/agent/skills/graphify/references/extraction-spec.md": "1a0c7e30327728b397adcc990c12162e12a6b1a0733db79b0eba63e477fa14ad"
+    }
+  },
+  ".pi/agent/skills/graphify/references/github-and-merge.md": {
+    "size": 2177,
+    "mtime_ns": 1789156772211606868,
+    "indexed_at_ns": 1789201085087409000,
+    "word_count": 271,
+    "hashes": {
+      ".pi/agent/skills/graphify/references/github-and-merge.md": "22c25e8d353126ead9585742c9d1533b9de7dcf37fce62458ab3213a663f6c7c"
+    }
+  },
+  ".pi/agent/skills/graphify/references/hooks.md": {
+    "size": 1267,
+    "mtime_ns": 1789156772211731991,
+    "indexed_at_ns": 1789201085087483000,
+    "word_count": 193,
+    "hashes": {
+      ".pi/agent/skills/graphify/references/hooks.md": "56f11306f086da5943886cee904151c8b60912880596b933e29b9d9d5620df40"
+    }
+  },
+  ".pi/agent/skills/graphify/references/query.md": {
+    "size": 13456,
+    "mtime_ns": 1789156772211932865,
+    "indexed_at_ns": 1789201085087571000,
+    "word_count": 1763,
+    "hashes": {
+      ".pi/agent/skills/graphify/references/query.md": "b8bdb24afbbb0b37c989dfb038c9ac278ea92a1cb1f4cf8b8c1706a0cefd3798"
+    }
+  },
+  ".pi/agent/skills/graphify/references/transcribe.md": {
+    "size": 3173,
+    "mtime_ns": 1789156772212050656,
+    "indexed_at_ns": 1789201085087650000,
+    "word_count": 418,
+    "hashes": {
+      ".pi/agent/skills/graphify/references/transcribe.md": "a95d02aa53edd1c522c0528f0a0d371b46b95d3df80d63a7627f3c1eda6f740f"
+    }
+  },
+  ".pi/agent/skills/graphify/references/update.md": {
+    "size": 10425,
+    "mtime_ns": 1789156772212212154,
+    "indexed_at_ns": 1789201085087723000,
+    "word_count": 1196,
+    "hashes": {
+      ".pi/agent/skills/graphify/references/update.md": "37732e28ebdebcbf4328c049a343665ffbc26f89e041612a40ae20de76173180"
+    }
+  },
+  "AGENTS.md": {
+    "size": 1129,
+    "mtime_ns": 1789156772212398028,
+    "indexed_at_ns": 1789201085087793000,
+    "word_count": 165,
+    "hashes": {
+      "agents.md": "7a3c6e853d6e516d5e92fcc4e96b373e0665220780def176579d00d124d983c5"
+    }
+  },
+  "src/components/providers/MidenNetworkApp.tsx": {
+    "size": 1174,
+    "mtime_ns": 1789162258758687689,
+    "indexed_at_ns": 1789201085051951000,
+    "word_count": 93
+  },
+  "src/config/miden.ts": {
+    "size": 720,
+    "mtime_ns": 1789162258513867518,
+    "indexed_at_ns": 1789201085053075000,
+    "word_count": 56
+  },
+  "src/hooks/useMidenNetwork.ts": {
+    "size": 498,
+    "mtime_ns": 1789156772227780980,
+    "indexed_at_ns": 1789201085054192000,
+    "word_count": 52
+  }
+}

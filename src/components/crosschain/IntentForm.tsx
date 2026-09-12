@@ -109,9 +109,10 @@ export function IntentForm({
   const selectedAsset = midenAssets.find(
     (a) => a.assetId.toLowerCase() === resolvedSelectedAssetId.toLowerCase(),
   );
-  // Use the hardcoded faucet→decimals map. Do NOT fall back to the wallet
-  // adapter's reported decimals (often defaults to 8 and silently mis-scales).
-  // `undefined` here gates the form via `Number.isFinite` below.
+  // Use the hardcoded faucet→decimals map only for display formatting. Do not
+  // fall back to the wallet adapter's reported decimals (often defaults to 8
+  // and silently mis-scales). Unknown faucets remain selectable and display
+  // their quoted amount in raw units.
   const midenFaucetDecimals = resolvedSelectedAssetId
     ? getMidenFaucetDecimals(resolvedSelectedAssetId, network)
     : undefined;
@@ -143,11 +144,6 @@ export function IntentForm({
     if (!midenAccountId) {
       throw new Error("Connect Miden wallet first");
     }
-    if (midenFaucetDecimals === undefined) {
-      throw new Error(
-        `Unknown Miden faucet ${resolvedSelectedAssetId} — add it to miden-tokens.ts before sending.`,
-      );
-    }
     return {
       midenAccountId,
       midenFaucetId: resolvedSelectedAssetId,
@@ -164,8 +160,7 @@ export function IntentForm({
     !!resolvedSelectedAssetId &&
     hasValidEvmRecipient &&
     !!destination.outputToken &&
-    hasValidDestinationChainId &&
-    Number.isFinite(midenFaucetDecimals);
+    hasValidDestinationChainId;
 
   const handleGetQuote = () => {
     if (

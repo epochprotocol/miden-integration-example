@@ -1,0 +1,118 @@
+{
+  "nodes": [
+    {
+      "id": "$graphify-root$_claude_skills_react_doctor_references_explain_md",
+      "label": "explain.md",
+      "file_type": "document",
+      "node_kind": "page",
+      "source_file": ".claude/skills/react-doctor/references/explain.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "$graphify-root$_claude_skills_react_doctor_references_explain_explaining_and_configuring_rules",
+      "label": "Explaining and configuring rules",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": ".claude/skills/react-doctor/references/explain.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "$graphify-root$_claude_skills_react_doctor_references_explain_workflow",
+      "label": "Workflow",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": ".claude/skills/react-doctor/references/explain.md",
+      "source_location": "L10"
+    },
+    {
+      "id": "$graphify-root$_claude_skills_react_doctor_references_explain_commands",
+      "label": "Commands",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": ".claude/skills/react-doctor/references/explain.md",
+      "source_location": "L27"
+    },
+    {
+      "id": "$graphify-root$_claude_skills_react_doctor_references_explain_decision_guide",
+      "label": "Decision guide",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": ".claude/skills/react-doctor/references/explain.md",
+      "source_location": "L44"
+    },
+    {
+      "id": "$graphify-root$_claude_skills_react_doctor_references_explain_config_shape",
+      "label": "Config shape",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": ".claude/skills/react-doctor/references/explain.md",
+      "source_location": "L57"
+    },
+    {
+      "id": "$graphify-root$_claude_skills_react_doctor_references_explain_educating_the_user",
+      "label": "Educating the user",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": ".claude/skills/react-doctor/references/explain.md",
+      "source_location": "L70"
+    }
+  ],
+  "edges": [
+    {
+      "source": "$graphify-root$_claude_skills_react_doctor_references_explain_md",
+      "target": "$graphify-root$_claude_skills_react_doctor_references_explain_explaining_and_configuring_rules",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/skills/react-doctor/references/explain.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_claude_skills_react_doctor_references_explain_explaining_and_configuring_rules",
+      "target": "$graphify-root$_claude_skills_react_doctor_references_explain_workflow",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/skills/react-doctor/references/explain.md",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_claude_skills_react_doctor_references_explain_explaining_and_configuring_rules",
+      "target": "$graphify-root$_claude_skills_react_doctor_references_explain_commands",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/skills/react-doctor/references/explain.md",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_claude_skills_react_doctor_references_explain_explaining_and_configuring_rules",
+      "target": "$graphify-root$_claude_skills_react_doctor_references_explain_decision_guide",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/skills/react-doctor/references/explain.md",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_claude_skills_react_doctor_references_explain_explaining_and_configuring_rules",
+      "target": "$graphify-root$_claude_skills_react_doctor_references_explain_config_shape",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/skills/react-doctor/references/explain.md",
+      "source_location": "L57",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_claude_skills_react_doctor_references_explain_explaining_and_configuring_rules",
+      "target": "$graphify-root$_claude_skills_react_doctor_references_explain_educating_the_user",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": ".claude/skills/react-doctor/references/explain.md",
+      "source_location": "L70",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

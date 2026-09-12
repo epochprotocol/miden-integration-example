@@ -1,0 +1,101 @@
+{
+  "nodes": [
+    {
+      "id": "$graphify-root$_claude_md",
+      "label": "CLAUDE.md",
+      "file_type": "document",
+      "node_kind": "page",
+      "source_file": "CLAUDE.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "$graphify-root$_claude_claude_md",
+      "label": "CLAUDE.md",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "CLAUDE.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "$graphify-root$_claude_what_this_is",
+      "label": "What this is",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "CLAUDE.md",
+      "source_location": "L3"
+    },
+    {
+      "id": "$graphify-root$_claude_comments",
+      "label": "Comments",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "CLAUDE.md",
+      "source_location": "L21"
+    },
+    {
+      "id": "$graphify-root$_claude_traps",
+      "label": "Traps",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "CLAUDE.md",
+      "source_location": "L30"
+    },
+    {
+      "id": "$graphify-root$_claude_graphify",
+      "label": "graphify",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "CLAUDE.md",
+      "source_location": "L42"
+    }
+  ],
+  "edges": [
+    {
+      "source": "$graphify-root$_claude_md",
+      "target": "$graphify-root$_claude_claude_md",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_claude_claude_md",
+      "target": "$graphify-root$_claude_what_this_is",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_claude_claude_md",
+      "target": "$graphify-root$_claude_comments",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_claude_claude_md",
+      "target": "$graphify-root$_claude_traps",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_claude_claude_md",
+      "target": "$graphify-root$_claude_graphify",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "CLAUDE.md",
+      "source_location": "L42",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}
