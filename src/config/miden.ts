@@ -11,7 +11,7 @@ export interface MidenNetworkConfig {
 
 const TESTNET_RPC_URL =
   import.meta.env.VITE_MIDEN_RPC_URL?.trim() ?? "https://rpc.testnet.miden.io";
-const TESTNET_ALLOCATOR_URL = "https://testnet-dev.epochprotocol.xyz";
+const TESTNET_ALLOCATOR_URL = import.meta.env.VITE_TESTNET_ALLOCATOR_URL;
 
 const testnetConfig: MidenNetworkConfig = {
   rpcUrl: TESTNET_RPC_URL,
