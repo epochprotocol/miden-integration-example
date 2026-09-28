@@ -1,6 +1,14 @@
 import { normalizeMidenIdToHex } from "../services/epoch-bridge";
 import type { MidenNetwork } from "../config/miden";
 
+const PRAGMA_SUPPORTED_MIDEN_SYMBOLS = new Set([
+  "USDC",
+  "USDT",
+  "DAI",
+  "WETH",
+  "WBTC",
+]);
+
 /**
  * Hardcoded Miden testnet faucet → decimals map.
  *
@@ -40,4 +48,17 @@ export function getMidenFaucetDecimals(
   } catch {
     return undefined;
   }
+}
+
+/** Returns whether the solver has a Pragma price feed for this wallet asset. */
+export function isPragmaSupportedMidenAsset(
+  asset: { assetId: string; symbol?: string },
+  network: MidenNetwork,
+): boolean {
+  const symbol = asset.symbol?.trim().toUpperCase();
+  if (symbol && PRAGMA_SUPPORTED_MIDEN_SYMBOLS.has(symbol)) return true;
+
+  // Metadata can arrive after the wallet asset list. Keep known testnet faucets
+  // available while their symbol is still loading.
+  return getMidenFaucetDecimals(asset.assetId, network) !== undefined;
 }

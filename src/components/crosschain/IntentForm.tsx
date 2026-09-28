@@ -11,7 +11,10 @@ import {
   DEFAULT_TESTNET_CHAIN_ID_STR,
   isSupportedTestnetEvmChain,
 } from "../../constants/chains";
-import { getMidenFaucetDecimals } from "../../constants/miden-tokens";
+import {
+  getMidenFaucetDecimals,
+  isPragmaSupportedMidenAsset,
+} from "../../constants/miden-tokens";
 import { EPOCH_TESTNET_TOKENS } from "../../constants/evm-tokens";
 import { midenscanNoteUrl } from "../../lib/explorers";
 import {
@@ -62,13 +65,18 @@ export function IntentForm({
   const { address } = useAccount();
   const walletChainId = useChainId();
 
+  const supportedMidenAssets = midenAssets.filter((asset) =>
+    isPragmaSupportedMidenAsset(asset, network),
+  );
+  const unsupportedAssetCount =
+    midenAssets.length - supportedMidenAssets.length;
   const [selectedAssetId, setSelectedAssetId] = useState("");
-  const selectedAssetIdIsAvailable = midenAssets.some(
+  const selectedAssetIdIsAvailable = supportedMidenAssets.some(
     (asset) => asset.assetId === selectedAssetId,
   );
   const resolvedSelectedAssetId = selectedAssetIdIsAvailable
     ? selectedAssetId
-    : (midenAssets[0]?.assetId ?? "");
+    : (supportedMidenAssets[0]?.assetId ?? "");
 
   // Follows the connected wallet until the user overrides a field. Not
   // useState defaults: the wallet connects after this mounts.
@@ -106,13 +114,12 @@ export function IntentForm({
     destination.evmAddress.trim(),
   );
 
-  const selectedAsset = midenAssets.find(
+  const selectedAsset = supportedMidenAssets.find(
     (a) => a.assetId.toLowerCase() === resolvedSelectedAssetId.toLowerCase(),
   );
   // Use the hardcoded faucet→decimals map only for display formatting. Do not
   // fall back to the wallet adapter's reported decimals (often defaults to 8
-  // and silently mis-scales). Unknown faucets remain selectable and display
-  // their quoted amount in raw units.
+  // and silently mis-scales).
   const midenFaucetDecimals = resolvedSelectedAssetId
     ? getMidenFaucetDecimals(resolvedSelectedAssetId, network)
     : undefined;
@@ -231,10 +238,11 @@ export function IntentForm({
 
       <div className="mt-4 space-y-4">
         <IntentSourceAssetField
-          assets={midenAssets ?? []}
+          assets={supportedMidenAssets}
           selectedAssetId={resolvedSelectedAssetId}
           selectedAsset={selectedAsset}
           isLoadingAssets={isLoadingMidenAssets}
+          unsupportedAssetCount={unsupportedAssetCount}
           onSelect={(assetId) => {
             setSelectedAssetId(assetId);
             onClearQuote();
