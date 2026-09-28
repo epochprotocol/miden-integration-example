@@ -13,6 +13,7 @@ interface Props {
   selectedAssetId: string;
   selectedAsset?: MidenAssetOption;
   isLoadingAssets: boolean;
+  unsupportedAssetCount: number;
   onSelect: (assetId: string) => void;
 }
 
@@ -21,6 +22,7 @@ export function IntentSourceAssetField({
   selectedAssetId,
   selectedAsset,
   isLoadingAssets,
+  unsupportedAssetCount,
   onSelect,
 }: Props) {
   return (
@@ -46,9 +48,23 @@ export function IntentSourceAssetField({
           {selectedAsset?.amount?.toString() ?? "—"}
         </span>
       </p>
-      {!isLoadingAssets && assets.length === 0 && (
+      {!isLoadingAssets &&
+        assets.length === 0 &&
+        unsupportedAssetCount === 0 && (
+          <p className="text-xs text-amber-800">
+            No Miden assets found in this wallet. Fund it before bridging.
+          </p>
+        )}
+      {!isLoadingAssets && assets.length === 0 && unsupportedAssetCount > 0 && (
         <p className="text-xs text-amber-800">
-          No Miden assets found in this wallet. Fund it before bridging.
+          No Pragma-priced assets found. This bridge supports USDC, USDT, DAI,
+          WETH, and WBTC.
+        </p>
+      )}
+      {!isLoadingAssets && assets.length > 0 && unsupportedAssetCount > 0 && (
+        <p className="text-xs text-neutral-500">
+          {unsupportedAssetCount} unsupported wallet
+          {unsupportedAssetCount === 1 ? " asset is" : " assets are"} hidden.
         </p>
       )}
     </div>
