@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAccount, useChainId } from "wagmi";
 import { toast } from "sonner";
 import { MIDEN_VIRTUAL_CHAIN_ID } from "@epoch-protocol/epoch-intents-sdk";
@@ -20,6 +20,7 @@ import {
 import { WithdrawTokenFields } from "./withdraw/WithdrawTokenFields";
 import { WithdrawAccountFields } from "./withdraw/WithdrawAccountFields";
 import { WithdrawQuoteSummary } from "./withdraw/WithdrawQuoteSummary";
+import type { ResourceLockStatus } from "@epoch-protocol/epoch-intents-sdk";
 
 interface Props {
   accounts: MidenAccount[];
@@ -30,6 +31,7 @@ interface Props {
   isFetchingQuote: boolean;
   isLoading: boolean;
   isSDKReady: boolean;
+  resourceLockStatus?: ResourceLockStatus | null;
 }
 
 export function WithdrawForm({
@@ -41,6 +43,7 @@ export function WithdrawForm({
   isFetchingQuote,
   isLoading,
   isSDKReady,
+  resourceLockStatus,
 }: Props) {
   const [evmToken, setEvmToken] = useState(WITHDRAW_TOKENS[0].address);
   const [customToken, setCustomToken] = useState("");
@@ -50,6 +53,22 @@ export function WithdrawForm({
     () => getMidenNetworkConfig().defaultFaucetId,
   );
   const [status, setStatus] = useState("");
+
+  useEffect(() => {
+    if (!resourceLockStatus) return;
+    const labels: Record<ResourceLockStatus["phase"], string> = {
+      "compact-prepared": "Preparing Compact deposit…",
+      "awaiting-approval": "Approve token spending in your wallet…",
+      "approval-confirmed": "Approval confirmed — preparing Compact deposit…",
+      "awaiting-deposit": "Confirm Compact deposit in your wallet…",
+      "deposit-confirmed":
+        "Deposit confirmed — submitting the intent to Epoch…",
+      "submitting-allocation":
+        "Deposit confirmed — submitting the intent to Epoch…",
+      "allocation-accepted": "Intent accepted — polling for Miden settlement…",
+    };
+    setStatus(labels[resourceLockStatus.phase]);
+  }, [resourceLockStatus]);
 
   const { address: connectedAddress } = useAccount();
   const walletChainId = useChainId();
@@ -124,8 +143,8 @@ export function WithdrawForm({
     // Two-stage toast: (1) Compact deposit signature/confirmation,
     // (2) SIO Miden settlement — dismissed by parent WithdrawTab once the
     // synthetic Miden row appears in the status poll.
-    setStatus("Awaiting Compact deposit signature in wallet…");
-    toast.loading("Sign Compact deposit in wallet…", {
+    setStatus("Preparing Compact deposit…");
+    toast.loading("Preparing Compact deposit…", {
       id: WITHDRAW_DEPOSIT_TOAST_ID,
     });
     try {
