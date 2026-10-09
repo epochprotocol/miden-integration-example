@@ -37,11 +37,12 @@ Testnet tokens (USDC, DAI, USDT, etc.) share the same contract addresses across 
 ## Wallets
 
 - **EVM**: any RainbowKit-supported wallet (MetaMask etc.) on an Epoch testnet EVM chain. Pays gas + provides tokens for withdraw deposits.
-- **Miden**: Miden wallet adapter. Required for Withdraw and for creating P2IDE notes in Cross-chain.
+- **Miden**: Miden wallet adapter. Required for Withdraw and for creating P2IDE notes in Cross-chain. The app is on Miden 0.17, so the wallet must be a 0.17 build: older wallets cannot read the transaction request it sends.
 
 ## Test Funds
 
 - **Miden testnet tokens**: claim from a configured testnet faucet in a testnet Miden wallet.
+- **Miden fees**: testnet charges transaction fees in USDCx (`0x4cbdcaffe75f0a317482224dae6436`), so the Miden account needs some USDCx to create the P2IDE note.
 - **EVM testnet tokens**: ping Epoch team with your Ethereum address; team will send testnet USDC.
 
 ## Key Files
