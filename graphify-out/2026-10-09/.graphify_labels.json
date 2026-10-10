@@ -3,9 +3,9 @@
   "1": "dependencies",
   "2": "IntentForm.tsx",
   "3": "devDependencies",
-  "4": "WithdrawTab.tsx",
+  "4": "IntentStatus.tsx",
   "5": "compilerOptions",
-  "6": "useMidenWalletAdapter.ts",
+  "6": "WithdrawTab.tsx",
   "7": "What You Must Do When Invoked",
   "8": "components.json",
   "9": "What You Must Do When Invoked",
@@ -52,7 +52,5 @@
   "50": ".claude/skills/graphify/references/extraction-spec.md",
   "51": ".codex/skills/graphify/references/extraction-spec.md",
   "52": ".opencode/skills/graphify/references/extraction-spec.md",
-  "53": "agent/skills/graphify/references/extraction-spec.md",
-  "54": "WithdrawForm.tsx",
-  "55": "main.tsx"
+  "53": "agent/skills/graphify/references/extraction-spec.md"
 }

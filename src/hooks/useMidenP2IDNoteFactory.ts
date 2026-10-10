@@ -12,9 +12,12 @@ import {
   NoteArray,
   NoteAttachment,
   TransactionRequestBuilder,
-  Word,
 } from "@miden-sdk/miden-sdk";
 import type { SolveIntentParams } from "@epoch-protocol/epoch-intents-sdk";
+import {
+  randomMultisigSalt,
+  withMultisigAuthArgs,
+} from "../lib/miden-multisig-auth";
 
 interface Options {
   midenAccountId: string | null;
@@ -28,14 +31,6 @@ const WAIT_FOR_TRANSACTION_TIMEOUT_MS = 120_000;
 function toAccountId(id: string): AccountId {
   const s = id.trim();
   return s.startsWith("0x") ? AccountId.fromHex(s) : AccountId.fromBech32(s);
-}
-
-function createFeeConversionSalt(): Word {
-  // Each 32-bit limb is a valid Miden field element. Four independent limbs
-  // give the Guarded Multisig account a fresh replay guard for this request.
-  return new Word(
-    BigUint64Array.from(crypto.getRandomValues(new Uint32Array(4)), BigInt),
-  );
 }
 
 /**
@@ -55,11 +50,12 @@ export function useMidenP2IDNoteFactory({
   onStatus,
   onNoteCreated,
 }: Options): SolveIntentParams["createMidenP2IDENote"] {
-  const { requestTransaction, waitForTransaction } = useMidenFiWallet();
-  // The app-owned client is used only for the public chain tip required to
-  // calculate the absolute reclaim height. The wallet owns the account and
-  // signs/submits the custom transaction below.
-  const { client, isReady } = useMiden();
+  const { requestTransaction, waitForTransaction, requestGuardianInfo } =
+    useMidenFiWallet();
+  // The app-owned client only reads the public chain: the tip for the absolute
+  // reclaim height and, for a Guardian account, the fee faucet. The wallet owns
+  // the account and signs/submits the custom transaction below.
+  const { client, isReady, runExclusive } = useMiden();
   const hasLoggedClientReady = useRef(false);
 
   useEffect(() => {
@@ -84,7 +80,7 @@ export function useMidenP2IDNoteFactory({
         if (!bindingAttachmentFelts?.length) {
           throw new Error("Missing mandate-binding attachment felts from SDK");
         }
-        if (!requestTransaction) {
+        if (!requestTransaction || !requestGuardianInfo) {
           throw new Error("Wallet does not support custom transactions");
         }
         if (!isReady || !client) {
@@ -92,6 +88,12 @@ export function useMidenP2IDNoteFactory({
             "Miden client not ready yet — retry once it initializes",
           );
         }
+
+        const { isGuardianAccount } = await requestGuardianInfo();
+        const chain = await runExclusive(async () => ({
+          syncHeight: await client.getSyncHeight(),
+          feeFaucetId: isGuardianAccount ? await client.feeFaucetId() : null,
+        }));
 
         const assets = new NoteAssets([
           new FungibleAsset(toAccountId(faucetIdParam), BigInt(amountParam)),
@@ -105,7 +107,7 @@ export function useMidenP2IDNoteFactory({
         // P2IDE reclaim height is ABSOLUTE; the SDK gives a RELATIVE recallBlocks
         // (allocator min + buffer). Convert against the client's synced chain tip
         // (getSyncHeight needs the chain, not the account).
-        const currentBlock = await client.getSyncHeight();
+        const currentBlock = chain.syncHeight;
         if (!Number.isFinite(currentBlock) || currentBlock <= 0) {
           throw new Error(
             "Miden client not synced yet — retry once the block height is available",
@@ -123,11 +125,19 @@ export function useMidenP2IDNoteFactory({
         );
         const noteId = note.id().toString();
 
-        // This request crosses into the wallet, so it must carry its own fresh
-        // replay guard instead of asking this app-owned client to inspect the
-        // wallet account.
-        const txRequest = new TransactionRequestBuilder()
-          .withFeeConversionSalt(createFeeConversionSalt())
+        // A Guardian account is a multisig: since Miden 0.17 it aborts unless the
+        // request carries multisig auth args, and `withFeeConversionSalt` no
+        // longer satisfies it. A single-sig account needs nothing here.
+        let builder = new TransactionRequestBuilder();
+        if (chain.feeFaucetId) {
+          builder = withMultisigAuthArgs(builder, {
+            boundBlockNum: currentBlock,
+            salt: randomMultisigSalt(),
+            feeFaucetPrefix: chain.feeFaucetId.prefix().asInt(),
+            feeFaucetSuffix: chain.feeFaucetId.suffix().asInt(),
+          });
+        }
+        const txRequest = builder
           .withOwnOutputNotes(new NoteArray([note]))
           .build();
 
@@ -165,8 +175,10 @@ export function useMidenP2IDNoteFactory({
       midenAccountId,
       requestTransaction,
       waitForTransaction,
+      requestGuardianInfo,
       client,
       isReady,
+      runExclusive,
       onStatus,
       onNoteCreated,
     ],
