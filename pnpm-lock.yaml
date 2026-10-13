@@ -18,17 +18,17 @@ importers:
         specifier: ^0.34.0
         version: 0.34.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       '@miden-sdk/miden-sdk':
-        specifier: 0.17.2
-        version: 0.17.2
+        specifier: 0.17.3
+        version: 0.17.3
       '@miden-sdk/miden-wallet-adapter-base':
-        specifier: 0.17.2
-        version: 0.17.2(@miden-sdk/miden-sdk@0.17.2)
+        specifier: 0.17.3
+        version: 0.17.3(@miden-sdk/miden-sdk@0.17.3)
       '@miden-sdk/miden-wallet-adapter-react':
-        specifier: 0.17.2
-        version: 0.17.2(@miden-sdk/miden-sdk@0.17.2)(@miden-sdk/react@0.17.2(@miden-sdk/miden-sdk@0.17.2)(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5)))(@types/react@19.2.14)(react@19.2.5)(typescript@5.9.3)
+        specifier: 0.17.3
+        version: 0.17.3(@miden-sdk/miden-sdk@0.17.3)(@miden-sdk/react@0.17.3(@miden-sdk/miden-sdk@0.17.3)(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5)))(@types/react@19.2.14)(react@19.2.5)(typescript@5.9.3)
       '@miden-sdk/react':
-        specifier: 0.17.2
-        version: 0.17.2(@miden-sdk/miden-sdk@0.17.2)(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5))
+        specifier: 0.17.3
+        version: 0.17.3(@miden-sdk/miden-sdk@0.17.3)(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5))
       '@phosphor-icons/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -757,25 +757,25 @@ packages:
     resolution: {integrity: sha512-w8CVbdkDrVXFJbfBSlDfafDR6BAkpDmv1bC1UJVCoVny5tW2RKAdn9i68Xf7asYT4TnUhl/hN4zfUiKQq9II4g==}
     engines: {node: '>=16.0.0'}
 
-  '@miden-sdk/miden-sdk@0.17.2':
-    resolution: {integrity: sha512-HM53/IK4IKourAuui97Jroza9fP7CrL/KpKszhoX0NUn/cBepNVgsNtousZvWq/P/Xe0l9MRpDre5M79vYbgow==}
+  '@miden-sdk/miden-sdk@0.17.3':
+    resolution: {integrity: sha512-37FIyywn/HAiFj/VM81J/FcAq+ZcaTXvHVnOizPfMZz/XEwgeVVYqawwFFSsemRT/bY910oV3b7Zi0iGGiPT7w==}
 
-  '@miden-sdk/miden-wallet-adapter-base@0.17.2':
-    resolution: {integrity: sha512-PWz7vHChi9X4GvQyO94bvSwBUppnas0FGFG0IHSNepknDzA6ZtNVIdgDLgo0UISMRgpKwT8IaQxv01XRRmyIIQ==}
+  '@miden-sdk/miden-wallet-adapter-base@0.17.3':
+    resolution: {integrity: sha512-nD3BbM9cRgXG6PZxpyT8Ho2wZs2TQXb8gouajuVw9lWQGUblh98JPPoAntdrzz5n91hUUyKbATXIIjnjPchRQA==}
     peerDependencies:
-      '@miden-sdk/miden-sdk': ^0.17.2
+      '@miden-sdk/miden-sdk': ^0.17.3
 
-  '@miden-sdk/miden-wallet-adapter-miden@0.17.2':
-    resolution: {integrity: sha512-nKiWYMD8hr3TcjV+hgoPdTWnnK5isPtCQ5nkdaqBTEOyPTa9ctVGUBbRPJUwoac9srrSLRNWz4opseXGV7Wg2A==}
+  '@miden-sdk/miden-wallet-adapter-miden@0.17.3':
+    resolution: {integrity: sha512-0BivVjz4SdsJcmVeaKlcA2ICaovCfdOXAJPGRHsqzqzVvOVyfM6EZ2fbYKkrtZfRU7c2xf1FxvvwXn0MQJdmAg==}
     peerDependencies:
-      '@miden-sdk/miden-sdk': ^0.17.2
+      '@miden-sdk/miden-sdk': ^0.17.3
       typescript: ^5.0.0
 
-  '@miden-sdk/miden-wallet-adapter-react@0.17.2':
-    resolution: {integrity: sha512-KI7lBSNacxeU2ABWE/0uoUIfgwHfCqWVE5VE6UQzX2gdl9sj9kkNifKnGqBNh7JpUS+xjfO/s8CR6defxsBCRQ==}
+  '@miden-sdk/miden-wallet-adapter-react@0.17.3':
+    resolution: {integrity: sha512-Ih7tXDPF+MQFxL93NSWZikKrkNNNm8Rs7maQRr/DVkqi6nR2d5+kijhOkVnhXPQSF3HPtCzPsMJwPRR3sy3G4w==}
     peerDependencies:
-      '@miden-sdk/miden-sdk': ^0.17.2
-      '@miden-sdk/react': ^0.17.2
+      '@miden-sdk/miden-sdk': ^0.17.3
+      '@miden-sdk/react': ^0.17.3
       '@types/react': ^18.0.0 || ^19.0.0
       react: ^18.0.0 || ^19.0.0
     peerDependenciesMeta:
@@ -784,25 +784,25 @@ packages:
       '@types/react':
         optional: true
 
-  '@miden-sdk/node-darwin-arm64@0.17.2':
-    resolution: {integrity: sha512-XAVsfF4EAKV1cwetz9lKCMC5YFwfPCCstfi7F0dx/ndupQQfm8Bws3QXHQabhCZCHhiKMj4nK/kIMZ76dHKaxA==}
+  '@miden-sdk/node-darwin-arm64@0.17.3':
+    resolution: {integrity: sha512-9jvvccYqyUUSr0svSsIf/ZVd9ZzOGT9dmw/8pM2/n0IB+EzIZTFPmHTZH4Pivu7hjBy0W7UFLCESZdYg0RVOdQ==}
     cpu: [arm64]
     os: [darwin]
 
-  '@miden-sdk/node-darwin-x64@0.17.2':
-    resolution: {integrity: sha512-wBkbrnAH3PJlRsmlqGTjyXRHRfN48YZQPR40EOQY3+2zCmdRm1HsylonKVKPNmPyS6Ldu1IxMfDCfgpNUkOxyw==}
+  '@miden-sdk/node-darwin-x64@0.17.3':
+    resolution: {integrity: sha512-Rk0hlwEZFISc4BOTL0Unb+bFW++sb0ZUzXJKiVYvva6rKCga4lcgmTKtXhIPWnWyqAsykp7ljFq+ys2BFAeViw==}
     cpu: [x64]
     os: [darwin]
 
-  '@miden-sdk/node-linux-x64-gnu@0.17.2':
-    resolution: {integrity: sha512-QqQp16R39+e2HpbTdujU9qYwvkG+y6ldT5PXOgzpWODv9Q9+TIpkh9FyorqC3UzpkWGuezTXtqNT8m6SnPtk9A==}
+  '@miden-sdk/node-linux-x64-gnu@0.17.3':
+    resolution: {integrity: sha512-S4R49wHo8nyBC2dfBhZYPpFSzqbDneU0N0fzd1OuL1D7VRpc4hL6dXs5hiaifVZHJL8SNH9mksCwr6eUeYdjTA==}
     cpu: [x64]
     os: [linux]
 
-  '@miden-sdk/react@0.17.2':
-    resolution: {integrity: sha512-cu6pjS7Vd70M0tWvuuLZ3QsK5d8J99W/c17y7t44/INM5Vr9YFDPAN9rdzP3tAiM0heceH1+ijc8FmAHfiv0dw==}
+  '@miden-sdk/react@0.17.3':
+    resolution: {integrity: sha512-oLY0rrcXUvIcx3mpeIu7S/G0sVmgs+ZpitZWcYU2uxYKq5yM9+Bd6mMY13nbXIYqRWLN3od9B2bMdrDHWC87YA==}
     peerDependencies:
-      '@miden-sdk/miden-sdk': ^0.17.2
+      '@miden-sdk/miden-sdk': ^0.17.3
       '@types/react': '>=18.0.0'
       react: '>=18.0.0'
     peerDependenciesMeta:
@@ -6263,50 +6263,50 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@miden-sdk/miden-sdk@0.17.2':
+  '@miden-sdk/miden-sdk@0.17.3':
     dependencies:
       dexie: 4.4.2
       glob: 11.1.0
     optionalDependencies:
-      '@miden-sdk/node-darwin-arm64': 0.17.2
-      '@miden-sdk/node-darwin-x64': 0.17.2
-      '@miden-sdk/node-linux-x64-gnu': 0.17.2
+      '@miden-sdk/node-darwin-arm64': 0.17.3
+      '@miden-sdk/node-darwin-x64': 0.17.3
+      '@miden-sdk/node-linux-x64-gnu': 0.17.3
 
-  '@miden-sdk/miden-wallet-adapter-base@0.17.2(@miden-sdk/miden-sdk@0.17.2)':
+  '@miden-sdk/miden-wallet-adapter-base@0.17.3(@miden-sdk/miden-sdk@0.17.3)':
     dependencies:
-      '@miden-sdk/miden-sdk': 0.17.2
+      '@miden-sdk/miden-sdk': 0.17.3
       eventemitter3: 5.0.4
 
-  '@miden-sdk/miden-wallet-adapter-miden@0.17.2(@miden-sdk/miden-sdk@0.17.2)(typescript@5.9.3)':
+  '@miden-sdk/miden-wallet-adapter-miden@0.17.3(@miden-sdk/miden-sdk@0.17.3)(typescript@5.9.3)':
     dependencies:
-      '@miden-sdk/miden-sdk': 0.17.2
-      '@miden-sdk/miden-wallet-adapter-base': 0.17.2(@miden-sdk/miden-sdk@0.17.2)
+      '@miden-sdk/miden-sdk': 0.17.3
+      '@miden-sdk/miden-wallet-adapter-base': 0.17.3(@miden-sdk/miden-sdk@0.17.3)
       typescript: 5.9.3
 
-  '@miden-sdk/miden-wallet-adapter-react@0.17.2(@miden-sdk/miden-sdk@0.17.2)(@miden-sdk/react@0.17.2(@miden-sdk/miden-sdk@0.17.2)(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5)))(@types/react@19.2.14)(react@19.2.5)(typescript@5.9.3)':
+  '@miden-sdk/miden-wallet-adapter-react@0.17.3(@miden-sdk/miden-sdk@0.17.3)(@miden-sdk/react@0.17.3(@miden-sdk/miden-sdk@0.17.3)(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5)))(@types/react@19.2.14)(react@19.2.5)(typescript@5.9.3)':
     dependencies:
-      '@miden-sdk/miden-sdk': 0.17.2
-      '@miden-sdk/miden-wallet-adapter-base': 0.17.2(@miden-sdk/miden-sdk@0.17.2)
-      '@miden-sdk/miden-wallet-adapter-miden': 0.17.2(@miden-sdk/miden-sdk@0.17.2)(typescript@5.9.3)
+      '@miden-sdk/miden-sdk': 0.17.3
+      '@miden-sdk/miden-wallet-adapter-base': 0.17.3(@miden-sdk/miden-sdk@0.17.3)
+      '@miden-sdk/miden-wallet-adapter-miden': 0.17.3(@miden-sdk/miden-sdk@0.17.3)(typescript@5.9.3)
       react: 19.2.5
     optionalDependencies:
-      '@miden-sdk/react': 0.17.2(@miden-sdk/miden-sdk@0.17.2)(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5))
+      '@miden-sdk/react': 0.17.3(@miden-sdk/miden-sdk@0.17.3)(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5))
       '@types/react': 19.2.14
     transitivePeerDependencies:
       - typescript
 
-  '@miden-sdk/node-darwin-arm64@0.17.2':
+  '@miden-sdk/node-darwin-arm64@0.17.3':
     optional: true
 
-  '@miden-sdk/node-darwin-x64@0.17.2':
+  '@miden-sdk/node-darwin-x64@0.17.3':
     optional: true
 
-  '@miden-sdk/node-linux-x64-gnu@0.17.2':
+  '@miden-sdk/node-linux-x64-gnu@0.17.3':
     optional: true
 
-  '@miden-sdk/react@0.17.2(@miden-sdk/miden-sdk@0.17.2)(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5))':
+  '@miden-sdk/react@0.17.3(@miden-sdk/miden-sdk@0.17.3)(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5))':
     dependencies:
-      '@miden-sdk/miden-sdk': 0.17.2
+      '@miden-sdk/miden-sdk': 0.17.3
       react: 19.2.5
       zustand: 5.0.12(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.4.0(react@19.2.5))
     optionalDependencies:
