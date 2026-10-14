@@ -231,7 +231,10 @@ export async function getEVMToMidenQuote(
 
 export async function buildEVMToMidenIntent(
   sdk: EpochIntentSDK,
-  params: EVMToMidenIntentParams & { preFetchedQuote?: EVMToMidenQuote },
+  params: EVMToMidenIntentParams & {
+    preFetchedQuote?: EVMToMidenQuote;
+    onResourceLockStatus?: SolveIntentParams["onResourceLockStatus"];
+  },
 ): Promise<IntentResult> {
   let taskTypeString: string;
   let intentData: unknown;
@@ -252,6 +255,7 @@ export async function buildEVMToMidenIntent(
       intentData,
       quoteResult,
       collateralType: "evm" as CollateralType,
+      onResourceLockStatus: params.onResourceLockStatus,
     });
 
     return {

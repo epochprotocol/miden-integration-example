@@ -85,6 +85,7 @@ export function WithdrawTab() {
         isFetchingQuote={withdraw.isFetchingQuote}
         isLoading={withdraw.isLoading}
         isSDKReady={withdraw.isSDKReady}
+        resourceLockStatus={withdraw.resourceLockStatus}
       />
       <IntentStatus
         result={withdraw.withdrawResult}
