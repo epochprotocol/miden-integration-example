@@ -16,7 +16,7 @@ const TESTNET_ALLOCATOR_URL = import.meta.env.VITE_TESTNET_ALLOCATOR_URL;
 const testnetConfig: MidenNetworkConfig = {
   rpcUrl: TESTNET_RPC_URL,
   allocatorUrl: TESTNET_ALLOCATOR_URL,
-  defaultFaucetId: "0x537c15a622074e91188aa894456c52",
+  defaultFaucetId: "0x4cbdcaffe75f0a317482224dae6436",
   midenscanBase: "https://testnet.midenscan.com",
 };
 

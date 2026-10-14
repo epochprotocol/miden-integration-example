@@ -23,6 +23,7 @@ const PRAGMA_SUPPORTED_MIDEN_SYMBOLS = new Set([
  */
 const MIDEN_FAUCET_DECIMALS: Record<MidenNetwork, Record<string, number>> = {
   testnet: {
+    "4cbdcaffe75f0a317482224dae6436": 6,
     "537c15a622074e91188aa894456c52": 6,
     "6500ca8c2dd69e9147ab7eafad162c": 6,
     d17976f0809a8191412f2a126625df: 6,
