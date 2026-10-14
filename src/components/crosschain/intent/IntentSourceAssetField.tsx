@@ -57,8 +57,8 @@ export function IntentSourceAssetField({
         )}
       {!isLoadingAssets && assets.length === 0 && unsupportedAssetCount > 0 && (
         <p className="text-xs text-amber-800">
-          No Pragma-priced assets found. This bridge supports USDC, USDT, DAI,
-          WETH, and WBTC.
+          No Pragma-priced assets found. This bridge supports USDCx, USDC, USDT,
+          DAI, WETH, and WBTC.
         </p>
       )}
       {!isLoadingAssets && assets.length > 0 && unsupportedAssetCount > 0 && (
