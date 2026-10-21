@@ -8,14 +8,14 @@ import type {
 } from "../../types/miden";
 import type { IntentQuotePhase } from "../../hooks/useEpochIntent";
 import {
-  DEFAULT_TESTNET_CHAIN_ID_STR,
-  isSupportedTestnetEvmChain,
+  DEFAULT_EVM_CHAIN_ID_STR,
+  isSupportedEvmChain,
 } from "../../constants/chains";
 import {
   getMidenFaucetDecimals,
   isPragmaSupportedMidenAsset,
 } from "../../constants/miden-tokens";
-import { EPOCH_TESTNET_TOKENS } from "../../constants/evm-tokens";
+import { EPOCH_EVM_TOKENS } from "../../constants/evm-tokens";
 import { midenscanNoteUrl } from "../../lib/explorers";
 import {
   extractIntentIdentity,
@@ -23,6 +23,7 @@ import {
 } from "../../lib/intent-result";
 import { useIntentSettlementView } from "../../hooks/useIntentSettlementView";
 import { useMidenP2IDNoteFactory } from "../../hooks/useMidenP2IDNoteFactory";
+import type { CachedMidenNote } from "../../lib/miden-note-retry";
 import { useMidenNetwork } from "../../hooks/useMidenNetwork";
 import { Button } from "@/components/ui/button";
 import { IntentSourceAssetField } from "./intent/IntentSourceAssetField";
@@ -82,13 +83,13 @@ export function IntentForm({
   // useState defaults: the wallet connects after this mounts.
   const [edits, setEdits] = useState<Partial<IntentDestination>>({});
   const destination: IntentDestination = {
-    outputToken: edits.outputToken ?? EPOCH_TESTNET_TOKENS[0].address,
-    minTokenOut: edits.minTokenOut ?? "1000000000000000000",
+    outputToken: edits.outputToken ?? EPOCH_EVM_TOKENS[0].address,
+    minTokenOut: edits.minTokenOut ?? "1000000",
     chainId:
       edits.chainId ??
-      (isSupportedTestnetEvmChain(walletChainId)
+      (isSupportedEvmChain(walletChainId)
         ? String(walletChainId)
-        : DEFAULT_TESTNET_CHAIN_ID_STR),
+        : DEFAULT_EVM_CHAIN_ID_STR),
     evmAddress: edits.evmAddress ?? address ?? "",
   };
   const [confirmStatus, setConfirmStatus] = useState("");
@@ -98,13 +99,18 @@ export function IntentForm({
   const [localIntentUserAddress, setLocalIntentUserAddress] = useState<
     string | undefined
   >(undefined);
-  const [localMidenNoteId, setLocalMidenNoteId] = useState<string | undefined>(
-    undefined,
-  );
+  const [localMidenNote, setLocalMidenNote] = useState<
+    CachedMidenNote | undefined
+  >(undefined);
+
+  const clearQuote = () => {
+    setLocalMidenNote(undefined);
+    onClearQuote();
+  };
 
   const editDestination = (key: keyof IntentDestination, value: string) => {
     setEdits((prev) => ({ ...prev, [key]: value }));
-    onClearQuote();
+    clearQuote();
   };
 
   const destinationChainIdNum = Number.parseInt(destination.chainId, 10);
@@ -132,8 +138,9 @@ export function IntentForm({
 
   const createMidenP2IDENote = useMidenP2IDNoteFactory({
     midenAccountId,
+    existingNote: localMidenNote,
     onStatus: setConfirmStatus,
-    onNoteCreated: setLocalMidenNoteId,
+    onNoteCreated: setLocalMidenNote,
   });
 
   const buildParams = (): CrossChainIntentParams => {
@@ -245,7 +252,7 @@ export function IntentForm({
           unsupportedAssetCount={unsupportedAssetCount}
           onSelect={(assetId) => {
             setSelectedAssetId(assetId);
-            onClearQuote();
+            clearQuote();
           }}
         />
 
@@ -259,7 +266,7 @@ export function IntentForm({
             quote={activeQuote}
             faucetDecimals={midenFaucetDecimals}
             assetSymbol={selectedAsset?.symbol}
-            onRequote={onClearQuote}
+            onRequote={clearQuote}
           />
         )}
 
@@ -299,11 +306,11 @@ export function IntentForm({
           </p>
         )}
 
-        {localMidenNoteId && (
+        {localMidenNote && (
           <ExplorerHashCard
             label="Miden note id (P2IDE)"
-            value={localMidenNoteId}
-            href={midenscanNoteUrl(localMidenNoteId)}
+            value={localMidenNote.noteId}
+            href={midenscanNoteUrl(localMidenNote.noteId)}
             linkLabel="View on Midenscan"
             tone="neutral"
           />

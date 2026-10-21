@@ -26,6 +26,9 @@ export default defineConfig({
     // After rebuilding the SDK, restart the dev server with `--force` to refresh.
     include: ["@epoch-protocol/epoch-intents-sdk"],
   },
+  server: {
+    allowedHosts: ["miden-integration-example.epochprotocol.xyz"],
+  },
   build: {
     target: "esnext",
   },

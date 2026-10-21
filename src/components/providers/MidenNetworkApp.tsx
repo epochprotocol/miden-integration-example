@@ -10,6 +10,7 @@ import {
   DEFAULT_MIDEN_NETWORK,
   getMidenNetworkConfig,
 } from "../../config/miden";
+import { DEPLOYMENT_PROFILE } from "../../config/deployment";
 import { MidenNetworkContext } from "../../hooks/useMidenNetwork";
 
 export function MidenNetworkApp() {
@@ -25,7 +26,9 @@ export function MidenNetworkApp() {
         }}
       >
         <MidenFiSignerProvider
-          network={WalletAdapterNetwork.Testnet}
+          network={
+            DEPLOYMENT_PROFILE.miden.walletNetwork as WalletAdapterNetwork
+          }
           appName="Miden Integration Example"
           allowedPrivateData={AllowedPrivateData.Assets}
         >

@@ -1,25 +1,23 @@
-export type MidenNetwork = "testnet";
+import { DEPLOYMENT_PROFILE } from "./deployment";
 
-export const DEFAULT_MIDEN_NETWORK: MidenNetwork = "testnet";
+export type MidenNetwork = "mainnet";
+
+export const DEFAULT_MIDEN_NETWORK: MidenNetwork = "mainnet";
 
 export interface MidenNetworkConfig {
   rpcUrl: string;
-  allocatorUrl: string;
+  apiBaseUrl: string;
   defaultFaucetId: string;
   midenscanBase: string;
 }
 
-const TESTNET_RPC_URL =
-  import.meta.env.VITE_MIDEN_RPC_URL?.trim() ?? "https://rpc.testnet.miden.io";
-const TESTNET_ALLOCATOR_URL = import.meta.env.VITE_TESTNET_ALLOCATOR_URL;
-
-const testnetConfig: MidenNetworkConfig = {
-  rpcUrl: TESTNET_RPC_URL,
-  allocatorUrl: TESTNET_ALLOCATOR_URL,
-  defaultFaucetId: "0x4cbdcaffe75f0a317482224dae6436",
-  midenscanBase: "https://testnet.midenscan.com",
+const mainnetConfig: MidenNetworkConfig = {
+  rpcUrl: DEPLOYMENT_PROFILE.miden.rpcUrl,
+  apiBaseUrl: DEPLOYMENT_PROFILE.epoch.apiBaseUrl,
+  defaultFaucetId: DEPLOYMENT_PROFILE.miden.tokens[0].faucetId,
+  midenscanBase: DEPLOYMENT_PROFILE.miden.midenscanBase,
 };
 
 export function getMidenNetworkConfig(): MidenNetworkConfig {
-  return testnetConfig;
+  return mainnetConfig;
 }

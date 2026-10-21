@@ -51,8 +51,8 @@ function App() {
                   Wallets
                 </div>
                 <div className="text-sm text-neutral-700">
-                  Connect both to run end-to-end flows. EVM pays gas on any
-                  Epoch testnet chain; Miden provides/receives notes.
+                  Connect both to run end-to-end flows. EVM uses Base mainnet;
+                  Miden provides or receives Cedar notes.
                 </div>
               </div>
             </div>
