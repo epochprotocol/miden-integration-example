@@ -1,7 +1,4 @@
-import {
-  EPOCH_EVM_TOKENS,
-  type EvmToken,
-} from "../../../constants/evm-tokens";
+import { EPOCH_EVM_TOKENS, type EvmToken } from "../../../constants/evm-tokens";
 
 export const WITHDRAW_TOKENS: EvmToken[] = [
   ...EPOCH_EVM_TOKENS,

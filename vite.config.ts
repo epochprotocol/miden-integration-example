@@ -31,5 +31,8 @@ export default defineConfig({
   },
   build: {
     target: "esnext",
+    // The Miden WASM + wallet graph exceeds this host's memory during minification.
+    // Keep production builds deployable; Caddy still serves generated assets compressed.
+    minify: false,
   },
 });

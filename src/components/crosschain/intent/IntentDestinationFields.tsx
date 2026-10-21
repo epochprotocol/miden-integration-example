@@ -7,10 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  EPOCH_EVM_CHAINS,
-  getEvmChainName,
-} from "../../../constants/chains";
+import { EPOCH_EVM_CHAINS, getEvmChainName } from "../../../constants/chains";
 import { EPOCH_EVM_TOKENS } from "../../../constants/evm-tokens";
 
 export interface IntentDestination {

@@ -2,11 +2,7 @@ import { DEPLOYMENT_PROFILE } from "../config/deployment";
 import type { MidenNetwork } from "../config/miden";
 import { normalizeMidenIdToHex } from "../services/epoch-bridge";
 
-const PRAGMA_SUPPORTED_MIDEN_SYMBOLS = new Set([
-  "USDC",
-  "USDCX",
-  "ETH",
-]);
+const PRAGMA_SUPPORTED_MIDEN_SYMBOLS = new Set(["USDC", "USDCX", "ETH"]);
 
 function toMapKey(faucetId: string): string {
   const hex = normalizeMidenIdToHex(faucetId);

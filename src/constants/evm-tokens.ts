@@ -7,9 +7,7 @@ export interface EvmToken {
 }
 
 /** Canonical EVM token list for this deployment. */
-export const EPOCH_EVM_TOKENS: EvmToken[] = [
-  ...DEPLOYMENT_PROFILE.evmTokens,
-];
+export const EPOCH_EVM_TOKENS: EvmToken[] = [...DEPLOYMENT_PROFILE.evmTokens];
 
 const BY_ADDR: Map<string, EvmToken> = new Map(
   EPOCH_EVM_TOKENS.map((token) => [token.address.toLowerCase(), token]),
