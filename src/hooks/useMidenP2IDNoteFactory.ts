@@ -22,6 +22,7 @@ import {
   reuseOrCreateMidenNote,
   type CachedMidenNote,
 } from "../lib/miden-note-retry";
+import { requirePublicMidenAccountId } from "../lib/miden-account-validation";
 
 interface Options {
   midenAccountId: string | null;
@@ -78,10 +79,17 @@ export function useMidenP2IDNoteFactory({
       recallBlocks,
       bindingAttachmentFelts,
     ) => {
+      if (!midenAccountId) {
+        throw new Error("Missing Miden account id");
+      }
+      requirePublicMidenAccountId(midenAccountId, "Miden source account");
       const quote = {
         amount: amountParam,
         token: faucetIdParam,
         recipient: allocatorId,
+        mandateBinding: Array.from(bindingAttachmentFelts ?? [], (felt) =>
+          felt.toString(),
+        ).join(":"),
       };
       const createNote = async () => {
         onStatus("Resource lock required — creating P2IDE note on Miden…");

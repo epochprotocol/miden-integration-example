@@ -8,6 +8,7 @@ import { truncateHash } from "../../lib/explorers";
 import { readDepositHash, readIntentError } from "../../lib/intent-result";
 import { findEvmToken } from "../../constants/evm-tokens";
 import { getMidenNetworkConfig } from "../../config/miden";
+import { getMidenPublicAccountError } from "../../lib/miden-account-validation";
 import { Button } from "@/components/ui/button";
 import {
   CUSTOM_TOKEN_DEFAULT_DECIMALS,
@@ -56,6 +57,9 @@ export function WithdrawForm({
 
   // Defaults to the connected wallet until the user types their own.
   const midenRecipientId = midenRecipientInput || (accounts[0]?.id ?? "");
+  const midenRecipientError = midenRecipientId
+    ? getMidenPublicAccountError(midenRecipientId, "Miden destination account")
+    : "Enter a Miden destination account";
 
   const resolvedFaucetId = midenFaucetId.trim();
   const finalToken = customToken || evmToken;
@@ -70,6 +74,9 @@ export function WithdrawForm({
   const buildParams = (): EVMToMidenIntentParams => {
     if (!connectedAddress) {
       throw new Error("Connect EVM wallet first");
+    }
+    if (midenRecipientError) {
+      throw new Error(midenRecipientError);
     }
     return {
       sourceChainId: walletChainId,
@@ -88,6 +95,7 @@ export function WithdrawForm({
     !!connectedAddress &&
     walletChainId > 0 &&
     !!midenRecipientId &&
+    !midenRecipientError &&
     !!resolvedFaucetId &&
     !!finalToken &&
     minTokenOut.trim() !== "" &&
@@ -121,6 +129,11 @@ export function WithdrawForm({
   };
 
   const handleConfirm = async () => {
+    if (midenRecipientError) {
+      setStatus(`Error: ${midenRecipientError}`);
+      toast.error(midenRecipientError, { id: WITHDRAW_DEPOSIT_TOAST_ID });
+      return;
+    }
     // Two-stage toast: (1) Compact deposit signature/confirmation,
     // (2) SIO Miden settlement — dismissed by parent WithdrawTab once the
     // synthetic Miden row appears in the status poll.
@@ -208,6 +221,12 @@ export function WithdrawForm({
             onClearQuote();
           }}
         />
+
+        {midenRecipientError && (
+          <p className="text-xs text-red-600" role="alert">
+            {midenRecipientError}
+          </p>
+        )}
 
         {pendingQuote && (
           <WithdrawQuoteSummary

@@ -8,6 +8,7 @@ export interface MidenNoteQuote {
   amount: string;
   token: string;
   recipient: string;
+  mandateBinding: string;
 }
 
 export interface CachedMidenNote {
@@ -22,7 +23,8 @@ function matchesQuote(
   return (
     cachedQuote.amount === requestedQuote.amount &&
     cachedQuote.token === requestedQuote.token &&
-    cachedQuote.recipient === requestedQuote.recipient
+    cachedQuote.recipient === requestedQuote.recipient &&
+    cachedQuote.mandateBinding === requestedQuote.mandateBinding
   );
 }
 

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { MIDEN_VIRTUAL_CHAIN_ID } from "@epoch-protocol/epoch-intents-sdk";
+import { mainnetGraph } from "@epoch-protocol/epoch-commons-sdk";
 import { getDeploymentProfile } from "../src/config/deployment.ts";
 
 describe("Miden mainnet configuration", () => {
@@ -15,22 +15,28 @@ describe("Miden mainnet configuration", () => {
         decimals: 6,
       },
     ]);
-    assert.equal(profile.miden.chainId, MIDEN_VIRTUAL_CHAIN_ID);
+    assert.equal(profile.miden.chainId, mainnetGraph.chains.Miden.chainId);
     assert.equal(profile.miden.chainId, 999999999);
     assert.deepEqual(profile.miden.tokens, [
       {
         symbol: "USDCX",
-        faucetId: "mm1arnfum9xuwwlrvgvrefejwvlavn3vk24_qr7qqq9wr6w",
-        decimals: 6,
+        faucetId: mainnetGraph.tokens.USDCX.contractAddress.Miden,
+        decimals: mainnetGraph.tokens.USDCX.decimals,
       },
       {
         symbol: "ETH",
-        faucetId: "mm1apqelr6tlaeftyfj4f7w59dycysmtawe_qr7qqq9wr6w",
-        decimals: 18,
+        faucetId: mainnetGraph.tokens.WETH.contractAddress.Miden,
+        decimals: mainnetGraph.tokens.WETH.decimals,
       },
     ]);
-    assert.equal(profile.miden.rpcUrl, "https://rpc.cedar.miden.io");
-    assert.equal(profile.miden.midenscanBase, "https://midenscan.com");
+    assert.equal(
+      profile.miden.rpcUrl,
+      mainnetGraph.oracles.PragmaMidenV1.rpcUrl,
+    );
+    assert.equal(
+      profile.miden.midenscanBase,
+      mainnetGraph.chains.Miden.explorer,
+    );
   });
 
   it("accepts non-empty public runtime endpoint overrides", () => {

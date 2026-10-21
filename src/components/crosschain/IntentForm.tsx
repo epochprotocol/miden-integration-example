@@ -25,6 +25,7 @@ import { useIntentSettlementView } from "../../hooks/useIntentSettlementView";
 import { useMidenP2IDNoteFactory } from "../../hooks/useMidenP2IDNoteFactory";
 import type { CachedMidenNote } from "../../lib/miden-note-retry";
 import { useMidenNetwork } from "../../hooks/useMidenNetwork";
+import { getMidenPublicAccountError } from "../../lib/miden-account-validation";
 import { Button } from "@/components/ui/button";
 import { IntentSourceAssetField } from "./intent/IntentSourceAssetField";
 import {
@@ -120,6 +121,10 @@ export function IntentForm({
     destination.evmAddress.trim(),
   );
 
+  const midenAccountError = midenAccountId
+    ? getMidenPublicAccountError(midenAccountId, "Miden source account")
+    : "Connect Miden wallet first";
+
   const selectedAsset = supportedMidenAssets.find(
     (a) => a.assetId.toLowerCase() === resolvedSelectedAssetId.toLowerCase(),
   );
@@ -158,6 +163,9 @@ export function IntentForm({
     if (!midenAccountId) {
       throw new Error("Connect Miden wallet first");
     }
+    if (midenAccountError) {
+      throw new Error(midenAccountError);
+    }
     return {
       midenAccountId,
       midenFaucetId: resolvedSelectedAssetId,
@@ -171,6 +179,7 @@ export function IntentForm({
   const canFetch =
     isSDKReady &&
     !!midenAccountId &&
+    !midenAccountError &&
     !!resolvedSelectedAssetId &&
     hasValidEvmRecipient &&
     !!destination.outputToken &&
@@ -193,6 +202,10 @@ export function IntentForm({
 
   const handleConfirm = () => {
     if (quotePhase.status !== "ready") return;
+    if (midenAccountError) {
+      setConfirmStatus(`Error: ${midenAccountError}`);
+      return;
+    }
 
     void toast.promise(
       (async () => {
@@ -255,6 +268,12 @@ export function IntentForm({
             clearQuote();
           }}
         />
+
+        {midenAccountError && (
+          <p className="text-xs text-red-600" role="alert">
+            {midenAccountError}
+          </p>
+        )}
 
         <IntentDestinationFields
           values={destination}

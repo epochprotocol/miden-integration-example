@@ -1,17 +1,23 @@
-import {
-  MIDEN_VIRTUAL_CHAIN_ID,
-  mainnetGraph,
-} from "@epoch-protocol/epoch-intents-sdk";
+import { mainnetGraph } from "@epoch-protocol/epoch-commons-sdk";
 
 export interface PublicDeploymentEnv {
   VITE_EPOCH_API_BASE_URL?: string;
   VITE_MIDEN_RPC_URL?: string;
 }
 
+interface MidenMainnetGraph {
+  chains: { Miden: { chainId: number; explorer: string } };
+  tokens: {
+    USDCX: { contractAddress: { Miden: string }; decimals: number };
+    WETH: { contractAddress: { Miden: string }; decimals: number };
+  };
+  oracles: { PragmaMidenV1: { rpcUrl: string } };
+}
+
 interface MidenAsset {
   symbol: "USDCX" | "ETH";
   faucetId: string;
-  decimals: 6 | 18;
+  decimals: number;
 }
 
 export interface DeploymentProfile {
@@ -26,26 +32,29 @@ export interface DeploymentProfile {
     apiBaseUrl: string;
   };
   miden: {
-    chainId: typeof MIDEN_VIRTUAL_CHAIN_ID;
+    chainId: number;
     rpcUrl: string;
     tokens: ReadonlyArray<MidenAsset>;
-    midenscanBase: "https://midenscan.com";
+    midenscanBase: string;
     walletNetwork: "mainnet";
   };
 }
 
 const BASE_MAINNET = mainnetGraph.chains.Base;
 const BASE_USDC = mainnetGraph.tokens.USDC;
+const COMMONS_MIDEN_MAINNET = mainnetGraph as unknown as MidenMainnetGraph;
+const MIDEN_MAINNET = COMMONS_MIDEN_MAINNET.chains.Miden;
+const MIDEN_ORACLE = COMMONS_MIDEN_MAINNET.oracles.PragmaMidenV1;
 const MIDEN_ASSETS: ReadonlyArray<MidenAsset> = [
   {
     symbol: "USDCX",
-    faucetId: "mm1arnfum9xuwwlrvgvrefejwvlavn3vk24_qr7qqq9wr6w",
-    decimals: 6,
+    faucetId: COMMONS_MIDEN_MAINNET.tokens.USDCX.contractAddress.Miden,
+    decimals: COMMONS_MIDEN_MAINNET.tokens.USDCX.decimals,
   },
   {
     symbol: "ETH",
-    faucetId: "mm1apqelr6tlaeftyfj4f7w59dycysmtawe_qr7qqq9wr6w",
-    decimals: 18,
+    faucetId: COMMONS_MIDEN_MAINNET.tokens.WETH.contractAddress.Miden,
+    decimals: COMMONS_MIDEN_MAINNET.tokens.WETH.decimals,
   },
 ];
 
@@ -74,10 +83,10 @@ export function getDeploymentProfile(
       ),
     },
     miden: {
-      chainId: MIDEN_VIRTUAL_CHAIN_ID,
-      rpcUrl: endpoint(env.VITE_MIDEN_RPC_URL, "https://rpc.cedar.miden.io"),
+      chainId: MIDEN_MAINNET.chainId,
+      rpcUrl: endpoint(env.VITE_MIDEN_RPC_URL, MIDEN_ORACLE.rpcUrl),
       tokens: MIDEN_ASSETS,
-      midenscanBase: "https://midenscan.com",
+      midenscanBase: MIDEN_MAINNET.explorer,
       walletNetwork: "mainnet",
     },
   };
