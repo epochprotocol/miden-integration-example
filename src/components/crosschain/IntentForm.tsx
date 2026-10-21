@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAccount, useChainId } from "wagmi";
 import { toast } from "sonner";
 import type { SolveIntentParams } from "@epoch-protocol/epoch-intents-sdk";
@@ -41,9 +41,10 @@ interface Props {
   midenAssets: MidenAssetOption[];
   isLoadingMidenAssets: boolean;
   onFetchQuote: (params: CrossChainIntentParams) => Promise<void>;
-  onConfirmIntent: (
-    createMidenP2IDENote: SolveIntentParams["createMidenP2IDENote"],
-  ) => Promise<unknown>;
+  onConfirmIntent: (input: {
+    createMidenP2IDENote: SolveIntentParams["createMidenP2IDENote"];
+    currentMidenAccountId: string;
+  }) => Promise<unknown>;
   onClearQuote: () => void;
   quotePhase: IntentQuotePhase;
   isSDKReady: boolean;
@@ -103,6 +104,15 @@ export function IntentForm({
   const [localMidenNote, setLocalMidenNote] = useState<
     CachedMidenNote | undefined
   >(undefined);
+  const previousMidenAccountId = useRef(midenAccountId);
+
+  useEffect(() => {
+    if (previousMidenAccountId.current !== midenAccountId) {
+      setLocalMidenNote(undefined);
+      onClearQuote();
+      previousMidenAccountId.current = midenAccountId;
+    }
+  }, [midenAccountId, onClearQuote]);
 
   const clearQuote = () => {
     setLocalMidenNote(undefined);
@@ -202,7 +212,7 @@ export function IntentForm({
 
   const handleConfirm = () => {
     if (quotePhase.status !== "ready") return;
-    if (midenAccountError) {
+    if (!midenAccountId || midenAccountError) {
       setConfirmStatus(`Error: ${midenAccountError}`);
       return;
     }
@@ -210,7 +220,10 @@ export function IntentForm({
     void toast.promise(
       (async () => {
         setConfirmStatus("Submitting intent…");
-        const result = await onConfirmIntent(createMidenP2IDENote);
+        const result = await onConfirmIntent({
+          createMidenP2IDENote,
+          currentMidenAccountId: midenAccountId,
+        });
 
         const solverError = readIntentError(result);
         if (solverError) throw new Error(solverError);

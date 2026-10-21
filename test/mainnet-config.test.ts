@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { mainnetGraph } from "@epoch-protocol/epoch-commons-sdk";
+import { isPragmaSupportedMidenAsset } from "../src/constants/miden-tokens.ts";
 import { getDeploymentProfile } from "../src/config/deployment.ts";
 
 describe("Miden mainnet configuration", () => {
@@ -48,4 +49,24 @@ describe("Miden mainnet configuration", () => {
     assert.equal(profile.epoch.apiBaseUrl, "https://api.example.test");
     assert.equal(profile.miden.rpcUrl, "https://rpc.example.test");
   });
+});
+
+it("accepts only canonical mainnet faucet IDs even when metadata symbols are spoofed", () => {
+  const profile = getDeploymentProfile();
+  const usdcx = profile.miden.tokens.find((token) => token.symbol === "USDCX");
+  assert.ok(usdcx);
+  assert.equal(
+    isPragmaSupportedMidenAsset(
+      { assetId: usdcx.faucetId, symbol: "USDCX" },
+      "mainnet",
+    ),
+    true,
+  );
+  assert.equal(
+    isPragmaSupportedMidenAsset(
+      { assetId: "0xcee345d29e1ccf0177307b63f94a5a", symbol: "USDCX" },
+      "mainnet",
+    ),
+    false,
+  );
 });

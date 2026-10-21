@@ -36,6 +36,14 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
+          if (id.includes("/node_modules/@miden-sdk/")) return "miden";
+          if (
+            id.includes("/node_modules/@rainbow-me/") ||
+            id.includes("/node_modules/@walletconnect/") ||
+            id.includes("/node_modules/@reown/")
+          ) {
+            return "wallet-providers";
+          }
           if (
             id.includes("epoch-commons-sdk") ||
             id.includes("epoch-intents-sdk")

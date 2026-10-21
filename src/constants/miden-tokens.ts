@@ -2,8 +2,6 @@ import { DEPLOYMENT_PROFILE } from "../config/deployment";
 import type { MidenNetwork } from "../config/miden";
 import { normalizeMidenIdToHex } from "../services/epoch-bridge";
 
-const PRAGMA_SUPPORTED_MIDEN_SYMBOLS = new Set(["USDC", "USDCX", "ETH"]);
-
 function toMapKey(faucetId: string): string {
   const hex = normalizeMidenIdToHex(faucetId);
   const lower = hex.trim().toLowerCase();
@@ -40,10 +38,5 @@ export function isPragmaSupportedMidenAsset(
   asset: { assetId: string; symbol?: string },
   network: MidenNetwork,
 ): boolean {
-  const symbol = asset.symbol?.trim().toUpperCase();
-  if (symbol && PRAGMA_SUPPORTED_MIDEN_SYMBOLS.has(symbol)) return true;
-
-  // Metadata can arrive after the wallet asset list. Keep known faucets
-  // available while their symbol is still loading.
   return getMidenFaucetDecimals(asset.assetId, network) !== undefined;
 }

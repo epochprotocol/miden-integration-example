@@ -82,11 +82,15 @@ export function useMidenP2IDNoteFactory({
       if (!midenAccountId) {
         throw new Error("Missing Miden account id");
       }
-      requirePublicMidenAccountId(midenAccountId, "Miden source account");
+      const sourceAccount = requirePublicMidenAccountId(
+        midenAccountId,
+        "Miden source account",
+      );
       const quote = {
         amount: amountParam,
         token: faucetIdParam,
         recipient: allocatorId,
+        sourceAccount,
         mandateBinding: Array.from(bindingAttachmentFelts ?? [], (felt) =>
           felt.toString(),
         ).join(":"),
@@ -102,8 +106,14 @@ export function useMidenP2IDNoteFactory({
               "Missing mandate-binding attachment felts from SDK",
             );
           }
-          if (!requestTransaction || !requestGuardianInfo) {
-            throw new Error("Wallet does not support custom transactions");
+          if (
+            !requestTransaction ||
+            !requestGuardianInfo ||
+            !waitForTransaction
+          ) {
+            throw new Error(
+              "Wallet does not support custom transactions and finalization",
+            );
           }
           if (!isReady || !client) {
             throw new Error(
@@ -174,17 +184,20 @@ export function useMidenP2IDNoteFactory({
             txRequest,
           );
           const txId = await requestTransaction(customTx);
+          const submittedNote: CachedMidenNote = {
+            noteId,
+            transactionId: txId,
+            confirmed: false,
+            quote,
+          };
 
-          // Wait for finalization before returning, so the note is committed and
-          // queryable when the allocator fetches it during intent validation.
-          // Without this the intent can race ahead of the note and be rejected
-          // "not found on-chain".
-          if (waitForTransaction) {
-            onStatus("P2IDE note created — waiting for finalization on Miden…");
-            await waitForTransaction(txId, WAIT_FOR_TRANSACTION_TIMEOUT_MS);
-          }
+          // Cache immediately after submission. If confirmation times out, a
+          // retry resumes this transaction instead of locking funds again.
+          onNoteCreated(submittedNote);
+          onStatus("P2IDE note submitted — waiting for finalization on Miden…");
+          await waitForTransaction(txId, WAIT_FOR_TRANSACTION_TIMEOUT_MS);
 
-          onNoteCreated({ noteId, quote });
+          onNoteCreated({ ...submittedNote, confirmed: true });
           return { success: true, noteId };
         } catch (err) {
           return {
@@ -194,7 +207,35 @@ export function useMidenP2IDNoteFactory({
         }
       };
 
-      return reuseOrCreateMidenNote(existingNote, quote, createNote);
+      const resumeNote = async (pending: CachedMidenNote) => {
+        if (!waitForTransaction || !pending.transactionId) {
+          return {
+            success: false,
+            error: "Wallet does not support transaction finalization",
+          };
+        }
+        try {
+          onStatus("P2IDE note submitted — resuming finalization on Miden…");
+          await waitForTransaction(
+            pending.transactionId,
+            WAIT_FOR_TRANSACTION_TIMEOUT_MS,
+          );
+          onNoteCreated({ ...pending, confirmed: true });
+          return { success: true, noteId: pending.noteId };
+        } catch (err) {
+          return {
+            success: false,
+            error: err instanceof Error ? err.message : String(err),
+          };
+        }
+      };
+
+      return reuseOrCreateMidenNote(
+        existingNote,
+        quote,
+        createNote,
+        resumeNote,
+      );
     },
     [
       midenAccountId,
