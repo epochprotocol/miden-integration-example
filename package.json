@@ -16,7 +16,7 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@epoch-protocol/epoch-commons-sdk": "github:epochprotocol/epoch-commons-sdk#2728ac9443e4376e76dab76ef069bc24516d8c30",
+    "@epoch-protocol/epoch-commons-sdk": "github:epochprotocol/epoch-commons-sdk#36226c5d1fd640cc8497dd1c3976ddfe47429aa8",
     "@epoch-protocol/epoch-intents-sdk": "1.0.39",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@metamask/sdk": "^0.34.0",

@@ -11,7 +11,6 @@ interface MidenMainnetGraph {
     USDCX: { contractAddress: { Miden: string }; decimals: number };
     WETH: { contractAddress: { Miden: string }; decimals: number };
   };
-  oracles: { PragmaMidenV1: { rpcUrl: string } };
 }
 
 interface MidenAsset {
@@ -44,7 +43,7 @@ const BASE_MAINNET = mainnetGraph.chains.Base;
 const BASE_USDC = mainnetGraph.tokens.USDC;
 const COMMONS_MIDEN_MAINNET = mainnetGraph as unknown as MidenMainnetGraph;
 const MIDEN_MAINNET = COMMONS_MIDEN_MAINNET.chains.Miden;
-const MIDEN_ORACLE = COMMONS_MIDEN_MAINNET.oracles.PragmaMidenV1;
+const MIDEN_MAINNET_RPC_URL = "https://rpc.cedar.miden.io";
 const MIDEN_ASSETS: ReadonlyArray<MidenAsset> = [
   {
     symbol: "USDCX",
@@ -84,7 +83,7 @@ export function getDeploymentProfile(
     },
     miden: {
       chainId: MIDEN_MAINNET.chainId,
-      rpcUrl: endpoint(env.VITE_MIDEN_RPC_URL, MIDEN_ORACLE.rpcUrl),
+      rpcUrl: endpoint(env.VITE_MIDEN_RPC_URL, MIDEN_MAINNET_RPC_URL),
       tokens: MIDEN_ASSETS,
       midenscanBase: MIDEN_MAINNET.explorer,
       walletNetwork: "mainnet",

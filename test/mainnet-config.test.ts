@@ -30,10 +30,7 @@ describe("Miden mainnet configuration", () => {
         decimals: mainnetGraph.tokens.WETH.decimals,
       },
     ]);
-    assert.equal(
-      profile.miden.rpcUrl,
-      mainnetGraph.oracles.PragmaMidenV1.rpcUrl,
-    );
+    assert.equal(profile.miden.rpcUrl, "https://rpc.cedar.miden.io");
     assert.equal(
       profile.miden.midenscanBase,
       mainnetGraph.chains.Miden.explorer,

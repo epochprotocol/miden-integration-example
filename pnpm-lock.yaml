@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@epoch-protocol/epoch-commons-sdk':
-        specifier: github:epochprotocol/epoch-commons-sdk#2728ac9443e4376e76dab76ef069bc24516d8c30
-        version: git+https://git@github.com:epochprotocol/epoch-commons-sdk.git#2728ac9443e4376e76dab76ef069bc24516d8c30(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)
+        specifier: github:epochprotocol/epoch-commons-sdk#36226c5d1fd640cc8497dd1c3976ddfe47429aa8
+        version: git+https://git@github.com:epochprotocol/epoch-commons-sdk.git#36226c5d1fd640cc8497dd1c3976ddfe47429aa8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)
       '@epoch-protocol/epoch-intents-sdk':
         specifier: 1.0.39
         version: 1.0.39(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(viem@2.48.8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76))(zod@3.25.76)
@@ -324,9 +324,9 @@ packages:
   '@epoch-protocol/epoch-commons-sdk@0.1.20':
     resolution: {integrity: sha512-KvM6hkKHik/x8Dp3cpu0wwgQfqwOEndkdh3GhTvnQrLi+QcSrHQ2BLy6ZElV3Jv8vO2TA2yWHCMUl+Ks8GyuPg==}
 
-  '@epoch-protocol/epoch-commons-sdk@git+https://git@github.com:epochprotocol/epoch-commons-sdk.git#2728ac9443e4376e76dab76ef069bc24516d8c30':
-    resolution: {commit: 2728ac9443e4376e76dab76ef069bc24516d8c30, repo: git@github.com:epochprotocol/epoch-commons-sdk.git, type: git}
-    version: 0.1.20
+  '@epoch-protocol/epoch-commons-sdk@git+https://git@github.com:epochprotocol/epoch-commons-sdk.git#36226c5d1fd640cc8497dd1c3976ddfe47429aa8':
+    resolution: {commit: 36226c5d1fd640cc8497dd1c3976ddfe47429aa8, repo: git@github.com:epochprotocol/epoch-commons-sdk.git, type: git}
+    version: 0.1.21-mainnet.0
 
   '@epoch-protocol/epoch-intents-sdk@1.0.39':
     resolution: {integrity: sha512-b41yIOmkwNXIzHcfemyp7oFRrQBDMLQK9yRpWyGQUcPvMIgJbtd4jBtZjMJ6DAKW64qoqB/2pTGRb4lifjKxgQ==}
@@ -5920,7 +5920,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  '@epoch-protocol/epoch-commons-sdk@git+https://git@github.com:epochprotocol/epoch-commons-sdk.git#2728ac9443e4376e76dab76ef069bc24516d8c30(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)':
+  '@epoch-protocol/epoch-commons-sdk@git+https://git@github.com:epochprotocol/epoch-commons-sdk.git#36226c5d1fd640cc8497dd1c3976ddfe47429aa8(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)':
     dependencies:
       ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       viem: 2.42.0(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@3.25.76)
