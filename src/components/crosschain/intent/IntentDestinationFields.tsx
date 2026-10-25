@@ -7,11 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  EPOCH_TESTNET_EVM_CHAINS,
-  getTestnetChainName,
-} from "../../../constants/chains";
-import { EPOCH_TESTNET_TOKENS } from "../../../constants/evm-tokens";
+import { EPOCH_EVM_CHAINS, getEvmChainName } from "../../../constants/chains";
+import { EPOCH_EVM_TOKENS } from "../../../constants/evm-tokens";
 
 export interface IntentDestination {
   outputToken: string;
@@ -30,7 +27,7 @@ export function IntentDestinationFields({ values, onChange }: Props) {
     <>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <Label>Output token ({getTestnetChainName(values.chainId)})</Label>
+          <Label>Output token ({getEvmChainName(values.chainId)})</Label>
           <SelectRoot
             value={values.outputToken}
             onValueChange={(v) => onChange("outputToken", v)}
@@ -39,7 +36,7 @@ export function IntentDestinationFields({ values, onChange }: Props) {
               <SelectValue placeholder="Token" />
             </SelectTrigger>
             <SelectContent>
-              {EPOCH_TESTNET_TOKENS.map((token) => (
+              {EPOCH_EVM_TOKENS.map((token) => (
                 <SelectItem key={token.symbol} value={token.address}>
                   {token.symbol}
                   {token.address ? ` · ${token.address.slice(0, 10)}…` : ""}
@@ -70,7 +67,7 @@ export function IntentDestinationFields({ values, onChange }: Props) {
               <SelectValue placeholder="Chain" />
             </SelectTrigger>
             <SelectContent>
-              {EPOCH_TESTNET_EVM_CHAINS.map((chain) => (
+              {EPOCH_EVM_CHAINS.map((chain) => (
                 <SelectItem key={chain.id} value={String(chain.id)}>
                   {chain.name} ({chain.id})
                 </SelectItem>

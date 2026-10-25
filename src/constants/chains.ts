@@ -1,29 +1,21 @@
-/**
- * Epoch testnet EVM chains — source of truth: docs/docs-new/supported-chains-and-tokens.md
- */
-export const EPOCH_TESTNET_EVM_CHAINS = [
-  { id: 11155111, name: "Ethereum Sepolia" },
-  { id: 84532, name: "Base Sepolia" },
-  { id: 11155420, name: "Optimism Sepolia" },
-] as const;
+import { DEPLOYMENT_PROFILE } from "../config/deployment";
 
-export type EpochTestnetEvmChainId =
-  (typeof EPOCH_TESTNET_EVM_CHAINS)[number]["id"];
+/** EVM networks enabled by this deployment. */
+export const EPOCH_EVM_CHAINS = DEPLOYMENT_PROFILE.evmChains;
 
-/** Default destination chain for Cross-chain deposit and withdraw source chain. */
-export const DEFAULT_TESTNET_CHAIN_ID = 11155111;
-export const DEFAULT_TESTNET_CHAIN_ID_STR = String(DEFAULT_TESTNET_CHAIN_ID);
+export type EpochEvmChainId = (typeof EPOCH_EVM_CHAINS)[number]["id"];
 
-/** @deprecated Prefer `DEFAULT_TESTNET_CHAIN_ID_STR`. */
-export const DEFAULT_SEPOLIA_CHAIN_ID_STR = DEFAULT_TESTNET_CHAIN_ID_STR;
+/** Default destination chain for Miden→EVM and source chain for EVM→Miden. */
+export const DEFAULT_EVM_CHAIN_ID = EPOCH_EVM_CHAINS[0].id;
+export const DEFAULT_EVM_CHAIN_ID_STR = String(DEFAULT_EVM_CHAIN_ID);
 
-export function getTestnetChainName(chainId: number | string): string {
+export function getEvmChainName(chainId: number | string): string {
   const id =
     typeof chainId === "string" ? Number.parseInt(chainId, 10) : chainId;
-  const chain = EPOCH_TESTNET_EVM_CHAINS.find((c) => c.id === id);
+  const chain = EPOCH_EVM_CHAINS.find((candidate) => candidate.id === id);
   return chain?.name ?? `Chain ${id}`;
 }
 
-export function isSupportedTestnetEvmChain(chainId: number): boolean {
-  return EPOCH_TESTNET_EVM_CHAINS.some((c) => c.id === chainId);
+export function isSupportedEvmChain(chainId: number): boolean {
+  return EPOCH_EVM_CHAINS.some((chain) => chain.id === chainId);
 }

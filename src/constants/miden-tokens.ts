@@ -1,42 +1,24 @@
-import { normalizeMidenIdToHex } from "../services/epoch-bridge";
+import { DEPLOYMENT_PROFILE } from "../config/deployment";
 import type { MidenNetwork } from "../config/miden";
-
-const PRAGMA_SUPPORTED_MIDEN_SYMBOLS = new Set([
-  "USDC",
-  "USDT",
-  "DAI",
-  "WETH",
-  "WBTC",
-]);
-
-/**
- * Hardcoded Miden testnet faucet → decimals map.
- *
- * Backend (sio/dex-solver/inventory) does not surface faucet decimals to the
- * frontend; relying on the wallet adapter's reported `decimals` is unreliable
- * (some adapters return 8 by default which silently mis-scales 6-decimal
- * tokens by 100x). Frontends must look up decimals here.
- *
- * Keys are normalized to lowercase hex without `0x` prefix. Lookups go through
- * `normalizeMidenIdToHex` first so bech32 faucet ids from the wallet adapter
- * (e.g. `mtst1...`) resolve correctly.
- */
-const MIDEN_FAUCET_DECIMALS: Record<MidenNetwork, Record<string, number>> = {
-  testnet: {
-    "4cbdcaffe75f0a317482224dae6436": 6,
-    "537c15a622074e91188aa894456c52": 6,
-    "6500ca8c2dd69e9147ab7eafad162c": 6,
-    d17976f0809a8191412f2a126625df: 6,
-    "4a09f13153d9cd114c078bfb62a7ec": 6,
-    "5fd2e6fd17712c51404d09c2b847f7": 6,
-  },
-};
+import { normalizeMidenIdToHex } from "../services/epoch-bridge";
 
 function toMapKey(faucetId: string): string {
   const hex = normalizeMidenIdToHex(faucetId);
   const lower = hex.trim().toLowerCase();
   return lower.startsWith("0x") ? lower.slice(2) : lower;
 }
+
+// Miden asset decimals are public deployment metadata. The wallet adapter can
+// report a default precision before it has loaded faucet metadata, so derive the
+// lookup from the deployment profile instead of duplicating network-specific ids.
+const MIDEN_FAUCET_DECIMALS: Record<MidenNetwork, Record<string, number>> = {
+  mainnet: Object.fromEntries(
+    DEPLOYMENT_PROFILE.miden.tokens.map(({ faucetId, decimals }) => [
+      toMapKey(faucetId),
+      decimals,
+    ]),
+  ),
+};
 
 /** Returns Miden faucet decimals, or `undefined` if the faucet is unknown. */
 export function getMidenFaucetDecimals(
@@ -56,10 +38,5 @@ export function isPragmaSupportedMidenAsset(
   asset: { assetId: string; symbol?: string },
   network: MidenNetwork,
 ): boolean {
-  const symbol = asset.symbol?.trim().toUpperCase();
-  if (symbol && PRAGMA_SUPPORTED_MIDEN_SYMBOLS.has(symbol)) return true;
-
-  // Metadata can arrive after the wallet asset list. Keep known testnet faucets
-  // available while their symbol is still loading.
   return getMidenFaucetDecimals(asset.assetId, network) !== undefined;
 }

@@ -22,7 +22,7 @@ interface SdkEntry {
 export function useEpochSdk(chainIdOverride?: number): EpochIntentSDK | null {
   const [entry, setEntry] = useState<SdkEntry | null>(null);
   const { data: walletClient } = useWalletClient();
-  const apiBaseUrl = getMidenNetworkConfig().allocatorUrl;
+  const apiBaseUrl = getMidenNetworkConfig().apiBaseUrl;
 
   useEffect(() => {
     if (!walletClient || !apiBaseUrl) {

@@ -26,7 +26,35 @@ export default defineConfig({
     // After rebuilding the SDK, restart the dev server with `--force` to refresh.
     include: ["@epoch-protocol/epoch-intents-sdk"],
   },
+  server: {
+    allowedHosts: ["miden-integration-example.epochprotocol.xyz"],
+  },
   build: {
     target: "esnext",
+    reportCompressedSize: false,
+    cssMinify: false,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("/node_modules/@miden-sdk/")) return "miden";
+          if (
+            id.includes("/node_modules/@rainbow-me/") ||
+            id.includes("/node_modules/@walletconnect/") ||
+            id.includes("/node_modules/@reown/")
+          ) {
+            return "wallet-providers";
+          }
+          if (
+            id.includes("epoch-commons-sdk") ||
+            id.includes("epoch-intents-sdk")
+          ) {
+            return "epoch-sdk";
+          }
+        },
+      },
+    },
+    // The Miden WASM + wallet graph exceeds this host's memory during minification.
+    // Keep production builds deployable; Caddy still serves generated assets compressed.
+    minify: false,
   },
 });

@@ -17,6 +17,7 @@ import {
   type TaskType,
 } from "@epoch-protocol/epoch-intents-sdk";
 import { AccountId, Address } from "@miden-sdk/miden-sdk";
+import { requirePublicMidenAccountId } from "../lib/miden-account-validation";
 
 export interface CrossChainQuote {
   taskTypeString: string;
@@ -110,7 +111,10 @@ export function normalizeMidenIdToHex(id: string): string {
 export function buildEpochTaskDataParams(
   params: CrossChainIntentParams,
 ): GetTaskDataParams {
-  const midenSourceAccountHex = normalizeMidenIdToHex(params.midenAccountId);
+  const midenSourceAccountHex = requirePublicMidenAccountId(
+    params.midenAccountId,
+    "Miden source account",
+  );
   const midenFaucetIdHex = normalizeMidenIdToHex(params.midenFaucetId);
 
   const outputToken = params.outputTokenAddress || EVM_ZERO_ADDRESS;
@@ -150,7 +154,10 @@ export function buildEpochTaskDataParams(
 }
 
 export function buildEVMToMidenTaskDataParams(params: EVMToMidenIntentParams) {
-  const midenRecipientHex = normalizeMidenIdToHex(params.midenRecipientId);
+  const midenRecipientHex = requirePublicMidenAccountId(
+    params.midenRecipientId,
+    "Miden destination account",
+  );
   const midenFaucetHex = normalizeMidenIdToHex(params.midenFaucetId);
   const evmDecimals = params.evmTokenDecimals ?? 18;
 
@@ -233,6 +240,10 @@ export async function buildEVMToMidenIntent(
   sdk: EpochIntentSDK,
   params: EVMToMidenIntentParams & { preFetchedQuote?: EVMToMidenQuote },
 ): Promise<IntentResult> {
+  requirePublicMidenAccountId(
+    params.midenRecipientId,
+    "Miden destination account",
+  );
   let taskTypeString: string;
   let intentData: unknown;
   let quoteResult: IntentQuoteResult | undefined;
@@ -308,8 +319,9 @@ export async function buildCrossChainIntent(
   },
 ): Promise<IntentResult> {
   const midenFaucetIdHex = normalizeMidenIdToHex(params.midenFaucetId);
-  const midenSourceHex = normalizeMidenIdToHex(
+  const midenSourceHex = requirePublicMidenAccountId(
     params.midenSourceAccount || params.midenAccountId,
+    "Miden source account",
   );
   let taskTypeString: string;
   let intentData: unknown;

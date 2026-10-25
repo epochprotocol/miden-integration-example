@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getTestnetChainName } from "../../../constants/chains";
+import { getEvmChainName } from "../../../constants/chains";
 import { TOKEN_CUSTOM, WITHDRAW_TOKENS } from "./withdraw-tokens";
 
 interface Props {
@@ -35,7 +35,7 @@ export function WithdrawTokenFields({
   return (
     <>
       <div>
-        <Label>Source EVM token ({getTestnetChainName(walletChainId)})</Label>
+        <Label>Source EVM token ({getEvmChainName(walletChainId)})</Label>
         <SelectRoot
           value={isCustom ? TOKEN_CUSTOM : evmToken}
           onValueChange={(v) => onEvmTokenChange(v === TOKEN_CUSTOM ? "" : v)}

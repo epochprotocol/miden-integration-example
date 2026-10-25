@@ -14,6 +14,7 @@ import {
 } from "@epoch-protocol/epoch-intents-sdk";
 import { useEpochSdk } from "../lib/epoch-sdk";
 import { readIntentError } from "../lib/intent-result";
+import { requirePublicMidenAccountId } from "../lib/miden-account-validation";
 
 export type IntentQuotePhase =
   | { status: "idle" }
@@ -60,11 +61,28 @@ export function useEpochIntent() {
     isPending: isConfirming,
     error: confirmError,
   } = useMutation({
-    mutationFn: async (
-      createMidenP2IDENote: SolveIntentParams["createMidenP2IDENote"],
-    ) => {
+    mutationFn: async ({
+      createMidenP2IDENote,
+      currentMidenAccountId,
+    }: {
+      createMidenP2IDENote: SolveIntentParams["createMidenP2IDENote"];
+      currentMidenAccountId: string;
+    }) => {
       if (!sdk) throw new Error("Epoch SDK not ready");
       if (!pendingQuote) throw new Error("Fetch a quote first");
+      const currentAccount = requirePublicMidenAccountId(
+        currentMidenAccountId,
+        "Miden source account",
+      );
+      const quotedAccount = requirePublicMidenAccountId(
+        pendingQuote.params.midenAccountId,
+        "Miden source account",
+      );
+      if (currentAccount !== quotedAccount) {
+        throw new Error(
+          "Miden account changed after quoting. Fetch a new quote before confirming.",
+        );
+      }
 
       setIntentResult(null);
       const result = await buildCrossChainIntent(sdk, {
