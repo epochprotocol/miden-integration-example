@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAccount, useChainId } from "wagmi";
 import { toast } from "sonner";
+import { isAddress } from "viem";
 import type { SolveIntentParams } from "@epoch-protocol/epoch-intents-sdk";
 import type {
   CrossChainIntentParams,
@@ -166,14 +167,11 @@ export function IntentForm({
     !!midenAccountId &&
     !!resolvedSelectedAssetId &&
     hasValidEvmRecipient &&
-    !!destination.outputToken &&
+    isAddress(destination.outputToken, { strict: false }) &&
     hasValidDestinationChainId;
 
   const handleGetQuote = () => {
-    if (
-      !destination.outputToken ||
-      destination.outputToken === "0x0000000000000000000000000000000000000000"
-    ) {
+    if (!isAddress(destination.outputToken, { strict: false })) {
       toast.error("Select or enter a valid output token address");
       return;
     }

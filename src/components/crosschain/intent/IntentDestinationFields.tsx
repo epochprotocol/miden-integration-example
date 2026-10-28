@@ -11,7 +11,10 @@ import {
   EPOCH_TESTNET_EVM_CHAINS,
   getTestnetChainName,
 } from "../../../constants/chains";
-import { EPOCH_TESTNET_TOKENS } from "../../../constants/evm-tokens";
+import {
+  EPOCH_TESTNET_TOKENS,
+  isNativeEvmTokenAddress,
+} from "../../../constants/evm-tokens";
 
 export interface IntentDestination {
   outputToken: string;
@@ -42,7 +45,9 @@ export function IntentDestinationFields({ values, onChange }: Props) {
               {EPOCH_TESTNET_TOKENS.map((token) => (
                 <SelectItem key={token.symbol} value={token.address}>
                   {token.symbol}
-                  {token.address ? ` · ${token.address.slice(0, 10)}…` : ""}
+                  {isNativeEvmTokenAddress(token.address)
+                    ? " · Native"
+                    : ` · ${token.address.slice(0, 10)}…`}
                 </SelectItem>
               ))}
             </SelectContent>

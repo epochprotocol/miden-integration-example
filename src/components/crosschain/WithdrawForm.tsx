@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAccount, useChainId } from "wagmi";
 import { toast } from "sonner";
+import { isAddress } from "viem";
 import { MIDEN_VIRTUAL_CHAIN_ID } from "@epoch-protocol/epoch-intents-sdk";
 import type { MidenAccount, EVMToMidenIntentParams } from "../../types/miden";
 import type { EVMToMidenQuote } from "../../services/epoch-bridge";
@@ -58,7 +59,7 @@ export function WithdrawForm({
   const midenRecipientId = midenRecipientInput || (accounts[0]?.id ?? "");
 
   const resolvedFaucetId = midenFaucetId.trim();
-  const finalToken = customToken || evmToken;
+  const finalToken = (evmToken === "" ? customToken : evmToken).trim();
   // Resolve decimals via the canonical EVM token map first (case-insensitive
   // address match). Custom / unknown tokens fall back to 18 — the SIO testnet
   // default. Do NOT trust a stale entry from `WITHDRAW_TOKENS` matched by exact
@@ -89,15 +90,12 @@ export function WithdrawForm({
     walletChainId > 0 &&
     !!midenRecipientId &&
     !!resolvedFaucetId &&
-    !!finalToken &&
+    isAddress(finalToken, { strict: false }) &&
     minTokenOut.trim() !== "" &&
     minTokenOut.trim() !== "0";
 
   const handleGetQuote = () => {
-    if (
-      !finalToken ||
-      finalToken === "0x0000000000000000000000000000000000000000"
-    ) {
+    if (!isAddress(finalToken, { strict: false })) {
       toast.error("Select or enter a valid source token address");
       return;
     }
@@ -174,8 +172,9 @@ export function WithdrawForm({
         Intent details
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-neutral-600">
-        Pay ERC-20 on the EVM chain below, set min Miden out, then{" "}
-        <strong>Get quote</strong> (same allocator flow as Cross-chain deposit).
+        Pay native ETH or an ERC-20 on the EVM chain below, set min Miden out,
+        then <strong>Get quote</strong> (same allocator flow as Cross-chain
+        deposit).
       </p>
 
       <div className="mt-4 space-y-4">

@@ -3,7 +3,7 @@ import {
   type EvmToken,
 } from "../../../constants/evm-tokens";
 
-// SIO testnet mocks are deployed with 18 decimals across the board — even
+// Native ETH and SIO testnet mocks use 18 decimals — even
 // tokens that have 6 decimals on mainnet (USDC/USDT). See `constants/evm-tokens.ts`.
 export const WITHDRAW_TOKENS: EvmToken[] = [
   ...EPOCH_TESTNET_TOKENS,

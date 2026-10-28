@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getTestnetChainName } from "../../../constants/chains";
+import { isNativeEvmTokenAddress } from "../../../constants/evm-tokens";
 import { TOKEN_CUSTOM, WITHDRAW_TOKENS } from "./withdraw-tokens";
 
 interface Props {
@@ -50,7 +51,11 @@ export function WithdrawTokenFields({
                 value={token.address === "" ? TOKEN_CUSTOM : token.address}
               >
                 {token.symbol}
-                {token.address ? ` · ${token.address.slice(0, 10)}…` : ""}
+                {isNativeEvmTokenAddress(token.address)
+                  ? " · Native"
+                  : token.address
+                    ? ` · ${token.address.slice(0, 10)}…`
+                    : ""}
               </SelectItem>
             ))}
           </SelectContent>

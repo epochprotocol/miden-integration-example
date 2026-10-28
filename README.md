@@ -5,7 +5,7 @@ Reference dapp showing how to use [`@epoch-protocol/epoch-intents-sdk`](https://
 Two flows:
 
 - **Cross-chain** — Miden → EVM. Lock a Miden note, receive tokens on the selected EVM testnet chain.
-- **Withdraw** — EVM → Miden. Pay ERC-20 on a connected EVM testnet chain, receive a Miden note.
+- **Withdraw** — EVM → Miden. Pay native ETH or an ERC-20 on a connected EVM testnet chain, receive a Miden note.
 
 ## Supported testnet chains
 
@@ -17,6 +17,19 @@ Two flows:
 | Miden (virtual)  | 999999999 |
 
 Testnet tokens (USDC, DAI, USDT, etc.) share the same contract addresses across all EVM testnet chains. See [Supported Chains & Tokens](../docs/docs-new/supported-chains-and-tokens.md).
+
+Native ETH is available as **ETH · Native** in both EVM token selectors,
+separately from WETH. ETH uses 18 decimals and the zero address
+(`0x0000000000000000000000000000000000000000`). EVM → Miden uses the SDK's
+native Compact deposit, with no ERC-20 approval. Miden → ETH uses Miden note
+collateral and delivers native ETH to the EVM recipient. Quotes still depend
+on solver liquidity for the selected pair.
+
+When running the local stack, use the matching `smallocator`, `dex-solver`,
+and `epoch-inventory-ts` changes. Native quotes use the Pragma ETH/USD feed
+with the same freshness checks as Miden asset prices. Miden → ETH requires
+native ETH in the inventory treasury on the selected EVM testnet; ERC-20
+balances cannot fund a native payout.
 
 ## Stack
 
