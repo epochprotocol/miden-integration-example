@@ -43,7 +43,7 @@ export default defineConfig([
 
   // Runs in Node, not the browser.
   {
-    files: ["vite.config.ts"],
+    files: ["vite.config.ts", "scripts/**/*.ts"],
     extends: [js.configs.recommended, tseslint.configs.recommendedTypeChecked],
     languageOptions: {
       ecmaVersion: 2022,

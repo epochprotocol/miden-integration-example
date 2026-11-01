@@ -17,6 +17,7 @@ import {
   type TaskType,
 } from "@epoch-protocol/epoch-intents-sdk";
 import { AccountId, Address } from "@miden-sdk/miden-sdk";
+import { isNativeEvmTokenAddress } from "../constants/evm-tokens";
 
 export interface CrossChainQuote {
   taskTypeString: string;
@@ -125,7 +126,8 @@ export function buildEpochTaskDataParams(
   const taskDataParams = {
     taskType: "gettokenout" as TaskType,
     intentData: {
-      // isNative must be false — tokenIn is zero-address (Miden-sourced) but tokenOut is a real EVM token
+      // isNative selects EVM deposit funding. Miden note collateral stays false,
+      // including when the EVM output is native ETH (zero address).
       isNative: false,
       depositTokenAddress: EVM_ZERO_ADDRESS,
       tokenInAmount,
@@ -183,7 +185,7 @@ export function buildEVMToMidenTaskDataParams(params: EVMToMidenIntentParams) {
   const taskDataParams = {
     taskType: "gettokenout" as TaskType,
     intentData: {
-      isNative: false,
+      isNative: isNativeEvmTokenAddress(params.evmTokenAddress),
       depositTokenAddress: params.evmTokenAddress,
       tokenInAmount: amountInWei,
       outputTokenAddress: EVM_ZERO_ADDRESS,
@@ -219,7 +221,7 @@ export async function getEVMToMidenQuote(
     sponsorAddress: sponsorAddress as `0x${string}`,
     taskTypeString,
     intentData,
-    isNative: false,
+    isNative: isNativeEvmTokenAddress(quoteParams.evmTokenAddress),
   });
 
   if (!quoteResult.success) {
@@ -246,7 +248,7 @@ export async function buildEVMToMidenIntent(
 
   try {
     const solveResult = await sdk.solveIntent({
-      isNative: false,
+      isNative: isNativeEvmTokenAddress(params.evmTokenAddress),
       sponsorAddress: params.evmSourceAddress as `0x${string}`,
       taskTypeString,
       intentData,

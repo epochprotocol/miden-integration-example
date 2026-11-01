@@ -120,7 +120,7 @@
       "source_location": "L18"
     },
     {
-      "id": "ref_epoch_protocol_epoch_intents_sdk",
+      "id": "epoch_protocol_epoch_intents_sdk",
       "label": "@epoch-protocol/epoch-intents-sdk",
       "file_type": "concept",
       "source_file": "package.json",
@@ -134,7 +134,7 @@
       "source_location": "L19"
     },
     {
-      "id": "ref_fontsource_variable_jetbrains_mono",
+      "id": "fontsource_variable_jetbrains_mono",
       "label": "@fontsource-variable/jetbrains-mono",
       "file_type": "concept",
       "source_file": "package.json",
@@ -148,7 +148,7 @@
       "source_location": "L20"
     },
     {
-      "id": "ref_metamask_sdk",
+      "id": "metamask_sdk",
       "label": "@metamask/sdk",
       "file_type": "concept",
       "source_file": "package.json",
@@ -162,7 +162,7 @@
       "source_location": "L21"
     },
     {
-      "id": "ref_miden_sdk_miden_sdk",
+      "id": "miden_sdk_miden_sdk",
       "label": "@miden-sdk/miden-sdk",
       "file_type": "concept",
       "source_file": "package.json",
@@ -176,7 +176,7 @@
       "source_location": "L22"
     },
     {
-      "id": "ref_miden_sdk_miden_wallet_adapter_base",
+      "id": "miden_sdk_miden_wallet_adapter_base",
       "label": "@miden-sdk/miden-wallet-adapter-base",
       "file_type": "concept",
       "source_file": "package.json",
@@ -190,7 +190,7 @@
       "source_location": "L23"
     },
     {
-      "id": "ref_miden_sdk_miden_wallet_adapter_react",
+      "id": "miden_sdk_miden_wallet_adapter_react",
       "label": "@miden-sdk/miden-wallet-adapter-react",
       "file_type": "concept",
       "source_file": "package.json",
@@ -204,7 +204,7 @@
       "source_location": "L24"
     },
     {
-      "id": "ref_miden_sdk_react",
+      "id": "miden_sdk_react",
       "label": "@miden-sdk/react",
       "file_type": "concept",
       "source_file": "package.json",
@@ -218,7 +218,7 @@
       "source_location": "L25"
     },
     {
-      "id": "ref_phosphor_icons_react",
+      "id": "phosphor_icons_react",
       "label": "@phosphor-icons/react",
       "file_type": "concept",
       "source_file": "package.json",
@@ -232,7 +232,7 @@
       "source_location": "L26"
     },
     {
-      "id": "ref_rainbow_me_rainbowkit",
+      "id": "rainbow_me_rainbowkit",
       "label": "@rainbow-me/rainbowkit",
       "file_type": "concept",
       "source_file": "package.json",
@@ -246,7 +246,7 @@
       "source_location": "L27"
     },
     {
-      "id": "ref_tanstack_react_query",
+      "id": "tanstack_react_query",
       "label": "@tanstack/react-query",
       "file_type": "concept",
       "source_file": "package.json",
@@ -260,7 +260,7 @@
       "source_location": "L28"
     },
     {
-      "id": "ref_class_variance_authority",
+      "id": "class_variance_authority",
       "label": "class-variance-authority",
       "file_type": "concept",
       "source_file": "package.json",
@@ -274,7 +274,7 @@
       "source_location": "L29"
     },
     {
-      "id": "ref_clsx",
+      "id": "clsx",
       "label": "clsx",
       "file_type": "concept",
       "source_file": "package.json",
@@ -288,7 +288,7 @@
       "source_location": "L30"
     },
     {
-      "id": "ref_radix_ui",
+      "id": "radix_ui",
       "label": "radix-ui",
       "file_type": "concept",
       "source_file": "package.json",
@@ -302,7 +302,7 @@
       "source_location": "L31"
     },
     {
-      "id": "ref_react",
+      "id": "react",
       "label": "react",
       "file_type": "concept",
       "source_file": "package.json",
@@ -316,7 +316,7 @@
       "source_location": "L32"
     },
     {
-      "id": "ref_react_dom",
+      "id": "react_dom",
       "label": "react-dom",
       "file_type": "concept",
       "source_file": "package.json",
@@ -330,7 +330,7 @@
       "source_location": "L33"
     },
     {
-      "id": "ref_shadcn",
+      "id": "shadcn",
       "label": "shadcn",
       "file_type": "concept",
       "source_file": "package.json",
@@ -344,7 +344,7 @@
       "source_location": "L34"
     },
     {
-      "id": "ref_sonner",
+      "id": "sonner",
       "label": "sonner",
       "file_type": "concept",
       "source_file": "package.json",
@@ -358,7 +358,7 @@
       "source_location": "L35"
     },
     {
-      "id": "ref_tailwind_merge",
+      "id": "tailwind_merge",
       "label": "tailwind-merge",
       "file_type": "concept",
       "source_file": "package.json",
@@ -372,7 +372,7 @@
       "source_location": "L36"
     },
     {
-      "id": "ref_tw_animate_css",
+      "id": "tw_animate_css",
       "label": "tw-animate-css",
       "file_type": "concept",
       "source_file": "package.json",
@@ -386,7 +386,7 @@
       "source_location": "L37"
     },
     {
-      "id": "ref_viem",
+      "id": "viem",
       "label": "viem",
       "file_type": "concept",
       "source_file": "package.json",
@@ -400,7 +400,7 @@
       "source_location": "L38"
     },
     {
-      "id": "ref_wagmi",
+      "id": "wagmi",
       "label": "wagmi",
       "file_type": "concept",
       "source_file": "package.json",
@@ -421,7 +421,7 @@
       "source_location": "L41"
     },
     {
-      "id": "ref_eslint_js",
+      "id": "eslint_js",
       "label": "@eslint/js",
       "file_type": "concept",
       "source_file": "package.json",
@@ -435,7 +435,7 @@
       "source_location": "L42"
     },
     {
-      "id": "ref_types_node",
+      "id": "types_node",
       "label": "@types/node",
       "file_type": "concept",
       "source_file": "package.json",
@@ -449,7 +449,7 @@
       "source_location": "L43"
     },
     {
-      "id": "ref_types_react",
+      "id": "types_react",
       "label": "@types/react",
       "file_type": "concept",
       "source_file": "package.json",
@@ -463,7 +463,7 @@
       "source_location": "L44"
     },
     {
-      "id": "ref_types_react_dom",
+      "id": "types_react_dom",
       "label": "@types/react-dom",
       "file_type": "concept",
       "source_file": "package.json",
@@ -477,7 +477,7 @@
       "source_location": "L45"
     },
     {
-      "id": "ref_vitejs_plugin_react",
+      "id": "vitejs_plugin_react",
       "label": "@vitejs/plugin-react",
       "file_type": "concept",
       "source_file": "package.json",
@@ -491,7 +491,7 @@
       "source_location": "L46"
     },
     {
-      "id": "ref_autoprefixer",
+      "id": "autoprefixer",
       "label": "autoprefixer",
       "file_type": "concept",
       "source_file": "package.json",
@@ -505,7 +505,7 @@
       "source_location": "L47"
     },
     {
-      "id": "ref_eslint",
+      "id": "eslint",
       "label": "eslint",
       "file_type": "concept",
       "source_file": "package.json",
@@ -519,7 +519,7 @@
       "source_location": "L48"
     },
     {
-      "id": "ref_eslint_plugin_react_hooks",
+      "id": "eslint_plugin_react_hooks",
       "label": "eslint-plugin-react-hooks",
       "file_type": "concept",
       "source_file": "package.json",
@@ -533,7 +533,7 @@
       "source_location": "L49"
     },
     {
-      "id": "ref_eslint_plugin_react_refresh",
+      "id": "eslint_plugin_react_refresh",
       "label": "eslint-plugin-react-refresh",
       "file_type": "concept",
       "source_file": "package.json",
@@ -547,7 +547,7 @@
       "source_location": "L50"
     },
     {
-      "id": "ref_globals",
+      "id": "globals",
       "label": "globals",
       "file_type": "concept",
       "source_file": "package.json",
@@ -561,7 +561,7 @@
       "source_location": "L51"
     },
     {
-      "id": "ref_husky",
+      "id": "husky",
       "label": "husky",
       "file_type": "concept",
       "source_file": "package.json",
@@ -575,7 +575,7 @@
       "source_location": "L52"
     },
     {
-      "id": "ref_lint_staged",
+      "id": "lint_staged",
       "label": "lint-staged",
       "file_type": "concept",
       "source_file": "package.json",
@@ -589,7 +589,7 @@
       "source_location": "L53"
     },
     {
-      "id": "ref_postcss",
+      "id": "postcss",
       "label": "postcss",
       "file_type": "concept",
       "source_file": "package.json",
@@ -603,7 +603,7 @@
       "source_location": "L54"
     },
     {
-      "id": "ref_prettier",
+      "id": "prettier",
       "label": "prettier",
       "file_type": "concept",
       "source_file": "package.json",
@@ -617,7 +617,7 @@
       "source_location": "L55"
     },
     {
-      "id": "ref_tailwindcss",
+      "id": "tailwindcss",
       "label": "tailwindcss",
       "file_type": "concept",
       "source_file": "package.json",
@@ -631,7 +631,7 @@
       "source_location": "L56"
     },
     {
-      "id": "ref_typescript",
+      "id": "typescript",
       "label": "typescript",
       "file_type": "concept",
       "source_file": "package.json",
@@ -645,7 +645,7 @@
       "source_location": "L57"
     },
     {
-      "id": "ref_typescript_eslint",
+      "id": "typescript_eslint",
       "label": "typescript-eslint",
       "file_type": "concept",
       "source_file": "package.json",
@@ -659,7 +659,7 @@
       "source_location": "L58"
     },
     {
-      "id": "ref_vite",
+      "id": "vite",
       "label": "vite",
       "file_type": "concept",
       "source_file": "package.json",
@@ -673,7 +673,7 @@
       "source_location": "L59"
     },
     {
-      "id": "ref_vite_plugin_top_level_await",
+      "id": "vite_plugin_top_level_await",
       "label": "vite-plugin-top-level-await",
       "file_type": "concept",
       "source_file": "package.json",
@@ -687,7 +687,7 @@
       "source_location": "L60"
     },
     {
-      "id": "ref_vite_plugin_wasm",
+      "id": "vite_plugin_wasm",
       "label": "vite-plugin-wasm",
       "file_type": "concept",
       "source_file": "package.json",
@@ -840,8 +840,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_epoch_protocol_epoch_intents_sdk",
+      "source": "$graphify-root$_package_dependencies_epoch_protocol_epoch_intents_sdk",
+      "target": "epoch_protocol_epoch_intents_sdk",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -859,8 +859,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_fontsource_variable_jetbrains_mono",
+      "source": "$graphify-root$_package_dependencies_fontsource_variable_jetbrains_mono",
+      "target": "fontsource_variable_jetbrains_mono",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -878,8 +878,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_metamask_sdk",
+      "source": "$graphify-root$_package_dependencies_metamask_sdk",
+      "target": "metamask_sdk",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -897,8 +897,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_miden_sdk_miden_sdk",
+      "source": "$graphify-root$_package_dependencies_miden_sdk_miden_sdk",
+      "target": "miden_sdk_miden_sdk",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -916,8 +916,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_miden_sdk_miden_wallet_adapter_base",
+      "source": "$graphify-root$_package_dependencies_miden_sdk_miden_wallet_adapter_base",
+      "target": "miden_sdk_miden_wallet_adapter_base",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -935,8 +935,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_miden_sdk_miden_wallet_adapter_react",
+      "source": "$graphify-root$_package_dependencies_miden_sdk_miden_wallet_adapter_react",
+      "target": "miden_sdk_miden_wallet_adapter_react",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -954,8 +954,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_miden_sdk_react",
+      "source": "$graphify-root$_package_dependencies_miden_sdk_react",
+      "target": "miden_sdk_react",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -973,8 +973,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_phosphor_icons_react",
+      "source": "$graphify-root$_package_dependencies_phosphor_icons_react",
+      "target": "phosphor_icons_react",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -992,8 +992,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_rainbow_me_rainbowkit",
+      "source": "$graphify-root$_package_dependencies_rainbow_me_rainbowkit",
+      "target": "rainbow_me_rainbowkit",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1011,8 +1011,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_tanstack_react_query",
+      "source": "$graphify-root$_package_dependencies_tanstack_react_query",
+      "target": "tanstack_react_query",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1030,8 +1030,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_class_variance_authority",
+      "source": "$graphify-root$_package_dependencies_class_variance_authority",
+      "target": "class_variance_authority",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1049,8 +1049,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_clsx",
+      "source": "$graphify-root$_package_dependencies_clsx",
+      "target": "clsx",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1068,8 +1068,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_radix_ui",
+      "source": "$graphify-root$_package_dependencies_radix_ui",
+      "target": "radix_ui",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1087,8 +1087,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_react",
+      "source": "$graphify-root$_package_dependencies_react",
+      "target": "react",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1106,8 +1106,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_react_dom",
+      "source": "$graphify-root$_package_dependencies_react_dom",
+      "target": "react_dom",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1125,8 +1125,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_shadcn",
+      "source": "$graphify-root$_package_dependencies_shadcn",
+      "target": "shadcn",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1144,8 +1144,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_sonner",
+      "source": "$graphify-root$_package_dependencies_sonner",
+      "target": "sonner",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1163,8 +1163,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_tailwind_merge",
+      "source": "$graphify-root$_package_dependencies_tailwind_merge",
+      "target": "tailwind_merge",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1182,8 +1182,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_tw_animate_css",
+      "source": "$graphify-root$_package_dependencies_tw_animate_css",
+      "target": "tw_animate_css",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1201,8 +1201,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_viem",
+      "source": "$graphify-root$_package_dependencies_viem",
+      "target": "viem",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1220,8 +1220,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_wagmi",
+      "source": "$graphify-root$_package_dependencies_wagmi",
+      "target": "wagmi",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1248,8 +1248,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_eslint_js",
+      "source": "$graphify-root$_package_devdependencies_eslint_js",
+      "target": "eslint_js",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1267,8 +1267,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_types_node",
+      "source": "$graphify-root$_package_devdependencies_types_node",
+      "target": "types_node",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1286,8 +1286,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_types_react",
+      "source": "$graphify-root$_package_devdependencies_types_react",
+      "target": "types_react",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1305,8 +1305,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_types_react_dom",
+      "source": "$graphify-root$_package_devdependencies_types_react_dom",
+      "target": "types_react_dom",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1324,8 +1324,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_vitejs_plugin_react",
+      "source": "$graphify-root$_package_devdependencies_vitejs_plugin_react",
+      "target": "vitejs_plugin_react",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1343,8 +1343,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_autoprefixer",
+      "source": "$graphify-root$_package_devdependencies_autoprefixer",
+      "target": "autoprefixer",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1362,8 +1362,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_eslint",
+      "source": "$graphify-root$_package_devdependencies_eslint",
+      "target": "eslint",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1381,8 +1381,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_eslint_plugin_react_hooks",
+      "source": "$graphify-root$_package_devdependencies_eslint_plugin_react_hooks",
+      "target": "eslint_plugin_react_hooks",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1400,8 +1400,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_eslint_plugin_react_refresh",
+      "source": "$graphify-root$_package_devdependencies_eslint_plugin_react_refresh",
+      "target": "eslint_plugin_react_refresh",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1419,8 +1419,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_globals",
+      "source": "$graphify-root$_package_devdependencies_globals",
+      "target": "globals",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1438,8 +1438,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_husky",
+      "source": "$graphify-root$_package_devdependencies_husky",
+      "target": "husky",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1457,8 +1457,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_lint_staged",
+      "source": "$graphify-root$_package_devdependencies_lint_staged",
+      "target": "lint_staged",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1476,8 +1476,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_postcss",
+      "source": "$graphify-root$_package_devdependencies_postcss",
+      "target": "postcss",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1495,8 +1495,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_prettier",
+      "source": "$graphify-root$_package_devdependencies_prettier",
+      "target": "prettier",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1514,8 +1514,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_tailwindcss",
+      "source": "$graphify-root$_package_devdependencies_tailwindcss",
+      "target": "tailwindcss",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1533,8 +1533,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_typescript",
+      "source": "$graphify-root$_package_devdependencies_typescript",
+      "target": "typescript",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1552,8 +1552,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_typescript_eslint",
+      "source": "$graphify-root$_package_devdependencies_typescript_eslint",
+      "target": "typescript_eslint",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1571,8 +1571,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_vite",
+      "source": "$graphify-root$_package_devdependencies_vite",
+      "target": "vite",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1590,8 +1590,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_vite_plugin_top_level_await",
+      "source": "$graphify-root$_package_devdependencies_vite_plugin_top_level_await",
+      "target": "vite_plugin_top_level_await",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
@@ -1609,8 +1609,8 @@
       "weight": 1.0
     },
     {
-      "source": "$graphify-root$_package_json",
-      "target": "ref_vite_plugin_wasm",
+      "source": "$graphify-root$_package_devdependencies_vite_plugin_wasm",
+      "target": "vite_plugin_wasm",
       "relation": "imports",
       "confidence": "EXTRACTED",
       "source_file": "package.json",

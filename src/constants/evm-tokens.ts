@@ -1,7 +1,10 @@
+import { zeroAddress } from "viem";
+
 /**
  * Canonical EVM testnet token list shared across all Epoch testnet EVM chains
  *
- * NOTE: these are SIO testnet mock contracts. Even tokens that have 6 decimals
+ * ETH uses the zero-address native-asset sentinel. The ERC-20 entries are SIO
+ * testnet mock contracts. Even tokens that have 6 decimals
  * on mainnet (USDC/USDT) are deployed here with **18 decimals**. Source of
  * truth: docs/docs-new/supported-chains-and-tokens.md
  *
@@ -36,6 +39,11 @@ export const EPOCH_TESTNET_TOKENS: EvmToken[] = [
     decimals: 18,
   },
   {
+    symbol: "ETH",
+    address: zeroAddress,
+    decimals: 18,
+  },
+  {
     symbol: "WBTC",
     address: "0x9b2a2754a9182fD65360E23afCDf3BeFF51796E9",
     decimals: 18,
@@ -61,6 +69,11 @@ export const EPOCH_TESTNET_TOKENS: EvmToken[] = [
     decimals: 18,
   },
 ];
+
+/** Native EVM ETH is represented by the zero address, separately from WETH. */
+export function isNativeEvmTokenAddress(address: string): boolean {
+  return address.trim().toLowerCase() === zeroAddress;
+}
 
 /** @deprecated Prefer `EPOCH_TESTNET_TOKENS`. */
 export const SEPOLIA_TESTNET_TOKENS = EPOCH_TESTNET_TOKENS;

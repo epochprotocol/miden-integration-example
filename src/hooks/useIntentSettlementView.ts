@@ -26,7 +26,7 @@ export function useIntentSettlementView(
     statuses,
     destinationChainId,
   );
-  const evmTransactionHash = completed?.transactionHash;
+  const evmTransactionHash = completed?.transactionHash ?? undefined;
 
   return {
     latestStatusLabel: latestStatus?.status

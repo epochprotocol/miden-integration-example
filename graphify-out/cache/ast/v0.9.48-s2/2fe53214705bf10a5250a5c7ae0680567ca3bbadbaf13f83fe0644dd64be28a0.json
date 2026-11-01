@@ -1,0 +1,101 @@
+{
+  "nodes": [
+    {
+      "id": "$graphify-root$_bridge_random_run_report_md",
+      "label": "bridge-random-run-report.md",
+      "file_type": "document",
+      "node_kind": "page",
+      "source_file": "bridge-random-run-report.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "$graphify-root$_bridge_random_run_report_random_bridge_run_report",
+      "label": "Random bridge run report",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "bridge-random-run-report.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "$graphify-root$_bridge_random_run_report_run_summary",
+      "label": "Run summary",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "bridge-random-run-report.md",
+      "source_location": "L8"
+    },
+    {
+      "id": "$graphify-root$_bridge_random_run_report_transactions",
+      "label": "Transactions",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "bridge-random-run-report.md",
+      "source_location": "L17"
+    },
+    {
+      "id": "$graphify-root$_bridge_random_run_report_service_logs_and_observations",
+      "label": "Service logs and observations",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "bridge-random-run-report.md",
+      "source_location": "L27"
+    },
+    {
+      "id": "$graphify-root$_bridge_random_run_report_identifiers",
+      "label": "Identifiers",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "bridge-random-run-report.md",
+      "source_location": "L35"
+    }
+  ],
+  "edges": [
+    {
+      "source": "$graphify-root$_bridge_random_run_report_md",
+      "target": "$graphify-root$_bridge_random_run_report_random_bridge_run_report",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bridge-random-run-report.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_bridge_random_run_report_random_bridge_run_report",
+      "target": "$graphify-root$_bridge_random_run_report_run_summary",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bridge-random-run-report.md",
+      "source_location": "L8",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_bridge_random_run_report_random_bridge_run_report",
+      "target": "$graphify-root$_bridge_random_run_report_transactions",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bridge-random-run-report.md",
+      "source_location": "L17",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_bridge_random_run_report_random_bridge_run_report",
+      "target": "$graphify-root$_bridge_random_run_report_service_logs_and_observations",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bridge-random-run-report.md",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_bridge_random_run_report_random_bridge_run_report",
+      "target": "$graphify-root$_bridge_random_run_report_identifiers",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "bridge-random-run-report.md",
+      "source_location": "L35",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}
