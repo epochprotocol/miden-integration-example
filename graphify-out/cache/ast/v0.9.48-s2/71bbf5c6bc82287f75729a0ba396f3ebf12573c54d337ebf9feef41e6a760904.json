@@ -1,0 +1,135 @@
+{
+  "nodes": [
+    {
+      "id": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_md",
+      "label": "2026-10-25-evm-mainnet-chains-design.md",
+      "file_type": "document",
+      "node_kind": "page",
+      "source_file": "docs/superpowers/specs/2026-10-25-evm-mainnet-chains-design.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_evm_mainnet_chains_design",
+      "label": "EVM Mainnet Chains Design",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "docs/superpowers/specs/2026-10-25-evm-mainnet-chains-design.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_intent",
+      "label": "Intent",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "docs/superpowers/specs/2026-10-25-evm-mainnet-chains-design.md",
+      "source_location": "L3"
+    },
+    {
+      "id": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_goals",
+      "label": "Goals",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "docs/superpowers/specs/2026-10-25-evm-mainnet-chains-design.md",
+      "source_location": "L7"
+    },
+    {
+      "id": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_non_goals",
+      "label": "Non-goals",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "docs/superpowers/specs/2026-10-25-evm-mainnet-chains-design.md",
+      "source_location": "L15"
+    },
+    {
+      "id": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_approaches",
+      "label": "Approaches",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "docs/superpowers/specs/2026-10-25-evm-mainnet-chains-design.md",
+      "source_location": "L21"
+    },
+    {
+      "id": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_implementation_calls",
+      "label": "Implementation calls",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "docs/superpowers/specs/2026-10-25-evm-mainnet-chains-design.md",
+      "source_location": "L27"
+    },
+    {
+      "id": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_constraints",
+      "label": "Constraints",
+      "file_type": "document",
+      "node_kind": "heading",
+      "source_file": "docs/superpowers/specs/2026-10-25-evm-mainnet-chains-design.md",
+      "source_location": "L35"
+    }
+  ],
+  "edges": [
+    {
+      "source": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_md",
+      "target": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_evm_mainnet_chains_design",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-10-25-evm-mainnet-chains-design.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_evm_mainnet_chains_design",
+      "target": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_intent",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-10-25-evm-mainnet-chains-design.md",
+      "source_location": "L3",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_evm_mainnet_chains_design",
+      "target": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_goals",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-10-25-evm-mainnet-chains-design.md",
+      "source_location": "L7",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_evm_mainnet_chains_design",
+      "target": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_non_goals",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-10-25-evm-mainnet-chains-design.md",
+      "source_location": "L15",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_evm_mainnet_chains_design",
+      "target": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_approaches",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-10-25-evm-mainnet-chains-design.md",
+      "source_location": "L21",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_evm_mainnet_chains_design",
+      "target": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_implementation_calls",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-10-25-evm-mainnet-chains-design.md",
+      "source_location": "L27",
+      "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_evm_mainnet_chains_design",
+      "target": "$graphify-root$_docs_superpowers_specs_2026_10_25_evm_mainnet_chains_design_constraints",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/superpowers/specs/2026-10-25-evm-mainnet-chains-design.md",
+      "source_location": "L35",
+      "weight": 1.0
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

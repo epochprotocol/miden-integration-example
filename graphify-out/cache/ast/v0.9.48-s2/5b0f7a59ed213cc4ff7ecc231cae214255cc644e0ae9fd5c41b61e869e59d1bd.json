@@ -50,6 +50,27 @@
       "source_location": "L8"
     },
     {
+      "id": "ref_es2022",
+      "label": "ES2022",
+      "file_type": "concept",
+      "source_file": "tsconfig.json",
+      "source_location": "L8"
+    },
+    {
+      "id": "ref_dom",
+      "label": "DOM",
+      "file_type": "concept",
+      "source_file": "tsconfig.json",
+      "source_location": "L8"
+    },
+    {
+      "id": "ref_dom_iterable",
+      "label": "DOM.Iterable",
+      "file_type": "concept",
+      "source_file": "tsconfig.json",
+      "source_location": "L8"
+    },
+    {
       "id": "$graphify-root$_tsconfig_compileroptions_module",
       "label": "module",
       "file_type": "code",
@@ -60,6 +81,20 @@
       "id": "$graphify-root$_tsconfig_compileroptions_types",
       "label": "types",
       "file_type": "code",
+      "source_file": "tsconfig.json",
+      "source_location": "L12"
+    },
+    {
+      "id": "ref_vite_client",
+      "label": "vite/client",
+      "file_type": "concept",
+      "source_file": "tsconfig.json",
+      "source_location": "L12"
+    },
+    {
+      "id": "ref_node",
+      "label": "node",
+      "file_type": "concept",
       "source_file": "tsconfig.json",
       "source_location": "L12"
     },
@@ -174,6 +209,20 @@
       "file_type": "code",
       "source_file": "tsconfig.json",
       "source_location": "L36"
+    },
+    {
+      "id": "ref_src",
+      "label": "src",
+      "file_type": "concept",
+      "source_file": "tsconfig.json",
+      "source_location": "L36"
+    },
+    {
+      "id": "ref_vite_config_ts",
+      "label": "vite.config.ts",
+      "file_type": "concept",
+      "source_file": "tsconfig.json",
+      "source_location": "L36"
     }
   ],
   "edges": [
@@ -232,6 +281,36 @@
       "weight": 1.0
     },
     {
+      "source": "$graphify-root$_tsconfig_compileroptions_lib",
+      "target": "ref_es2022",
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "tsconfig.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "$graphify-root$_tsconfig_compileroptions_lib",
+      "target": "ref_dom",
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "tsconfig.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "$graphify-root$_tsconfig_compileroptions_lib",
+      "target": "ref_dom_iterable",
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "tsconfig.json",
+      "source_location": "L8",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
       "source": "$graphify-root$_tsconfig_compileroptions",
       "target": "$graphify-root$_tsconfig_compileroptions_module",
       "relation": "contains",
@@ -248,6 +327,26 @@
       "source_file": "tsconfig.json",
       "source_location": "L12",
       "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_tsconfig_compileroptions_types",
+      "target": "ref_vite_client",
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "tsconfig.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "$graphify-root$_tsconfig_compileroptions_types",
+      "target": "ref_node",
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "tsconfig.json",
+      "source_location": "L12",
+      "weight": 1.0,
+      "context": "import"
     },
     {
       "source": "$graphify-root$_tsconfig_compileroptions",
@@ -392,6 +491,26 @@
       "source_file": "tsconfig.json",
       "source_location": "L36",
       "weight": 1.0
+    },
+    {
+      "source": "$graphify-root$_tsconfig_include",
+      "target": "ref_src",
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "tsconfig.json",
+      "source_location": "L36",
+      "weight": 1.0,
+      "context": "import"
+    },
+    {
+      "source": "$graphify-root$_tsconfig_include",
+      "target": "ref_vite_config_ts",
+      "relation": "extends",
+      "confidence": "EXTRACTED",
+      "source_file": "tsconfig.json",
+      "source_location": "L36",
+      "weight": 1.0,
+      "context": "import"
     }
   ]
 }
